@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.backend.config.auth.PrincipalDetails;
-import com.example.backend.mapper.EmployeeMapper;
-import com.example.backend.model.EmployeeDto;
+import com.example.backend.employee.mapper.EmployeeMapper;
+import com.example.backend.employee.dto.response.EmployeeResDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,7 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void setSecurityContext(HttpServletResponse response, String username) {
-        EmployeeDto employee = employeeMapper.findByLoginId(username);
+        EmployeeResDto employee = employeeMapper.findByLoginId(username);
         if (employee == null) {
             response.setHeader("WWW-Authenticate", "Bearer error=\"invalid_token\"");
             response.setStatus(403);

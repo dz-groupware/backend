@@ -1,6 +1,6 @@
 package com.example.backend.config.auth;
 
-import com.example.backend.model.EmployeeDto;
+import com.example.backend.employee.dto.response.EmployeeResDto;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,9 +10,9 @@ import java.util.Collection;
 
 @Data
 public class PrincipalDetails implements UserDetails {
-    private final EmployeeDto employee;
+    private final EmployeeResDto employee;
 
-    public PrincipalDetails(EmployeeDto employee) {
+    public PrincipalDetails(EmployeeResDto employee) {
         this.employee = employee;
     }
 

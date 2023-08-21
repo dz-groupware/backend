@@ -2,7 +2,7 @@ package com.example.backend.config;
 
 import com.example.backend.config.jwt.JwtAuthenticationFilter;
 import com.example.backend.config.jwt.JwtAuthorizationFilter;
-import com.example.backend.mapper.EmployeeMapper;
+import com.example.backend.employee.mapper.EmployeeMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

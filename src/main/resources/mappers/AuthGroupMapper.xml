@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.backend.mapper.AuthGroupMapper">
-    <select id="getAllAuthGroups" resultType="AuthGroupDto">
+<mapper namespace="com.example.backend.authgroup.mapper.AuthGroupMapper">
+    <select id="getAllAuthGroups" resultType="com.example.backend.authgroup.dto.response.AuthResDto">
         SELECT a.*, c.name
-        FROM auth_group a
+        FROM auth a
         JOIN company c ON a.company_id = c.id
         WHERE c.id = #{companyId}
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="getAuthGroupCount" resultType="int">
-        SELECT COUNT(*) FROM TABLE
+    <select id="getTotalElements" resultType="long">
+        SELECT COUNT(*) FROM auth;
     </select>
 
 </mapper>

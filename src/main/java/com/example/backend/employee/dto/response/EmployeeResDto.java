@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.employee.dto.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EmployeeDto {
+public class EmployeeResDto {
     private Long id;
     private Long userId;
     private String empName;

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.backend.mapper.EmployeeMapper">
+<mapper namespace="com.example.backend.employee.mapper.EmployeeMapper">
 
-    <select id="findAll" resultType="com.example.backend.model.EmployeeDto">
+    <select id="findAll" resultType="com.example.backend.employee.dto.response.EmployeeResDto">
         SELECT * FROM employee
     </select>
 
-    <select id="findById" resultType="com.example.backend.model.EmployeeDto">
+    <select id="findById" resultType="com.example.backend.employee.dto.response.EmployeeResDto">
         SELECT * FROM employee WHERE id = #{id}
     </select>
 
-    <select id="findByLoginId" resultType="com.example.backend.model.EmployeeDto">
+    <select id="findByLoginId" resultType="com.example.backend.employee.dto.response.EmployeeResDto">
         SELECT * FROM employee WHERE login_Id = #{loginId}
     </select>
 
@@ -26,5 +26,9 @@
     <delete id="delete">
         DELETE FROM employee WHERE id = #{id}
     </delete>
+
+    <select id="getTotalElements" resultType="long">
+        SELECT COUNT(*) FROM employee;
+    </select>
 
 </mapper>

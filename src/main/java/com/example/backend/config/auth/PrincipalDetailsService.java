@@ -1,7 +1,7 @@
 package com.example.backend.config.auth;
 
-import com.example.backend.mapper.EmployeeMapper;
-import com.example.backend.model.EmployeeDto;
+import com.example.backend.employee.mapper.EmployeeMapper;
+import com.example.backend.employee.dto.response.EmployeeResDto;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +21,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        EmployeeDto employee = employeeMapper.findByLoginId(username);
+        EmployeeResDto employee = employeeMapper.findByLoginId(username);
         if (employee == null) {
             throw new UsernameNotFoundException("Employee not found");
         }

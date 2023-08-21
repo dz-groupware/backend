@@ -1,7 +1,7 @@
-package com.example.backend.service;
+package com.example.backend.employee.service;
 
-import com.example.backend.model.EmployeeDto;
-import com.example.backend.mapper.EmployeeMapper;
+import com.example.backend.employee.dto.response.EmployeeResDto;
+import com.example.backend.employee.mapper.EmployeeMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,32 +16,37 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeDto> findAll() {
+    public List<EmployeeResDto> findAll() {
         return employeeMapper.findAll();
     }
 
     @Override
-    public EmployeeDto findById(Long id) {
+    public EmployeeResDto findById(Long id) {
         return employeeMapper.findById(id);
     }
 
     @Override
-    public EmployeeDto findByLoginId(String loginId) {
+    public EmployeeResDto findByLoginId(String loginId) {
         return employeeMapper.findByLoginId(loginId);
     }
 
     @Override
-    public void insert(EmployeeDto employee) {
+    public void insert(EmployeeResDto employee) {
         employeeMapper.insert(employee);
     }
 
     @Override
-    public void update(EmployeeDto employee) {
+    public void update(EmployeeResDto employee) {
         employeeMapper.update(employee);
     }
 
     @Override
     public void delete(Long id) {
         employeeMapper.delete(id);
+    }
+
+    @Override
+    public long getTotalElements() {
+        return employeeMapper.getTotalElements();
     }
 }

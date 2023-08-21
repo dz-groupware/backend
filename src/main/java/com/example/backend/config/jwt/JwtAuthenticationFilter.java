@@ -4,8 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.config.auth.PrincipalDetails;
-import com.example.backend.model.EmployeeDto;
-import com.example.backend.model.LoginDto;
+import com.example.backend.employee.dto.response.EmployeeResDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,9 +36,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
 
-            LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
-            System.out.println(loginDto.toString());
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getLoginId(),loginDto.getLoginPw());
+            LoginReqDto loginReqDto = objectMapper.readValue(request.getInputStream(), LoginReqDto.class);
+            System.out.println(loginReqDto.toString());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw());
 
             // authenticationManager 로 로그인 시도를 하면
             // principalDetailsService 의 loadUserByUsername() 가 실행된 후 정상이면 authentication 이 리텀됨
@@ -66,9 +65,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader("Authorization", "Bearer " + jwtToken);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        EmployeeDto employee = principalDetails.getEmployee();
+        EmployeeResDto employee = principalDetails.getEmployee();
 
-        SingleResponseDto<EmployeeDto> responseBody = new SingleResponseDto<>(principalDetails.getEmployee());
+        SingleResponseDto<EmployeeResDto> responseBody = new SingleResponseDto<>(principalDetails.getEmployee());
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
         response.getWriter().flush();
     }

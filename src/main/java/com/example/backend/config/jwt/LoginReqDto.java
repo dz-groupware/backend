@@ -1,13 +1,12 @@
-package com.example.backend.model;
+package com.example.backend.config.jwt;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Getter
-public class LoginDto {
+public class LoginReqDto {
     private String loginId;
     private String loginPw;
 }
