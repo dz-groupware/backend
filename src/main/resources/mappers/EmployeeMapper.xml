@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.backend.mapper.EmployeeMapper">
+
+    <select id="findAll" resultType="com.example.backend.model.EmployeeDto">
+        SELECT * FROM employee
+    </select>
+
+    <select id="findById" resultType="com.example.backend.model.EmployeeDto">
+        SELECT * FROM employee WHERE id = #{id}
+    </select>
+
+    <select id="findByLoginId" resultType="com.example.backend.model.EmployeeDto">
+        SELECT * FROM employee WHERE login_Id = #{loginId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO employee (name, position, department, salary) VALUES (#{name}, #{position}, #{department}, #{salary})
+    </insert>
+
+    <update id="update">
+        UPDATE employee SET name = #{name}, position = #{position}, department = #{department}, salary = #{salary} WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM employee WHERE id = #{id}
+    </delete>
+
+</mapper>
