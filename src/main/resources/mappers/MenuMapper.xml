@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.menu.mapper.MenuMapper">
+
+    <select id="getMenuByEmpId" resultType="com.example.backend.menu.dto.MenuRes">
+        SELECT MENU_ID, PAR_ID, NAME, ICON_URL FROM MENU ,
+        (SELECT MENU_ID FROM MENU_AUTH
+        , (SELECT AUTH_ID FROM EMP_AUTH WHERE EMP_ID=#{empId})A
+        WHERE MENU_AUTH.AUTH_ID = A.AUTH_ID)B
+        WHERE MENU.ID = B.MENU_ID;
+    </select>
+
+    <select id="getFavorByEmpId" resultType="com.example.backend.menu.dto.MenuRes">
+        SELECT menu_id, par_id, name, icon_url FROM MENU,
+        (SELECT * FROM FAVOR WHERE EMP_ID=#{empId})B WHERE MENU.ID = B.MENU_ID;
+    </select>
+
+    <delete id="deleteFavor">
+        DELETE FROM FAVOR
+        <where>
+            EMP_ID=#{empId} and MENU_ID=#{menuId}
+        </where>
+    </delete>
+</mapper>
