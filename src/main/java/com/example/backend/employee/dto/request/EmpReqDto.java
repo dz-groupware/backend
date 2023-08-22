@@ -1,4 +1,4 @@
-package com.example.backend.employee.dto.response;
+package com.example.backend.employee.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EmployeeResDto {
+public class EmpReqDto {
     private Long id;
     private Long userId;
     private String empName;

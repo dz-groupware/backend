@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.config.auth.PrincipalDetails;
-import com.example.backend.employee.dto.response.EmployeeResDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -65,9 +64,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader("Authorization", "Bearer " + jwtToken);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        EmployeeResDto employee = principalDetails.getEmployee();
+        EmployeeReqDto employee = principalDetails.getEmployee();
 
-        SingleResponseDto<EmployeeResDto> responseBody = new SingleResponseDto<>(principalDetails.getEmployee());
+        SingleResponseDto<EmployeeReqDto> responseBody = new SingleResponseDto<>(principalDetails.getEmployee());
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
         response.getWriter().flush();
     }

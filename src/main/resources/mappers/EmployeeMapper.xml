@@ -3,27 +3,27 @@
 
 <mapper namespace="com.example.backend.employee.mapper.EmployeeMapper">
 
-    <select id="findAll" resultType="com.example.backend.employee.dto.response.EmployeeResDto">
+    <select id="findPage" resultType="com.example.backend.employee.dto.response.EmpResDto">
         SELECT * FROM employee
     </select>
 
-    <select id="findById" resultType="com.example.backend.employee.dto.response.EmployeeResDto">
+    <select id="findById" resultType="com.example.backend.employee.dto.response.EmpResDto">
         SELECT * FROM employee WHERE id = #{id}
     </select>
 
-    <select id="findByLoginId" resultType="com.example.backend.employee.dto.response.EmployeeResDto">
+    <select id="findByLoginId" resultType="com.example.backend.employee.dto.response.EmpResDto">
         SELECT * FROM employee WHERE login_Id = #{loginId}
     </select>
 
-    <insert id="insert">
+    <insert id="addEmployee">
         INSERT INTO employee (name, position, department, salary) VALUES (#{name}, #{position}, #{department}, #{salary})
     </insert>
 
-    <update id="update">
+    <update id="modifyEmployee">
         UPDATE employee SET name = #{name}, position = #{position}, department = #{department}, salary = #{salary} WHERE id = #{id}
     </update>
 
-    <delete id="delete">
+    <delete id="removeEmployee">
         DELETE FROM employee WHERE id = #{id}
     </delete>
 

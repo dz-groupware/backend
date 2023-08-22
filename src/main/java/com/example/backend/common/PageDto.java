@@ -14,7 +14,7 @@ public class PageDto {
     private long totalElements;
     private long totalPages;
 
-    public PageDto(int pageNumber,int pageSize, long totalElements) {
+    public PageDto(int pageNumber, int pageSize, long totalElements) {
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.totalElements = totalElements;

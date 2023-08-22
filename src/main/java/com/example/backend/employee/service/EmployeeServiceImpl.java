@@ -1,6 +1,7 @@
 package com.example.backend.employee.service;
 
-import com.example.backend.employee.dto.response.EmployeeResDto;
+import com.example.backend.employee.dto.request.EmpReqDto;
+import com.example.backend.employee.dto.response.EmpResDto;
 import com.example.backend.employee.mapper.EmployeeMapper;
 import org.springframework.stereotype.Service;
 
@@ -16,33 +17,34 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeResDto> findAll() {
-        return employeeMapper.findAll();
+    public List<EmpReqDto> findEmpList(Long companyId, int pageNumber, int pageSize) {
+        int offset = (pageNumber-1) * pageSize;
+        return employeeMapper.findEmpList(companyId, offset, pageSize);
     }
 
     @Override
-    public EmployeeResDto findById(Long id) {
+    public EmpResDto findById(Long id) {
         return employeeMapper.findById(id);
     }
 
     @Override
-    public EmployeeResDto findByLoginId(String loginId) {
+    public EmpResDto findByLoginId(String loginId) {
         return employeeMapper.findByLoginId(loginId);
     }
 
     @Override
-    public void insert(EmployeeResDto employee) {
-        employeeMapper.insert(employee);
+    public void addEmployee(EmpReqDto employee) {
+        employeeMapper.addEmployee(employee);
     }
 
     @Override
-    public void update(EmployeeResDto employee) {
-        employeeMapper.update(employee);
+    public void modifyEmployee(EmpReqDto employee) {
+        employeeMapper.modifyEmployee(employee);
     }
 
     @Override
-    public void delete(Long id) {
-        employeeMapper.delete(id);
+    public void removeEmployee(Long id) {
+        employeeMapper.removeEmployee(id);
     }
 
     @Override

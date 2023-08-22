@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface AuthGroupMapper {
-    List<AuthResDto> findAuthList(long companyId, long offset, int limit);
+public interface AuthMapper {
+    List<AuthResDto> findAuthList(Long companyId, long offset, int limit);
     long getTotalElements();
 }
