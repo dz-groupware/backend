@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.modal.mapper.ModalMapper">
+
+    <!-- emp_id 에 대한 모든 프로필 정보 가져오기 -->
+    <select id="getProfile" resultType="com.example.backend.modal.dto.ModalRes">
+        select employee.id AS emp_id, employee.emp_name as name, employee.p_img as p_img,
+        company.name as comp_name ,  department.name  as dept_name from employee
+        join department_employee on department_employee.emp_id = employee.user_id
+        join company_employee on company_employee.emp_id = employee.user_id
+        join company on company_employee.comp_id = company.id
+        join department on department_employee.dept_id = department.id
+        where employee.user_id=#{empId};
+    </select>
+
+    <!-- emp_id가 속한 회사 리스트 가져오기 -->
+    <select id="getCompList" resultType="com.example.backend.modal.dto.TreeRes">
+        select company.id, company.name from company_employee
+        join company on company_employee.comp_id = company.id
+        where emp_id=#{empId};
+    </select>
+
+    <!-- 회사 선택 시 가장 상위 부서 가져오기 -->
+    <select id="getDeptList1" resultType="com.example.backend.modal.dto.TreeRes">
+        select id, name from department where comp_id=#{compId} and id = par_id;
+    </select>
+
+    <!-- 부서 선택 시 하위 부서 가져오기 -->
+    <select id="getDeptList2" resultType="com.example.backend.modal.dto.TreeRes">
+        select id, name from department where comp_id=#{compId} and par_id=#{deptId} and id!=#{deptId};
+    </select>
+
+    <!-- 회사 선택 시 사원 리스트 가져오기 -->
+    <select id="getCompEmpList" resultType="com.example.backend.modal.dto.EmpRes">
+        SELECT employee.id as id, emp_name as name, login_id as loginId, mobile_number as number, p_img as pImg
+        FROM employee
+        join company_employee on comp_id =#{compId}
+        where employee.id = company_employee.emp_id;
+    </select>
+
+    <!-- 부서 선택 시 사원 리스트 가져오기 -->
+    <select id="getDeptEmpList" resultType="com.example.backend.modal.dto.EmpRes">
+        SELECT employee.id as id, emp_name as name, login_id as loginId, mobile_number as number, p_img as pImg
+        FROM employee
+        join department_employee on dept_id =#{deptId}
+        where employee.id = department_employee.emp_id;
+    </select>
+
+</mapper>
