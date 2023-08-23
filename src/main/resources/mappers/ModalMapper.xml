@@ -3,7 +3,7 @@
 <mapper namespace="com.example.backend.modal.mapper.ModalMapper">
 
     <!-- emp_id 에 대한 모든 프로필 정보 가져오기 -->
-    <select id="getProfile" resultType="com.example.backend.modal.dto.ModalRes">
+    <select id="getProfile" resultType="com.example.backend.modal.dto.ProfileRes">
         select employee.id AS emp_id, employee.emp_name as name, employee.p_img as p_img,
         company.name as comp_name ,  department.name  as dept_name from employee
         join department_employee on department_employee.emp_id = employee.user_id

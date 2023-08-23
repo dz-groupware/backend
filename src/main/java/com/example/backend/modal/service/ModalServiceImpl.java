@@ -1,7 +1,7 @@
 package com.example.backend.modal.service;
 
 import com.example.backend.modal.dto.EmpRes;
-import com.example.backend.modal.dto.ModalRes;
+import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeRes;
 import com.example.backend.modal.mapper.ModalMapper;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class ModalServiceImpl implements ModalService {
     }
 
     @Override
-    public List<ModalRes> getProfile(Long empId){
+    public List<ProfileRes> getProfile(Long empId){
         return modalMapper.getProfile(empId);
     }
 

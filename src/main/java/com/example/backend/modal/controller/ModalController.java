@@ -1,10 +1,8 @@
 package com.example.backend.modal.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.menu.dto.MenuRes;
-import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.dto.EmpRes;
-import com.example.backend.modal.dto.ModalRes;
+import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeRes;
 import com.example.backend.modal.service.ModalService;
 import org.springframework.http.HttpStatus;
@@ -27,7 +25,7 @@ public class ModalController {
 
     @GetMapping("/profile")
     public ResponseEntity getProfile(@RequestParam Long empId) {
-        return new ResponseEntity(new SingleResponseDto<List<ModalRes>>(modalService.getProfile(empId)), HttpStatus.OK);
+        return new ResponseEntity(new SingleResponseDto<List<ProfileRes>>(modalService.getProfile(empId)), HttpStatus.OK);
     }
     @GetMapping("/org/tree")
     public ResponseEntity getOrgTree(@RequestParam String type, @RequestParam(required = false) Long empId, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {

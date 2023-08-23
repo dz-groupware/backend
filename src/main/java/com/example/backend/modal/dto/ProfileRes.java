@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ModalRes {
+public class ProfileRes {
     private Long empId;
     private String name;
     private String pImg;
