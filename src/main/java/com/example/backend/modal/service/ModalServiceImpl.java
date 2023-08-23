@@ -28,7 +28,7 @@ public class ModalServiceImpl implements ModalService {
             return modalMapper.getCompList(empId);
         }
         if (type.equals("Dept1")){
-            return modalMapper.getDeptList1(empId);
+            return modalMapper.getDeptList1(compId);
         }
         if (type.equals("Dept2")){
             return modalMapper.getDeptList2(compId, deptId);
