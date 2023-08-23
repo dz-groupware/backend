@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.backend.employee.mapper.EmployeeMapper">
 
-    <select id="findPage" resultType="com.example.backend.employee.dto.response.EmpResDto">
-        SELECT * FROM employee
-    </select>
+  <delete id="removeEmployee">
+    DELETE FROM employee WHERE id = #{id}
+  </delete>
 
-    <select id="findById" resultType="com.example.backend.employee.dto.response.EmpResDto">
-        SELECT * FROM employee WHERE id = #{id}
-    </select>
+  <insert id="addEmployee">
+    INSERT INTO employee (name, position, department, salary) VALUES (#{name}, #{position},
+    #{department},
+    #{salary})
+  </insert>
 
-    <select id="findByLoginId" resultType="com.example.backend.employee.dto.response.EmpResDto">
-        SELECT * FROM employee WHERE login_Id = #{loginId}
-    </select>
+  <select id="findByLoginId" resultType="com.example.backend.employee.dto.EmployeeResDto">
+    SELECT * FROM employee WHERE login_Id = #{loginId}
+  </select>
 
-    <insert id="addEmployee">
-        INSERT INTO employee (name, position, department, salary) VALUES (#{name}, #{position}, #{department}, #{salary})
-    </insert>
+  <select id="findEmpList" resultType="com.example.backend.employee.dto.EmployeeResDto">
+    SELECT
+    c.name AS comp_name,
+    e.name AS emp_name,
+    e.position AS position,
+    ce.join_date AS join_date
+    FROM
+    comp_emp ce
+    JOIN
+    company c ON ce.comp_id = c.id
+    JOIN
+    employee e ON ce.emp_id = e.id
+  </select>
 
-    <update id="modifyEmployee">
-        UPDATE employee SET name = #{name}, position = #{position}, department = #{department}, salary = #{salary} WHERE id = #{id}
-    </update>
+  <select id="findById" resultType="com.example.backend.employee.dto.EmployeeResDto">
+    SELECT * FROM employee WHERE id = #{id}
+  </select>
 
-    <delete id="removeEmployee">
-        DELETE FROM employee WHERE id = #{id}
-    </delete>
+  <select id="getTotalElements" resultType="long">
+    SELECT COUNT(*) FROM employee;
+  </select>
 
-    <select id="getTotalElements" resultType="long">
-        SELECT COUNT(*) FROM employee;
-    </select>
+  <update id="modifyEmployee">
+    UPDATE employee SET name = #{name}, position = #{position}, department = #{department}, salary =
+    #{salary} WHERE
+    id = #{id}
+  </update>
 
 </mapper>
