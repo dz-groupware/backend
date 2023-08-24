@@ -8,6 +8,9 @@ import java.util.List;
 @Mapper
 public interface SettingMapper {
     List<MenuRes> getMenuDetailById(Long menuId);
+
+    List<MenuRes> getMenuDetailByName(Long menuId);
+
     int insertMenuById(MenuRes menu);
     int updateMenuImgById(int menuId, byte[] iconFile);
 
