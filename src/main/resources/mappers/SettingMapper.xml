@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.setting.mapper.SettingMapper">
+
+    <!-- 메뉴 설정 페이지 : 메뉴 선택 시 메뉴 상세 정보 가져오기 -->
+    <select id="getMenuDetailById" resultType="com.example.backend.setting.dto.MenuRes">
+        select name, enabled_YN, sort_order from menu where id=#{menuId};
+    </select>
+
+    <!-- 메뉴 검색 : 메뉴 명으로 검색 -->
+    <select id="getMenuDetailByName" resultType="com.example.backend.setting.dto.MenuRes">
+        select name, enabled_YN, sort_order from menu where name=#{text};
+    </select>
+
+    <!-- 메뉴 추가 : 메뉴 추가 (데이터) -->
+    <insert id="insertMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
+        insert into menu(id, par_id, name, enabled_YN, icon_url, icon_file, sort_order, tree_path, child_node_YN)
+        values( #{id}, #{parId}, #{name}, #{enabledYN}, #{iconUrl}, #{iconFile}, #{sortOrder}, #{treePath} , #{childNodeYN});
+    </insert>
+    <!-- 메뉴 추가 : 메뉴 추가 (이미지) -->
+    <update id="updateMenuImgById" parameterType="com.example.backend.setting.dto.MenuRes">
+        update menu set icon_file = #{iconFile} where id = #{menuId};
+    </update>
+
+    <!-- 메뉴 저장 : 메뉴 정보 수정 요청 -->
+    <update id="updateMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
+        update menu set par_id = #{parId}, name = '#{name}', enabled_YN = #{enabledYN},
+        icon_url = '#{iconUrl}', icon_file = #{iconFile}, sort_order = #{sortOrder},
+        tree_path = '#{treePath}', child_node_YN = #{childNodeYN} where id = #{menuId};
+    </update>
+
+    <!-- 메뉴 아이콘 : 모든 기본 아이콘 가져오기 -->
+
+</mapper>
