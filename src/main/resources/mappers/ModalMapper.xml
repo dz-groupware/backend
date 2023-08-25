@@ -4,8 +4,8 @@
 
     <!-- emp_id 에 대한 모든 프로필 정보 가져오기 -->
     <select id="getProfile" resultType="com.example.backend.modal.dto.ProfileRes">
-        select employee.id AS emp_id, employee.emp_name as name, employee.p_img as p_img,
-        company.name as comp_name ,  department.name  as dept_name from employee
+        select employee.id AS empId, employee.name as name, employee.image_url as pImg,
+        company.name as compName ,  department.name  as deptName from employee
         join department_employee on department_employee.emp_id = employee.user_id
         join company_employee on company_employee.emp_id = employee.user_id
         join company on company_employee.comp_id = company.id
@@ -32,7 +32,7 @@
 
     <!-- 회사 선택 시 사원 리스트 가져오기 -->
     <select id="getCompEmpList" resultType="com.example.backend.modal.dto.EmpRes">
-        SELECT employee.id as id, emp_name as name, login_id as loginId, mobile_number as number, p_img as pImg
+        SELECT employee.id as id, name, login_id as loginId, mobile_number as number, image_url as pImg
         FROM employee
         join company_employee on comp_id =#{compId}
         where employee.id = company_employee.emp_id;
@@ -40,7 +40,7 @@
 
     <!-- 부서 선택 시 사원 리스트 가져오기 -->
     <select id="getDeptEmpList" resultType="com.example.backend.modal.dto.EmpRes">
-        SELECT employee.id as id, emp_name as name, login_id as loginId, mobile_number as number, p_img as pImg
+        SELECT employee.id as id, name, login_id as loginId, mobile_number as number, image_url as pImg
         FROM employee
         join department_employee on dept_id =#{deptId}
         where employee.id = department_employee.emp_id;

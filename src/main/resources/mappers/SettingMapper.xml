@@ -14,13 +14,13 @@
 
     <!-- 메뉴 추가 : 메뉴 추가 (데이터) -->
     <insert id="insertMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
-        insert into menu(id, par_id, name, enabled_YN, icon_url, icon_file, sort_order, tree_path, child_node_YN)
-        values( #{id}, #{parId}, #{name}, #{enabledYN}, #{iconUrl}, #{iconFile}, #{sortOrder}, #{treePath} , #{childNodeYN});
+        insert into menu(id, par_id, name, enabled_YN, icon_url, sort_order, name_tree, id_tree, child_node_YN, admin_yn)
+        values( #{id}, #{parId}, #{name}, #{enabledYN}, #{iconUrl}, #{sortOrder}, #{nameTree}, #{idTree}, #{childNodeYN}, #{adminYN});
     </insert>
-    <!-- 메뉴 추가 : 메뉴 추가 (이미지) -->
+
+    <!-- 메뉴 추가 : 메뉴 추가 (이미지)
     <update id="updateMenuImgById" parameterType="com.example.backend.setting.dto.MenuRes">
         update menu set icon_file = #{iconFile} where id = #{menuId};
     </update>
-
-
+    -->
 </mapper>

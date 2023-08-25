@@ -13,9 +13,10 @@ public class MenuRes {
     private String name = "0";
     private int enabledYN = 0;
     private String iconUrl = "0";
-    private byte[] iconFile = new byte[0];
     private int sortOrder = 0;
-    private String treePath = "0";
+    private String nameTree = "0";
+    private String idTree = "0";
     private int childNodeYN=0;
+    private int adminYN=0;
 
 }

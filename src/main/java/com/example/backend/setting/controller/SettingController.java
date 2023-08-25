@@ -8,8 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.crypto.Data;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static java.time.LocalTime.now;
 
 @RestController
 @RequestMapping("/setting")
@@ -27,23 +31,17 @@ public class SettingController {
 
     @PostMapping("/menu")
     public ResponseEntity updateMenuById(@RequestBody MenuRes menu) {
-        System.out.println(menu.getId());
-        System.out.println(menu.getName());
-        System.out.println(menu.getEnabledYN());
-        System.out.println(menu.getSortOrder());
-        System.out.println(menu.getIconFile());
-        System.out.println(menu.getParId());
-        System.out.println(menu.getIconUrl());
-        System.out.println(menu.getTreePath());
-        System.out.println(menu.getChildNodeYN());
+        menu.setIconUrl(menu.getIconUrl()+now());
+
         return new ResponseEntity(settingService.updateMenuById(menu), HttpStatus.OK);
     }
 
     @PostMapping("/menu/img")
-    public ResponseEntity updateMenuImgById(@RequestParam("id") String id, @RequestParam("iconFile") MultipartFile iconFile) throws IOException {
-        System.out.println(id);
-        System.out.println(iconFile);
-        System.out.println(iconFile.getBytes());
-        return new ResponseEntity(settingService.updateMenuImgById(id, iconFile), HttpStatus.OK);
+    public ResponseEntity updateMenuImgById(@RequestParam("iconFile") MultipartFile iconFile) throws IOException {
+
+        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\" + iconFile.getOriginalFilename();
+
+        iconFile.transferTo(new File(path));
+        return new ResponseEntity("iconFile saved", HttpStatus.OK);
     }
 }
