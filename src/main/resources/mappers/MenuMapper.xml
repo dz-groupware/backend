@@ -3,22 +3,23 @@
 <mapper namespace="com.example.backend.menu.mapper.MenuMapper">
 
     <select id="getMenuByEmpId" resultType="com.example.backend.menu.dto.MenuRes">
-        SELECT #{empId} AS EMP_ID, MENU_ID, PAR_ID, NAME, ICON_URL FROM MENU ,
-        (SELECT MENU_ID FROM MENU_AUTH
-        , (SELECT AUTH_ID FROM EMP_AUTH WHERE EMP_ID=#{empId})A
-        WHERE MENU_AUTH.AUTH_ID = A.AUTH_ID)B
-        WHERE MENU.ID = B.MENU_ID;
+        SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU INNER JOIN
+        (SELECT MENU_ID FROM AUTH_MENU
+        INNER JOIN (SELECT AUTH_ID FROM AUTH_EMPLOYEE WHERE EMP_ID= #{empId} UNION
+        SELECT AUTH_ID FROM AUTH_DEPARTMENT INNER JOIN
+        (SELECT DEPT_ID FROM EMPLOYEE_DEPARTMENT WHERE EMP_ID = #{empId})DEPT
+        WHERE DEPT.DEPT_ID = AUTH_DEPARTMENT.DEPT_ID)ADMIN WHERE AUTH_MENU.AUTH_ID = ADMIN.AUTH_ID)MENU_LIST
+        WHERE MENU.ID=MENU_LIST.MENU_ID;
     </select>
 
     <select id="getFavorByEmpId" resultType="com.example.backend.menu.dto.MenuRes">
-        SELECT #{empId} AS EMP_ID, menu_id, par_id, name, icon_url FROM MENU,
-        (SELECT * FROM FAVOR WHERE EMP_ID=#{empId})B WHERE MENU.ID = B.MENU_ID;
+        SELECT menu.id, name, icon_url, sort_order FROM MENU, (SELECT * FROM FAVOR WHERE EMP_ID= #{empId})FAVOR_LIST WHERE MENU.ID = FAVOR_LIST.MENU_ID;
     </select>
 
     <delete id="deleteFavor">
         DELETE FROM FAVOR
         <where>
-            EMP_ID=#{empId} and MENU_ID=#{menuId}
+            EMP_ID=#{empId} AND MENU_ID=#{menuId}
         </where>
     </delete>
 </mapper>

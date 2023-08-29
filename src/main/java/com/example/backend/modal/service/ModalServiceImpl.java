@@ -1,9 +1,11 @@
 package com.example.backend.modal.service;
 
-import com.example.backend.modal.dto.EmpRes;
+import com.example.backend.common.SingleResponseDto;
 import com.example.backend.modal.dto.ProfileRes;
-import com.example.backend.modal.dto.TreeRes;
+import com.example.backend.modal.dto.PositionRes;
+import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,12 +20,12 @@ public class ModalServiceImpl implements ModalService {
     }
 
     @Override
-    public List<ProfileRes> getProfile(Long empId){
+    public List<PositionRes> getProfile(Long empId){
         return modalMapper.getProfile(empId);
     }
 
     @Override
-    public List<TreeRes> getOrgTree(String type, Long empId, Long compId, Long deptId){
+    public List<TreeItemRes> getOrgTree(String type, Long empId, Long compId, Long deptId){
         if (type.equals("comp")){
             return modalMapper.getCompList(empId);
         }
@@ -33,11 +35,11 @@ public class ModalServiceImpl implements ModalService {
         if (type.equals("Dept2")){
             return modalMapper.getDeptList2(compId, deptId);
         }
-        return new ArrayList<TreeRes>();
+        return new ArrayList<TreeItemRes>();
     }
 
     @Override
-    public List<EmpRes> getEmpList(String type, Long compId, Long deptId){
+    public List<ProfileRes> getEmpList(String type, Long compId, Long deptId){
         if (type.equals("comp")) {
             return modalMapper.getCompEmpList(compId);
         }
@@ -47,4 +49,16 @@ public class ModalServiceImpl implements ModalService {
         return new ArrayList<>();
     }
 
+    @Override
+    public SingleResponseDto<?> getSearchResult(String type, String text){
+        if (type.equals("dept")) {
+            System.out.println(type + " : " + text);
+            return new SingleResponseDto<List<TreeItemRes>>(modalMapper.searchWithDept(text));
+        }
+        if (type.equals("emp")) {
+            System.out.println(type + " : " + text);
+            return new SingleResponseDto<List<ProfileRes>>(modalMapper.searchWithEmp(text, text, text, text));
+        }
+        return new SingleResponseDto<>("");
+    }
 }

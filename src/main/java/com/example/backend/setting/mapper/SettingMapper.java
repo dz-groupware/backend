@@ -7,14 +7,16 @@ import java.util.List;
 
 @Mapper
 public interface SettingMapper {
+    List<MenuRes> getGnbList();
     List<MenuRes> getMenuDetailById(Long menuId);
-
-    List<MenuRes> getMenuDetailByName(Long menuId);
-
     int insertMenuById(MenuRes menu);
     int updateMenuImgById(int menuId, byte[] iconFile);
+    List<MenuRes> getMenuDetailByName(String gnbName, String name);
 
-
+    List<String> getIconList ();
+    int checkFavor (Long empId, Long menuId);
+    int FavorOn (Long empId, Long menuId);
+    int FavorOff (Long empId, Long menuId);
 
 }
 

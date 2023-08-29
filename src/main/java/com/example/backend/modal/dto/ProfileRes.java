@@ -6,10 +6,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProfileRes {
-    private Long empId;
+    private Long id;
     private String name;
-    private String pImg;
-    private String compName;
-    private String deptName;
+    private String loginId;
+    private String number;
+    private String imageUrl;
+    private String email;
+    private String nameTree;
+    private String position;
+    private String lastIp;
 
 }

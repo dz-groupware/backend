@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +21,11 @@ public class SettingController {
 
     public SettingController(SettingService settingService) {
         this.settingService = settingService;
+    }
+
+    @GetMapping("/menu/gnb")
+    public ResponseEntity getGnbList() {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.getGnbList()), HttpStatus.OK);
     }
 
     @GetMapping("/menu")
@@ -38,10 +42,37 @@ public class SettingController {
 
     @PostMapping("/menu/img")
     public ResponseEntity updateMenuImgById(@RequestParam("iconFile") MultipartFile iconFile) throws IOException {
-
-        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\" + iconFile.getOriginalFilename();
-
+        // 이미지 추가
+        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\static\\image\\" + iconFile.getOriginalFilename();
         iconFile.transferTo(new File(path));
         return new ResponseEntity("iconFile saved", HttpStatus.OK);
+    }
+
+    @GetMapping("/menu/search")
+    public ResponseEntity getMenuDetailByName(@RequestParam String gnbName, @RequestParam String name){
+        System.out.println(gnbName + " : " + name);
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.getMenuDetailByName(gnbName, name)), HttpStatus.OK);
+    }
+
+    @GetMapping("/menu/iconList")
+    public ResponseEntity getIconList() {
+        return new ResponseEntity(settingService.getIconList(), HttpStatus.OK);
+    }
+
+    @GetMapping("/favor")
+    public ResponseEntity checkFavor(@RequestParam Long empId, @RequestParam Long menuId) {
+        System.out.println(empId +" : "+ menuId);
+        // 현재 즐겨찾기 상태를 가져오기
+        return new ResponseEntity(settingService.checkFavor(empId, menuId), HttpStatus.OK);
+    }
+    @PostMapping("/favor")
+    public ResponseEntity FavorOn(Long empId, Long menuId) {
+        // 즐겨찾기 저장 요청
+        return new ResponseEntity(settingService.FavorOn(empId, menuId), HttpStatus.OK);
+    }
+    @DeleteMapping("/favor")
+    public ResponseEntity deleteFavor(@RequestParam Long empId, @RequestParam Long menuId) {
+        // 즐겨찾기 삭제 요청
+        return new ResponseEntity(settingService.FavorOff(empId, menuId), HttpStatus.OK);
     }
 }

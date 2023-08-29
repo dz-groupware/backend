@@ -5,10 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EmpRes {
+public class TreeItemRes {
     private Long id;
+    private String code;
     private String name;
-    private String loginId;
-    private String number;
-    private String pImg;
 }

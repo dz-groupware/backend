@@ -7,9 +7,14 @@ import java.io.IOException;
 import java.util.List;
 
 public interface SettingService {
+    List<MenuRes> getGnbList();
     List<MenuRes> getMenuDetailById(Long menuId);
     int updateMenuById(MenuRes menu);
 
     int updateMenuImgById(String menuId, MultipartFile iconFile) throws IOException;
-
+    List<MenuRes> getMenuDetailByName(String gnbName, String name);
+    List<String> getIconList ();
+    String checkFavor (Long empId, Long menuId);
+    int FavorOn (Long empId, Long menuId);
+    int FavorOff (Long empId, Long menuId);
 }
