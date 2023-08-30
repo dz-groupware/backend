@@ -1,3 +1,21 @@
+
+# spring:
+#     datasource:
+#         username: root
+#         password: 1234
+#         url: jdbc:mysql://localhost:3306/test_db
+#         driver-class-name: com.mysql.cj.jdbc.Driver
+
+#     resources:
+#         static-location:
+#             - C:/dz_groupware/backend/src/main/resources/image/
+#             - classpath:/static/
+
+# mybatis:
+#     configuration:
+#         map-underscore-to-camel-case: true
+#     mapper-locations: classpath:/mappers/*.xml
+
 server:
   port: 8010
   servlet:
@@ -19,6 +37,7 @@ mybatis:
 jwt:
   secret:
     key: abc
+
 
 
 
