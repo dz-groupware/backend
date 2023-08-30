@@ -34,10 +34,15 @@ public class SettingController {
     }
 
     @PostMapping("/menu")
-    public ResponseEntity updateMenuById(@RequestBody MenuRes menu) {
-        menu.setIconUrl(menu.getIconUrl()+now());
-
-        return new ResponseEntity(settingService.updateMenuById(menu), HttpStatus.OK);
+    public ResponseEntity submitMenu(@RequestBody MenuRes menu, @RequestParam String type) {
+        System.out.println("save menu data, type : " + type);
+        System.out.println(menu.getId());
+        System.out.println(menu.getParId());
+        System.out.println(menu.getName());
+        System.out.println(menu.getEnabledYN());
+        System.out.println(menu.getSortOrder());
+        System.out.println(menu.getIconUrl());
+        return new ResponseEntity(settingService.submitMenu(menu, type), HttpStatus.OK);
     }
 
     @PostMapping("/menu/img")

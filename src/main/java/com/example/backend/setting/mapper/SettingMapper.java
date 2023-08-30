@@ -10,6 +10,8 @@ public interface SettingMapper {
     List<MenuRes> getGnbList();
     List<MenuRes> getMenuDetailById(Long menuId);
     int insertMenuById(MenuRes menu);
+    int updateMenuParId();
+    int updateMenuById(MenuRes menu);
     int updateMenuImgById(int menuId, byte[] iconFile);
     List<MenuRes> getMenuDetailByName(String gnbName, String name);
 

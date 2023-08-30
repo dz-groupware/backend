@@ -3,8 +3,8 @@
 <mapper namespace="com.example.backend.setting.mapper.SettingMapper">
 
     <!-- 메뉴 설정 페이지 : GNB List 가져오기 -->
-    <select id="getGnbList" resultType="com.example.backend.setting.dto.ListRes">
-        select id, name, icon_url from menu where id=par_id;
+    <select id="getGnbList" resultType="com.example.backend.setting.dto.MenuRes">
+        select id, par_id, name, icon_url, sort_order, enabled_yn from menu where id = par_id;
     </select>
 
     <!-- 메뉴 설정 페이지 : 메뉴 선택 시 메뉴 상세 정보 가져오기 -->
@@ -13,8 +13,8 @@
     </select>
 
     <!-- 메뉴 검색 : GNB 선택 결과와 메뉴명 검색 결과 (메뉴트리를 그릴 수 있는 리스트 반환) -->
-    <select id="getMenuDetailByName" resultType="com.example.backend.setting.dto.ListRes">
-        select coalesce(searchTree.sub, 0) as sub, subTree.id, name, sort_order, par_id, enabled_yn
+    <select id="getMenuDetailByName" resultType="com.example.backend.setting.dto.MenuRes">
+        select coalesce(searchTree.sub, 0) as sub, subTree.id, searchTree.par_id, name, sort_order, par_id, enabled_yn
         from (select id, name, sort_order, name_tree
         from menu where name_tree like #{gnbName})subTree left join
         (select 1 as sub, id, par_id, enabled_yn from menu where name like #{name})searchTree on subTree.id=searchTree.id where sub=1;
@@ -23,13 +23,16 @@
     <!-- 메뉴 추가 -->
     <insert id="insertMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
         insert into menu(par_id, name, enabled_YN, icon_url, sort_order)
-        values(#{parId}, #{name}, #{enabledYN}, #{iconUrl}, #{sortOrder});
+        values(72, #{name}, #{enabledYN}, #{iconUrl}, #{sortOrder});
     </insert>
+    <update id="updateMenuParId">
+        update menu set par_id = LAST_INSERT_ID() WHERE id = LAST_INSERT_ID();
+    </update>
 
     <!-- 메뉴 수정 -->
     <update id="updateMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
-        update menu set par_id = #{parId}, name = #{name}, enabledYN = #{enabledYN}, iconUrl = #{iconUrl},
-        sortOrder = #{sortOrder}, where id = #{id};
+        update menu set par_id = #{parId}, name = #{name}, enabled_yn = #{enabledYN}, icon_url = #{iconUrl},
+        sort_order = #{sortOrder} where id = #{id};
     </update>
 
     <select id="getIconList" resultType="String">

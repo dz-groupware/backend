@@ -9,7 +9,7 @@ import java.util.List;
 public interface SettingService {
     List<MenuRes> getGnbList();
     List<MenuRes> getMenuDetailById(Long menuId);
-    int updateMenuById(MenuRes menu);
+    int submitMenu(MenuRes menu, String type);
 
     int updateMenuImgById(String menuId, MultipartFile iconFile) throws IOException;
     List<MenuRes> getMenuDetailByName(String gnbName, String name);

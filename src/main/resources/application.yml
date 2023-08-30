@@ -7,7 +7,7 @@ spring:
 
     resources:
         static-location:
-            - C:\dz_groupware\backend\src\main\resources\image
+            - C:/dz_groupware/backend/src/main/resources/image/
             - classpath:/static/
 
 mybatis:

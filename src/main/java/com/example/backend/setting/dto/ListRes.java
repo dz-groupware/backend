@@ -7,8 +7,9 @@ import lombok.Setter;
 @Setter
 public class ListRes {
     private Long id = 0L;
+    private Long parId = 0L;
     private String name = "";
     private String iconUrl = "0";
     private int sortOrder = 0;
-    private int sub = 0;
+    private int enabledYn = 0;
 }

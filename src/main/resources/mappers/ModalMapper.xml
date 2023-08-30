@@ -2,19 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.backend.modal.mapper.ModalMapper">
 
-    <!-- emp_id 에 대한 프로필 정보 가져오기-->
+    <!-- emp_id 에 대한 모든 프로필 정보 가져오기-->
     <select id="getProfile" resultType="com.example.backend.modal.dto.ProfileRes">
-        select id, name, login_id, image_url, email, mobile_number as number, last_ip
-        from employee where id = #{empId} and deleted_yn = 0;
-    </select>
-
-    <!-- emp_id 에 대한 모든 소속 가져오기-->
-    <select id="getPosition" resultType="com.example.backend.modal.dto.PositionRes">
-        SELECT COMPANY.NAME AS compName, DEPT.name as deptName, dept.id as deptId,
-        dept.name_tree as nameTree, dept.position  FROM COMPANY,
+        select id, name, login_id, image_url, last_ip, compName, nameTree from
+        (select * from employee where id = #{empId} and deleted_yn = 0)emp join
+        (SELECT COMPANY.NAME AS compName, dept.id as deptId,
+        dept.name_tree as nameTree, dept.position as position  FROM COMPANY,
         (SELECT  id, comp_id, name, name_tree, position FROM DEPARTMENT INNER JOIN
-        (SELECT DEPT_ID, position FROM EMPLOYEE_DEPARTMENT WHERE EMP_ID=12 AND DELETED_YN = 0)EXISTS_DEPT
-        WHERE DEPARTMENT.ID = EXISTS_DEPT.DEPT_ID)DEPT WHERE COMPANY.ID = DEPT.COMP_ID;
+        (SELECT DEPT_ID, position FROM EMPLOYEE_DEPARTMENT WHERE EMP_ID=#{empId} AND DELETED_YN = 0)EXISTS_DEPT
+        WHERE DEPARTMENT.ID = EXISTS_DEPT.DEPT_ID)DEPT WHERE COMPANY.ID = DEPT.COMP_ID)posi;
     </select>
 
     <!-- emp_id가 속한 회사 리스트 가져오기 -->
