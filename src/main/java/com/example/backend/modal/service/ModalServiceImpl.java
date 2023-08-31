@@ -5,7 +5,6 @@ import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.PositionRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,44 +19,44 @@ public class ModalServiceImpl implements ModalService {
     }
 
     @Override
-    public List<PositionRes> getProfile(Long empId){
-        return modalMapper.getProfile(empId);
+    public List<PositionRes> findProfileByEmpId(Long empId){
+        return modalMapper.findProfileByEmpId(empId);
     }
 
     @Override
-    public List<TreeItemRes> getOrgTree(String type, Long empId, Long compId, Long deptId){
+    public List<TreeItemRes> findOrgTree(String type, Long empId, Long compId, Long deptId){
         if (type.equals("comp")){
-            return modalMapper.getCompList(empId);
+            return modalMapper.findCompList(empId);
         }
         if (type.equals("Dept1")){
-            return modalMapper.getDeptList1(compId);
+            return modalMapper.findDeptList1(compId);
         }
         if (type.equals("Dept2")){
-            return modalMapper.getDeptList2(compId, deptId);
+            return modalMapper.findDeptList2(compId, deptId);
         }
         return new ArrayList<TreeItemRes>();
     }
 
     @Override
-    public List<ProfileRes> getEmpList(String type, Long compId, Long deptId){
+    public List<ProfileRes> findEmpList(String type, Long compId, Long deptId){
         if (type.equals("comp")) {
-            return modalMapper.getCompEmpList(compId);
+            return modalMapper.findCompEmpList(compId);
         }
         if (type.equals("dept")) {
-            return modalMapper.getDeptEmpList(deptId);
+            return modalMapper.findDeptEmpList(deptId);
         }
         return new ArrayList<>();
     }
 
     @Override
-    public SingleResponseDto<?> getSearchResult(String type, String text){
+    public SingleResponseDto<?> findOrgSearchResult(String type, String text){
         if (type.equals("dept")) {
             System.out.println(type + " : " + text);
-            return new SingleResponseDto<List<TreeItemRes>>(modalMapper.searchWithDept(text));
+            return new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultWithDept(text));
         }
         if (type.equals("emp")) {
             System.out.println(type + " : " + text);
-            return new SingleResponseDto<List<ProfileRes>>(modalMapper.searchWithEmp(text, text, text, text));
+            return new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultWithEmp(text, text, text, text));
         }
         return new SingleResponseDto<>("");
     }

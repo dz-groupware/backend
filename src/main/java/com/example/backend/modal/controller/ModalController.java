@@ -24,21 +24,21 @@ public class ModalController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity getProfile(@RequestParam Long empId) {
-        return new ResponseEntity(new SingleResponseDto<List<PositionRes>>(modalService.getProfile(empId)), HttpStatus.OK);
+    public ResponseEntity findProfileByEmpId(@RequestParam Long empId) {
+        return new ResponseEntity(new SingleResponseDto<List<PositionRes>>(modalService.findProfileByEmpId(empId)), HttpStatus.OK);
     }
     @GetMapping("/org/tree")
-    public ResponseEntity getOrgTree(@RequestParam String type, @RequestParam(required = false) Long empId, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
-        return new ResponseEntity(new SingleResponseDto<List<TreeItemRes>>(modalService.getOrgTree(type, empId, compId, deptId)), HttpStatus.OK);
+    public ResponseEntity findOrgTree(@RequestParam String type, @RequestParam(required = false) Long empId, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
+        return new ResponseEntity(new SingleResponseDto<List<TreeItemRes>>(modalService.findOrgTree(type, empId, compId, deptId)), HttpStatus.OK);
     }
 
     @GetMapping("/org/empList")
-    public ResponseEntity getEmpList(@RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
-        return new ResponseEntity(new SingleResponseDto<List<ProfileRes>>(modalService.getEmpList(type, compId, deptId)), HttpStatus.OK);
+    public ResponseEntity findEmpList(@RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
+        return new ResponseEntity(new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type, compId, deptId)), HttpStatus.OK);
     }
     @GetMapping("/org/search")
-    public ResponseEntity getSearchResult(@RequestParam String type, @RequestParam String text){
-        return new ResponseEntity(modalService.getSearchResult(type, text), HttpStatus.OK);
+    public ResponseEntity findOrgSearchResult(@RequestParam String type, @RequestParam String text){
+        return new ResponseEntity(modalService.findOrgSearchResult(type, text), HttpStatus.OK);
 
     }
 }

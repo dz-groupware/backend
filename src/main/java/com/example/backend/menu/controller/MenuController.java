@@ -19,18 +19,17 @@ public class MenuController {
     }
 
     @GetMapping("/GNB")
-    public ResponseEntity getMenuByEmpId(@RequestParam Long empId) {
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.getMenuByEmpId(empId)), HttpStatus.OK);
+    public ResponseEntity findMenuByEmpId(@RequestParam Long empId) {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.findMenuByEmpId(empId)), HttpStatus.OK);
     }
 
     @GetMapping("/Favor")
-    public ResponseEntity getFavorByEmpId(@RequestParam Long empId){
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.getFavorByEmpId(empId)), HttpStatus.OK);
+    public ResponseEntity findFavorByEmpId(@RequestParam Long empId){
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.findFavorByEmpId(empId)), HttpStatus.OK);
     }
     @DeleteMapping("/Favor")
-    public ResponseEntity deleteFavor(@RequestParam Long empId, @RequestParam Long menuId){
-        System.out.println("[Controller] empId : "+empId+" || menuId : "+menuId);
-        return new ResponseEntity(new SingleResponseDto<Integer>(menuService.deleteFavor(empId, menuId)), HttpStatus.OK);
+    public ResponseEntity removeFavor(@RequestParam Long empId, @RequestParam Long menuId){
+        return new ResponseEntity(new SingleResponseDto<Integer>(menuService.removeFavor(empId, menuId)), HttpStatus.OK);
     }
 
 }
