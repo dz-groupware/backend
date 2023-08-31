@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.companymgmt.mapper.CompanyMgmtMapper">
+
+
+    <select id="findCompanyMgmtList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
+        SELECT code,name,corp_type,rep_name from company where deleted_yn=false
+    </select>
+
+    <select id="findCompanyDetailsByCode" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
+        SELECT code, enabled_yn, name, abbr, business_type,
+        rep_name, rep_id_num,
+        rep_tel, business_num, corp_type, corp_num, establishment_date,
+        opening_date, closing_date, address  from company WHERE code=#{code}
+    </select>
+
+    <select id="searchCompanyMgmt" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
+        SELECT code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name} and enabled_yn=#{enabledYn}
+    </select>
+
+    <select id="searchAllCompanyMgmt" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
+        SELECT code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name}
+    </select>
+
+    <insert id="addCompanyMgmt">
+        INSERT INTO company (code, enabled_yn, name, abbr, business_type, rep_name, rep_id_num,
+        rep_tel, business_num, corp_type, corp_num, establishment_date, opening_date, closing_date,
+        address )VALUES(#{code}, #{enabledYn}, #{name}, #{abbr},
+        #{businessType}, #{repName}, #{repIdNum}, #{repTel}, #{businessNum}, #{corpType}, #{corpNum},
+        #{establishmentDate}, #{openingDate}, #{closingDate}, #{address} )
+    </insert>
+
+    <update id="modifyCompanyMgmt">
+        UPDATE company SET enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr}, business_type=#{businessType},
+        rep_name=#{repName}, rep_id_num=#{repIdNum},
+        rep_tel=#{repTel}, business_num=#{businessNum}, corp_type=#{corpType}, corp_num=#{corpNum}, establishment_date=
+        #{establishmentDate},
+        opening_date=#{openingDate}, closing_date=#{closingDate}, address=#{address} WHERE code=#{code}
+    </update>
+
+    <update id="removeCompanyMgmt" parameterType="com.example.backend.companymgmt.dto.CompanyMgmtReqDto">
+        UPDATE company SET enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr}, business_type=#{businessType},
+        rep_name=#{repName}, rep_id_num=#{repIdNum},
+        rep_tel=#{repTel}, business_num=#{businessNum}, corp_type=#{corpType}, corp_num=#{corpNum},
+        establishment_date=#{establishmentDate},
+        opening_date=#{openingDate}, closing_date=#{closingDate}, address=#{address}, deleted_yn=true WHERE code=#{code}
+    </update>
+
+</mapper>
