@@ -47,7 +47,7 @@ public class EmployeeController {
   @PostMapping
   public ResponseEntity insert(@RequestBody EmployeeReqDto employee) {
     employeeService.addEmployee(employee);
-    return new ResponseEntity<>(new SingleResponseDto<>(new SingleResponseDto("성공")),
+    return new ResponseEntity<>(new SingleResponseDto<>("성공"),
         HttpStatus.CREATED);
   }
 

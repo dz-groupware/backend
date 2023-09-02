@@ -3,30 +3,118 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.backend.company.mapper.CompanyMapper">
-<!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
-  <select id="getCompanyAuthSummaryListForPage" resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
-    SELECT a.name as auth_name, a.id as auth_id, c.id as company_id, c.name as company_name
-    FROM comp_auth ac
-      JOIN company c ON ac.comp_id = c.id
-      JOIN auth a ON ac.auth_id = a.id
+  <!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
+  <select id="getCompanyAuthSummaryListForPage"
+    resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
+    SELECT
+    a.name as auth_name,
+    a.id as auth_id,
+    c.id as company_id,
+    c.name as company_name
+    FROM auth_company ac
+    JOIN company c ON ac.comp_id = c.id
+    JOIN auth a ON ac.auth_id = a.id
     WHERE ac.comp_id = #{companyId}
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
-  <select id="countCompanyAuthSummaryList" resultType="long">
-    SELECT COUNT(*)
-    FROM comp_auth ac
-      JOIN company c ON ac.comp_id = c.id
-      JOIN auth a ON ac.auth_id = a.id
-    WHERE ac.comp_id = #{companyId}
+  <select id="getCompanyAuthList"
+    resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
+    SELECT
+    adb.id as id ,
+    c.id as company_id,
+    a.id as auth_id,
+    a.name as auth_name,
+    c.name as company_name
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    WHERE adb.comp_id = #{companyId}
+    <choose>
+      <when test="orderBy == 'authNameDesc' or orderBy == 'authDashboardIdDesc'">
+        AND adb.id &lt; #{lastId}
+      </when>
+      <otherwise>
+        AND adb.id &gt; #{lastId}
+      </otherwise>
+    </choose>
+    <choose>
+      <when test="orderBy == 'authNameAsc'">
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc'">
+        ORDER BY a.name DESC
+      </when>
+      <when test="orderBy == 'authDashboardIdAsc'">
+        ORDER BY adb.id ASC
+      </when>
+      <when test="orderBy == 'authDashboardIdDesc'">
+        ORDER BY adb.id DESC
+      </when>
+      <when test="orderBy == 'none'">
+        ORDER BY adb.id ASC
+      </when>
+    </choose>
+    LIMIT #{limit}
   </select>
 
-  <select id="getCompanyAuthSummaryList" resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
-    SELECT a.name as auth_name, a.id as auth_id, c.id as company_id, c.name as company_name
-    FROM comp_auth ac
-      JOIN company c ON ac.comp_id = c.id
-      JOIN auth a ON ac.auth_id = a.id
-    WHERE ac.comp_id = #{companyId} AND ac.id > #{afterAuthId}
-    LIMIT #{limit}
+
+
+  <select id="getCompanyAuthCount" resultType="long">
+    SELECT COUNT(*)
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    <choose>
+      <when test="orderBy == 'authNameAsc'">
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc'">
+        ORDER BY a.name DESC
+      </when>
+      <when test="orderBy == 'authCompanyIdAsc'">
+        ORDER BY adb.id ASC
+      </when>
+      <when test="orderBy == 'authCompanyIdDesc'">
+        ORDER BY adb.id DESC
+      </when>
+      <when test="orderBy == 'none'">
+        ORDER BY adb.id ASC
+      </when>
+    </choose>
+  </select>
+
+  <select id="getCompanyGnbList" resultType="com.example.backend.company.dto.CompanyMenuDto">
+    SELECT *
+    FROM MENU
+    WHERE comp_id = #{companyId}
+    AND id = par_id
+  </select>
+
+  <select id="getCompanyLnbList" resultType="com.example.backend.company.dto.CompanyMenuDto">
+    SELECT *
+    FROM MENU
+    WHERE comp_id = #{companyId}
+    AND par_id = #{parId}
+    AND id != #{parId}
+  </select>
+
+  <select id="getAuthMenuList" resultType="com.example.backend.company.dto.AuthMenuDto">
+    SELECT
+    a.id as auth_id,
+    m.id as menu_id,
+    m.par_id as menu_par_id,
+    a.name as auth_name,
+    m.name as menu_name,
+    m.id_tree as menu_id_tree,
+    m.name_tree as menu_name_tree,
+    m.child_node_yn as child_node_yn,
+    m.admin_yn as menu_admin_yn
+    FROM auth a
+    JOIN auth_menu am ON a.id = am.auth_id
+    JOIN menu m ON am.menu_id = m.id
+    where m.deleted_yn = 0
+    AND m.comp_id = #{companyId}
+    AND a.id = #{authId};
   </select>
 </mapper>
