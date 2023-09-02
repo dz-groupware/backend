@@ -9,8 +9,9 @@ import lombok.Setter;
 @Setter
 public class CompanyAuthSummaryDto {
 
-  private String companyId;
+  private Long id;
+  private Long companyId;
+  private Long authId;
   private String companyName;
   private String authName;
-  private String authId;
 }
