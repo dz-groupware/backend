@@ -20,8 +20,8 @@ public class CompanyMgmtController{
     }
 
     @GetMapping("/")
-    public ResponseEntity findCompanyMgmtList(@RequestParam boolean deletedYn){
-        return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.findCompanyMgmtList(deletedYn)),
+    public ResponseEntity findCompanyMgmtList(){
+        return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.findCompanyMgmtList()),
                 HttpStatus.OK);
     }
 
@@ -33,9 +33,9 @@ public class CompanyMgmtController{
                 HttpStatus.CREATED);
     }
 
-    @GetMapping("/{code}")
-    public ResponseEntity findCompanyDetailsByCode(@PathVariable String code){
-        return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.findCompanyDetailsByCode(code)),
+    @GetMapping("/{id}")
+    public ResponseEntity findCompanyDetailsById(@PathVariable int id){
+        return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.findCompanyDetailsById(id)),
                 HttpStatus.OK);
     }
 
@@ -46,16 +46,16 @@ public class CompanyMgmtController{
                 HttpStatus.OK);
     }
 
-    @PutMapping("/{code}")
-    public ResponseEntity update(@PathVariable String code, @RequestBody CompanyMgmtReqDto company) {
-        companyMgmtService.modifyCompanyMgmt(code,company);
+    @PutMapping("/{id}")
+    public ResponseEntity update(@PathVariable int id, @RequestBody CompanyMgmtReqDto company) {
+        companyMgmtService.modifyCompanyMgmt(id,company);
         return new ResponseEntity<>(new SingleResponseDto("성공"),
                 HttpStatus.OK);
     }
 
     @PutMapping("/del/{code}")
-    public ResponseEntity remove(@PathVariable String code,@RequestBody CompanyMgmtReqDto company) {
-        companyMgmtService.removeCompanyMgmt(code, company);
+    public ResponseEntity remove(@PathVariable int id,@RequestBody CompanyMgmtReqDto company) {
+        companyMgmtService.removeCompanyMgmt(id, company);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

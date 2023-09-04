@@ -10,6 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class CompanyMgmtResDto {
+    private int id;
     private String code;
     private int enabledYn;
     private String name;

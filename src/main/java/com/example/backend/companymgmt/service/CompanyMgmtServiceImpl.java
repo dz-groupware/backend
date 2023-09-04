@@ -18,13 +18,13 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     }
 
     @Override
-    public List<CompanyMgmtResDto> findCompanyMgmtList(boolean deletedYn) {
-        return companyMgmtMapper.findCompanyMgmtList(deletedYn);
+    public List<CompanyMgmtResDto> findCompanyMgmtList() {
+        return companyMgmtMapper.findCompanyMgmtList();
     }
 
     @Override
-    public CompanyMgmtResDto findCompanyDetailsByCode(String code) {
-        return companyMgmtMapper.findCompanyDetailsByCode(code);
+    public CompanyMgmtResDto findCompanyDetailsById(int id) {
+        return companyMgmtMapper.findCompanyDetailsById(id);
     }
 
     @Override
@@ -41,16 +41,14 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     }
 
     @Override
-    public void modifyCompanyMgmt(String code,CompanyMgmtReqDto companyMgmt) {
-        companyMgmt.setCode(code);
+    public void modifyCompanyMgmt(int id,CompanyMgmtReqDto companyMgmt) {
+        companyMgmt.setId(id);
         companyMgmtMapper.modifyCompanyMgmt(companyMgmt);
     }
 
     @Override
-    public void removeCompanyMgmt(String code, CompanyMgmtReqDto companyMgmt) {
-
-        companyMgmt.setCode(code);
-
+    public void removeCompanyMgmt(int id, CompanyMgmtReqDto companyMgmt) {
+        companyMgmt.setId(id);
         companyMgmtMapper.removeCompanyMgmt(companyMgmt);
 
     }

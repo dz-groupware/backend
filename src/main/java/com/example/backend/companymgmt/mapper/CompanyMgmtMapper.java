@@ -8,8 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface CompanyMgmtMapper {
-    List<CompanyMgmtResDto> findCompanyMgmtList(boolean deletedYn);
-    CompanyMgmtResDto findCompanyDetailsByCode(String code);
+    List<CompanyMgmtResDto> findCompanyMgmtList();
+    CompanyMgmtResDto findCompanyDetailsById(int id);
     List<CompanyMgmtResDto> searchAllCompanyMgmt(String name);
     List<CompanyMgmtResDto> searchCompanyMgmt(String name, int enabledYn);
     void addCompanyMgmt(CompanyMgmtReqDto companyMgmt);

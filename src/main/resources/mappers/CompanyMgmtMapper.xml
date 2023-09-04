@@ -5,22 +5,22 @@
 
 
     <select id="findCompanyMgmtList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
-        SELECT code,name,corp_type,rep_name from company where deleted_yn=false
+        SELECT id,code,name,corp_type,rep_name from company where deleted_yn=false
     </select>
 
-    <select id="findCompanyDetailsByCode" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
-        SELECT code, enabled_yn, name, abbr, business_type,
+    <select id="findCompanyDetailsById" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
+        SELECT id,code, enabled_yn, name, abbr, business_type,
         rep_name, rep_id_num,
         rep_tel, business_num, corp_type, corp_num, establishment_date,
         opening_date, closing_date, address  from company WHERE code=#{code}
     </select>
 
     <select id="searchCompanyMgmt" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
-        SELECT code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name} and enabled_yn=#{enabledYn}
+        SELECT id,code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name} and enabled_yn=#{enabledYn}
     </select>
 
     <select id="searchAllCompanyMgmt" resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
-        SELECT code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name}
+        SELECT id,code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name}
     </select>
 
     <insert id="addCompanyMgmt">

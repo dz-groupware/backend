@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface CompanyMgmtService{
 
-    List<CompanyMgmtResDto> findCompanyMgmtList(boolean deletedYn);
-    CompanyMgmtResDto findCompanyDetailsByCode(String code);
+    List<CompanyMgmtResDto> findCompanyMgmtList();
+    CompanyMgmtResDto findCompanyDetailsById(int id);
 
     List<CompanyMgmtResDto> searchCompanyMgmt(String name, int enabledYn);
     void addCompanyMgmt(CompanyMgmtReqDto companyMgmt);
-    void modifyCompanyMgmt(String code,CompanyMgmtReqDto companyMgmt);
-    void removeCompanyMgmt(String code, CompanyMgmtReqDto companyMgmt);
+    void modifyCompanyMgmt(int id,CompanyMgmtReqDto companyMgmt);
+    void removeCompanyMgmt(int id, CompanyMgmtReqDto companyMgmt);
 
 
 
