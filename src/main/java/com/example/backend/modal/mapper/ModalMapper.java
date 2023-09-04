@@ -15,6 +15,9 @@ public interface ModalMapper {
     List<TreeItemRes> findDeptList2(Long compId, Long deptId);
     List<ProfileRes> findCompEmpList(Long compId);
     List<ProfileRes> findDeptEmpList(Long deptId);
-    List<TreeItemRes> findResultWithDept(String text);
-    List<ProfileRes> findResultWithEmp(String text1, String text2, String text3, String text4);
+
+    List<TreeItemRes> findResultOfAllDept(String text);
+    List<ProfileRes> findResultOfAllEmp(String text);
+    List<TreeItemRes> findResultOfDept(String text);
+    List<ProfileRes> findResultOfEmp(String text1, String text2, String text3, String text4);
 }

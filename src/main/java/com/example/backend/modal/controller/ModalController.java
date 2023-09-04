@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Modal")
+@RequestMapping("/modal")
 public class ModalController {
     private final ModalService modalService;
 
@@ -24,7 +24,7 @@ public class ModalController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity findProfileByEmpId(@RequestParam Long empId) {
+    public ResponseEntity findProfileByEmpId(@RequestParam("empId") Long empId) {
         return new ResponseEntity(new SingleResponseDto<List<PositionRes>>(modalService.findProfileByEmpId(empId)), HttpStatus.OK);
     }
     @GetMapping("/org/tree")

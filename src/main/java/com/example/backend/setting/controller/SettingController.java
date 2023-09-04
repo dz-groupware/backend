@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalTime.now;
@@ -39,7 +40,7 @@ public class SettingController {
     }
 
     @PostMapping("/menu/img")
-    public ResponseEntity updateMenuImgById(@RequestParam("iconFile") MultipartFile iconFile) throws IOException {
+    public ResponseEntity addImgById(@RequestParam MultipartFile iconFile) throws IOException {
         // 이미지 추가
         String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\" + iconFile.getOriginalFilename();
         iconFile.transferTo(new File(path));
@@ -53,7 +54,15 @@ public class SettingController {
 
     @GetMapping("/menu/iconList")
     public ResponseEntity findAllIcon() {
-        return new ResponseEntity(settingService.findAllIcon(), HttpStatus.OK);
+        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\";
+        File[] files = new File(path).listFiles();
+        List<String> iconList = new ArrayList<String>();
+        for (File file : files){
+            if(file.isFile()){
+                iconList.add("http://localhost:8010/api/v1/image/" + file.getName());
+            }
+        }
+        return new ResponseEntity(new SingleResponseDto<List<String>>(iconList), HttpStatus.OK);
     }
 
     @GetMapping("/favor")
@@ -73,5 +82,11 @@ public class SettingController {
         // 즐겨찾기 삭제 요청
         return new ResponseEntity(settingService.modifyFavorOff(empId, menuId), HttpStatus.OK);
     }
+
+    @GetMapping("/menu/all")
+    public ResponseEntity findAllMenu(@RequestParam Long compId) {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
+    }
+
 
 }

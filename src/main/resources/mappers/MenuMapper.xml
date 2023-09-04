@@ -22,4 +22,8 @@
             EMP_ID=#{empId} AND MENU_ID=#{menuId}
         </where>
     </delete>
+    <select id="findMenuByParId" resultType="com.example.backend.menu.dto.MenuRes">
+        select id, par_id, name, sort_order, child_node_yn from menu where par_id=#{menuId}
+        and comp_id=#{compId} and enabled_yn=1 and deleted_yn=0;
+    </select>
 </mapper>

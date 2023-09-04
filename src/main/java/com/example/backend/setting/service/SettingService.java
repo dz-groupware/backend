@@ -15,4 +15,5 @@ public interface SettingService {
     String findFavorById (Long empId, Long menuId);
     int modifyFavorOn (Long empId, Long menuId);
     int modifyFavorOff (Long empId, Long menuId);
+    List<MenuRes> findAllMenu (Long compId);
 }

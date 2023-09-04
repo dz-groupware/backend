@@ -28,6 +28,8 @@ public class MenuServiceImpl implements MenuService{
     public int removeFavor(Long empId, Long menuId){
         return menuMapper.removeFavor(empId, menuId);
     }
-
-
+    @Override
+    public List<MenuRes> findMenuByParId (Long menuId, Long compId) {
+        return menuMapper.findMenuByParId(menuId, compId);
+    }
 }

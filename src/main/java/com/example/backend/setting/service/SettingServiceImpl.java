@@ -80,6 +80,9 @@ public class SettingServiceImpl  implements SettingService {
     public int modifyFavorOff (Long empId, Long menuId) {
         return settingMapper.modifyFavorOff(empId, menuId);
     }
-
+    @Override
+    public List<MenuRes> findAllMenu (Long compId) {
+        return settingMapper.findAllMenu(compId);
+    }
 
 }

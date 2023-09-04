@@ -8,4 +8,5 @@ public interface MenuService {
     List<MenuRes> findMenuByEmpId(Long empId);
     List<MenuRes> findFavorByEmpId(Long empId);
     int removeFavor(Long empId, Long menuId);
+    List<MenuRes> findMenuByParId (Long menuId, Long compId);
 }

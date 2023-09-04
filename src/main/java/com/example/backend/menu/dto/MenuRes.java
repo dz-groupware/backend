@@ -12,4 +12,5 @@ public class MenuRes {
     private String iconUrl = "";
     private int sortOrder = 0;
     private String nameTree = "";
+    private int childNodeYn = 0;
 }

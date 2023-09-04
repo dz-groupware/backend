@@ -50,13 +50,24 @@ public class ModalServiceImpl implements ModalService {
 
     @Override
     public SingleResponseDto<?> findOrgSearchResult(String type, String text){
+        if (type.equals("all")) {
+            System.out.println(type + " : " + text);
+
+            List<SingleResponseDto<?>> result = new ArrayList<SingleResponseDto<?>>();
+            result.add(new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfAllDept(text)));
+            result.add(new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultOfAllEmp(text)));
+//            SingleResponseDto result2 = new SingleResponseDto<List<SingleResponseDto>>();
+            return new SingleResponseDto<List<SingleResponseDto<?>>>(result);
+
+
+        }
         if (type.equals("dept")) {
             System.out.println(type + " : " + text);
-            return new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultWithDept(text));
+            return new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfDept(text));
         }
         if (type.equals("emp")) {
             System.out.println(type + " : " + text);
-            return new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultWithEmp(text, text, text, text));
+            return new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultOfEmp(text, text, text, text));
         }
         return new SingleResponseDto<>("");
     }
