@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.backend.company.mapper.CompanyMapper">
+<mapper namespace="com.example.backend.authgroup.mapper.AuthMapper">
   <!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
   <select id="getCompanyAuthSummaryListForPage"
-    resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
     a.name as auth_name,
     a.id as auth_id,
@@ -19,7 +19,7 @@
   </select>
 
   <select id="getCompanyAuthList"
-    resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
     adb.id as id ,
     c.id as company_id,
@@ -84,37 +84,96 @@
     </choose>
   </select>
 
-  <select id="getCompanyGnbList" resultType="com.example.backend.company.dto.CompanyMenuDto">
-    SELECT *
-    FROM MENU
+  <select id="getCompanyGnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
+    SELECT
+    m.id as menu_id,
+    m.par_id as menu_par_id,
+    m.comp_id as comp_id,
+    m.name as menu_name,
+    m.enabled_yn as enabled_yn,
+    m.sort_order as sort_order,
+    m.name_tree as name_tree,
+    m.id_tree as id_tree,
+    m.child_node_yn as child_node_yn,
+    m.admin_yn as admin_yn,
+    m.deleted_yn as deleted_yn
+    FROM menu m
     WHERE comp_id = #{companyId}
     AND id = par_id
   </select>
 
-  <select id="getCompanyLnbList" resultType="com.example.backend.company.dto.CompanyMenuDto">
-    SELECT *
-    FROM MENU
+  <select id="getCompanyLnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
+    SELECT
+    m.id as menu_id,
+    m.par_id as menu_par_id,
+    m.comp_id as comp_id,
+    m.name as menu_name,
+    m.enabled_yn as enabled_yn,
+    m.sort_order as sort_order,
+    m.id_tree as id_tree,
+    m.name_tree as name_tree,
+    m.child_node_yn as child_node_yn,
+    m.admin_yn as admin_yn,
+    m.deleted_yn as deleted_yn
+    FROM menu m
     WHERE comp_id = #{companyId}
     AND par_id = #{parId}
     AND id != #{parId}
   </select>
 
-  <select id="getAuthMenuList" resultType="com.example.backend.company.dto.AuthMenuDto">
+  <select id="getGnbListOfAuth" resultType="com.example.backend.authgroup.dto.AuthMenuDto">
     SELECT
-    a.id as auth_id,
     m.id as menu_id,
     m.par_id as menu_par_id,
-    a.name as auth_name,
+    m.comp_id as comp_id,
     m.name as menu_name,
+    m.enabled_yn as enabled_yn,
+    m.sort_order as sort_order,
     m.id_tree as menu_id_tree,
     m.name_tree as menu_name_tree,
     m.child_node_yn as child_node_yn,
-    m.admin_yn as menu_admin_yn
+    m.admin_yn as admin_yn,
+    m.deleted_yn as deleted_yn,
+    a.id as auth_id
     FROM auth a
     JOIN auth_menu am ON a.id = am.auth_id
     JOIN menu m ON am.menu_id = m.id
     where m.deleted_yn = 0
     AND m.comp_id = #{companyId}
-    AND a.id = #{authId};
+    AND a.id = #{authId}
+    AND m.id = m.par_id;
+  </select>
+
+  <select id="getGnbListOfAuthWithAll" resultType="com.example.backend.authgroup.dto.MenuAuthStatusDto">
+    SELECT
+    m.id AS menu_id,
+    m.par_id AS menu_par_id,
+    m.comp_id AS comp_id,
+    m.name AS menu_name,
+    am.auth_id AS auth_id,
+    m.child_node_yn AS child_node_yn,
+    CASE
+      WHEN am.auth_id = #{authId} THEN 1
+      ELSE 0
+    END AS has_menu
+    FROM menu m
+    LEFT JOIN auth_menu am ON m.id = am.menu_id AND am.auth_id = #{authId}
+    WHERE m.comp_id = #{companyId} AND m.deleted_yn = 0;
+  </select>
+
+  <select id="getEmpListOfAuth" resultType="com.example.backend.authgroup.dto.UserListOfAuthDto">
+    select ed.id AS id, d.name AS dept_name, e.position as emp_position, e.name as emp_name
+    from auth_department ad
+    JOIN department d ON d.id = ad.dept_id
+    JOIN employee_department ed ON ad.dept_id = ed.dept_id
+    JOIN employee e ON e.id = ed.emp_id
+    WHERE ad.auth_id = #{authId} AND ad.deleted_yn != 1 AND ed.deleted_yn !=1
+    UNION
+    select ed.id AS id, d.name AS dept_name, e.position as dept_position, e.name AS emp_name
+    from auth_employee ae
+    JOIN employee e ON e.id = ae.emp_id
+    JOIN employee_department ed ON ae.emp_id = ed.emp_id
+    JOIN department d ON d.id = ed.dept_id
+    WHERE ae.auth_id = #{authId} AND ae.deleted_yn != 1 AND ed.deleted_yn !=1
   </select>
 </mapper>

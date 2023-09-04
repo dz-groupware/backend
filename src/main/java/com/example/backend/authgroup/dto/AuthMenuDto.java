@@ -1,22 +1,22 @@
-package com.example.backend.company.dto;
+package com.example.backend.authgroup.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CompanyMenuDto {
+public class AuthMenuDto {
 
-  private Long id;
-  private Long parId;
+  private Long menuId;
+  private Long menuParId;
   private Long compId;
-  private String name;
+  private String menuName;
   private Boolean enabledYn;
-  private String iconUrl;
   private Integer sortOrder;
-  private String nameTree;
   private String idTree;
+  private String nameTree;
   private Boolean childNodeYn;
   private Boolean adminYn;
   private Boolean deletedYn;
+  private Long authId;
 }
