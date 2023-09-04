@@ -1,4 +1,4 @@
-package com.example.backend.company.dto;
+package com.example.backend.authgroup.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
