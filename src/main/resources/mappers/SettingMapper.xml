@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.setting.mapper.SettingMapper">
+
+    <!-- 메뉴 설정 페이지 : GNB List 가져오기 -->
+    <select id="findGnbList" resultType="com.example.backend.setting.dto.MenuRes">
+        select id, par_id, name, icon_url, sort_order, enabled_yn from menu where id = par_id;
+    </select>
+
+    <!-- 메뉴 설정 페이지 : 메뉴 선택 시 메뉴 상세 정보 가져오기 -->
+    <select id="findMenuDetailById" resultType="com.example.backend.setting.dto.MenuRes">
+        select * from menu where id=1;
+    </select>
+
+    <!-- 메뉴 검색 : GNB 선택 결과와 메뉴명 검색 결과 (메뉴트리를 그릴 수 있는 리스트 반환) -->
+    <select id="findMenuByName" resultType="com.example.backend.setting.dto.MenuRes">
+        select coalesce(searchTree.sub, 0) as sub, subTree.id, searchTree.par_id, name, sort_order, par_id, enabled_yn
+        from (select id, name, sort_order, name_tree
+        from menu where name_tree like #{gnbName})subTree left join
+        (select 1 as sub, id, par_id, enabled_yn from menu where name like #{name})searchTree on subTree.id=searchTree.id where sub=1;
+    </select>
+
+    <!-- 메뉴 추가 -->
+    <insert id="addMenu" parameterType="com.example.backend.setting.dto.MenuRes">
+        insert into menu(par_id, comp_id, name, enabled_YN, icon_url, sort_order)
+        values(50, #{compId}, #{name}, #{enabledYN}, #{iconUrl}, #{sortOrder});
+    </insert>
+    <update id="modifyParId">
+        update menu set par_id = LAST_INSERT_ID() WHERE id = LAST_INSERT_ID();
+    </update>
+
+    <!-- 메뉴 수정 -->
+    <update id="modifyMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
+        update menu set par_id = #{parId}, comp_id = #{compId}, name = #{name}, enabled_yn = #{enabledYN}, icon_url = #{iconUrl},
+        sort_order = #{sortOrder} where id = #{id};
+    </update>
+
+    <select id="findAllIcon" resultType="String">
+        select icon_url from menu;
+    </select>
+
+    <!-- 즐겨찾기 확인 -->
+    <select id="findFavorById">
+        select count(*) from favor where emp_id=#{empId} and menu_id=#{menuId};
+    </select>
+
+    <!-- 즐겨찾기 추가 -->
+    <insert id="modifyFavorOn">
+        insert into favor(emp_id, menu_id) values(#{empId}, #{menuId});
+    </insert>
+
+    <!-- 즐겨찾기 삭제 -->
+    <delete id="modifyFavorOff">
+        delete from favor where emp_id=#{empId} and menu_id=#{menuId};
+    </delete>
+
+    <!-- 전체 메뉴 가져오기 -->
+    <select id="findAllMenu">
+        select id, par_id, name from menu where comp_id=#{compId} and deleted_yn=0;
+    </select>
+
+</mapper>
