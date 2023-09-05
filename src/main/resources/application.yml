@@ -18,15 +18,6 @@ mybatis:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:/mappers/*.xml
 
-server:
-  port: 8010
-  servlet:
-    context-path: /api/v1
-
 jwt:
   secret:
     key: abc
-
-
-
-
