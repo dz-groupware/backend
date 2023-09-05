@@ -2,7 +2,6 @@ package com.example.backend.company.controller;
 
 import com.example.backend.common.MultiResponseDto;
 import com.example.backend.common.Page;
-import com.example.backend.common.PageDto;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.company.service.CompanyService;
 import org.springframework.http.HttpStatus;
@@ -25,8 +24,9 @@ public class CompanyController {
 
 
   @GetMapping("/{id}")
-  public ResponseEntity getCompanyAuthSummaryPage(@PathVariable("id") Long companyId,int pageNumber, int pageSize) {
-    Page page = companyService.getCompanyAuthSummaryPage(companyId, pageNumber, pageSize);
+  public ResponseEntity getCompanyAuthSummaryPage(@PathVariable("id") Long companyId,
+      int pageNumber, int pageSize) {
+    Page page = companyService.findCompanyAuthSummaryPage(companyId, pageNumber, pageSize);
 
     return new ResponseEntity(new MultiResponseDto(
         page.getData(),
@@ -36,10 +36,10 @@ public class CompanyController {
 
   @GetMapping("/{company-id}/auth-summaries")
   public ResponseEntity getCompanyAuthSummaryList(@PathVariable("company-id") Long companyId,
-                                                  @RequestParam(required = false) Long afterAuthId,
-                                                  @RequestParam int pageSize) {
+      @RequestParam(required = false) Long afterAuthId,
+      @RequestParam int pageSize) {
     return new ResponseEntity(new SingleResponseDto<>(
         companyService.getCompanyAuthSummaryList(companyId, afterAuthId, pageSize)
-    ),HttpStatus.OK);
+    ), HttpStatus.OK);
   }
 }

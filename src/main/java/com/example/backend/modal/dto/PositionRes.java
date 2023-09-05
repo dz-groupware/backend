@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class PositionRes {
 
-    private String compName;
-    private String deptName;
-    private Long deptId;
-    private String nameTree;
-    private String pImg;
+  private String compName;
+  private String deptName;
+  private Long deptId;
+  private String nameTree;
+  private String pImg;
 
 
 }

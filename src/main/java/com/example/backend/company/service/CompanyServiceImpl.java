@@ -17,13 +17,13 @@ public class CompanyServiceImpl implements CompanyService {
   }
 
   @Override
-  public Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(Long companyId,
-                                                                int pageNumber,
-                                                                int pageSize) {
+  public Page<CompanyAuthSummaryDto> findCompanyAuthSummaryPage(Long companyId,
+      int pageNumber,
+      int pageSize) {
     long offset = (long) (pageNumber - 1) * pageSize;
 
     return new Page<>(companyMapper.getCompanyAuthSummaryListForPage(companyId, offset, pageSize),
-        new PageDto(pageNumber,pageSize,companyMapper.countCompanyAuthSummaryList(companyId))
+        new PageDto(pageNumber, pageSize, companyMapper.countCompanyAuthSummaryList(companyId))
     );
   }
 
@@ -35,8 +35,8 @@ public class CompanyServiceImpl implements CompanyService {
 
   @Override
   public List<CompanyAuthSummaryDto> getCompanyAuthSummaryList(Long companyId,
-                                                                Long afterAuthId,
-                                                                int pageSize) {
+      Long afterAuthId,
+      int pageSize) {
     return companyMapper.getCompanyAuthSummaryList(companyId, afterAuthId, pageSize);
   }
 

@@ -7,7 +7,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CompanyMapper {
 
-  List<CompanyAuthSummaryDto> getCompanyAuthSummaryListForPage(Long companyId, long offset, int limit);
+  List<CompanyAuthSummaryDto> getCompanyAuthSummaryListForPage(Long companyId, long offset,
+      int limit);
+
   long countCompanyAuthSummaryList(Long companyId);
-  List<CompanyAuthSummaryDto> getCompanyAuthSummaryList(Long companyId, Long afterAuthId, int limit);
+
+  List<CompanyAuthSummaryDto> getCompanyAuthSummaryList(Long companyId, Long afterAuthId,
+      int limit);
 }

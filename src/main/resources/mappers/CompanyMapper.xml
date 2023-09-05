@@ -3,12 +3,13 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.backend.company.mapper.CompanyMapper">
-<!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
-  <select id="getCompanyAuthSummaryListForPage" resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
+  <!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
+  <select id="getCompanyAuthSummaryListForPage"
+    resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
     SELECT a.name as auth_name, a.id as auth_id, c.id as company_id, c.name as company_name
     FROM comp_auth ac
-      JOIN company c ON ac.comp_id = c.id
-      JOIN auth a ON ac.auth_id = a.id
+    JOIN company c ON ac.comp_id = c.id
+    JOIN auth a ON ac.auth_id = a.id
     WHERE ac.comp_id = #{companyId}
     LIMIT #{limit} OFFSET #{offset}
   </select>
@@ -16,16 +17,17 @@
   <select id="countCompanyAuthSummaryList" resultType="long">
     SELECT COUNT(*)
     FROM comp_auth ac
-      JOIN company c ON ac.comp_id = c.id
-      JOIN auth a ON ac.auth_id = a.id
+    JOIN company c ON ac.comp_id = c.id
+    JOIN auth a ON ac.auth_id = a.id
     WHERE ac.comp_id = #{companyId}
   </select>
 
-  <select id="getCompanyAuthSummaryList" resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
+  <select id="getCompanyAuthSummaryList"
+    resultType="com.example.backend.company.dto.CompanyAuthSummaryDto">
     SELECT a.name as auth_name, a.id as auth_id, c.id as company_id, c.name as company_name
     FROM comp_auth ac
-      JOIN company c ON ac.comp_id = c.id
-      JOIN auth a ON ac.auth_id = a.id
+    JOIN company c ON ac.comp_id = c.id
+    JOIN auth a ON ac.auth_id = a.id
     WHERE ac.comp_id = #{companyId} AND ac.id > #{afterAuthId}
     LIMIT #{limit}
   </select>

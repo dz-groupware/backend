@@ -1,5 +1,5 @@
-//package com.example.backend.authgroup.dto.response;
-//
-//public class AuthResDto {
-//
-//}
+package com.example.backend.authgroup.dto.response;
+
+public class AuthResDto {
+
+}

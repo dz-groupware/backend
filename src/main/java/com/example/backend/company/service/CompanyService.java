@@ -6,7 +6,11 @@ import java.util.List;
 
 public interface CompanyService {
 
-  Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(Long companyId, int pageNumber, int pageSize);
+  Page<CompanyAuthSummaryDto> findCompanyAuthSummaryPage(Long companyId, int pageNumber,
+      int pageSize);
+
   long countCompanyList(Long companyId);
-  List<CompanyAuthSummaryDto> getCompanyAuthSummaryList(Long companyId, Long afterAuthId, int pageSize);
+
+  List<CompanyAuthSummaryDto> getCompanyAuthSummaryList(Long companyId, Long afterAuthId,
+      int pageSize);
 }

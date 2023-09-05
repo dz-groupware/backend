@@ -27,6 +27,16 @@ jwt:
   secret:
     key: abc
 
-
-
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIAUYIFBFKNLD3LQW7B
+      secretKey: 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
+    s3:
+      bucket: dz-test-image
+      dir: /*
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 
