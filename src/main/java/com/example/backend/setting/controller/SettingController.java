@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalTime.now;
@@ -24,60 +25,68 @@ public class SettingController {
     }
 
     @GetMapping("/menu/gnb")
-    public ResponseEntity getGnbList() {
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.getGnbList()), HttpStatus.OK);
+    public ResponseEntity findGnbList() {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.findGnbList()), HttpStatus.OK);
     }
 
     @GetMapping("/menu")
-    public ResponseEntity getMenuDetailById(@RequestParam Long menuId) {
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.getMenuDetailById(menuId)), HttpStatus.OK);
+    public ResponseEntity findMenuDetailById (@RequestParam Long menuId) {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.findMenuDetailById(menuId)), HttpStatus.OK);
     }
 
     @PostMapping("/menu")
-    public ResponseEntity submitMenu(@RequestBody MenuRes menu, @RequestParam String type) {
-        System.out.println("save menu data, type : " + type);
-        System.out.println(menu.getId());
-        System.out.println(menu.getParId());
-        System.out.println(menu.getName());
-        System.out.println(menu.getEnabledYN());
-        System.out.println(menu.getSortOrder());
-        System.out.println(menu.getIconUrl());
-        return new ResponseEntity(settingService.submitMenu(menu, type), HttpStatus.OK);
+    public ResponseEntity saveMenu(@RequestBody MenuRes menu, @RequestParam String type) {
+        return new ResponseEntity(settingService.saveMenu(menu, type), HttpStatus.OK);
     }
 
     @PostMapping("/menu/img")
-    public ResponseEntity updateMenuImgById(@RequestParam("iconFile") MultipartFile iconFile) throws IOException {
+    public ResponseEntity addImgById(@RequestParam MultipartFile iconFile) throws IOException {
         // 이미지 추가
-        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\static\\image\\" + iconFile.getOriginalFilename();
+        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\" + iconFile.getOriginalFilename();
         iconFile.transferTo(new File(path));
         return new ResponseEntity("iconFile saved", HttpStatus.OK);
     }
 
     @GetMapping("/menu/search")
-    public ResponseEntity getMenuDetailByName(@RequestParam String gnbName, @RequestParam String name){
-        System.out.println(gnbName + " : " + name);
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.getMenuDetailByName(gnbName, name)), HttpStatus.OK);
+    public ResponseEntity findMenuByName(@RequestParam String gnbName, @RequestParam String name){
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.findMenuByName(gnbName, name)), HttpStatus.OK);
     }
 
     @GetMapping("/menu/iconList")
-    public ResponseEntity getIconList() {
-        return new ResponseEntity(settingService.getIconList(), HttpStatus.OK);
+    public ResponseEntity findAllIcon() {
+        String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\";
+        File[] files = new File(path).listFiles();
+        List<String> iconList = new ArrayList<String>();
+        for (File file : files){
+            if(file.isFile()){
+                iconList.add("http://localhost:8010/api/v1/image/" + file.getName());
+            }
+        }
+        return new ResponseEntity(new SingleResponseDto<List<String>>(iconList), HttpStatus.OK);
     }
 
     @GetMapping("/favor")
-    public ResponseEntity checkFavor(@RequestParam Long empId, @RequestParam Long menuId) {
-        System.out.println(empId +" : "+ menuId);
+    public ResponseEntity findFavorById(@RequestParam Long empId, @RequestParam Long menuId) {
         // 현재 즐겨찾기 상태를 가져오기
-        return new ResponseEntity(settingService.checkFavor(empId, menuId), HttpStatus.OK);
+        return new ResponseEntity(settingService.findFavorById(empId, menuId), HttpStatus.OK);
     }
+
     @PostMapping("/favor")
-    public ResponseEntity FavorOn(Long empId, Long menuId) {
+    public ResponseEntity modifyFavorOn(Long empId, Long menuId) {
         // 즐겨찾기 저장 요청
-        return new ResponseEntity(settingService.FavorOn(empId, menuId), HttpStatus.OK);
+        return new ResponseEntity(settingService.modifyFavorOn(empId, menuId), HttpStatus.OK);
     }
+
     @DeleteMapping("/favor")
-    public ResponseEntity deleteFavor(@RequestParam Long empId, @RequestParam Long menuId) {
+    public ResponseEntity modifyFavorOff(@RequestParam Long empId, @RequestParam Long menuId) {
         // 즐겨찾기 삭제 요청
-        return new ResponseEntity(settingService.FavorOff(empId, menuId), HttpStatus.OK);
+        return new ResponseEntity(settingService.modifyFavorOff(empId, menuId), HttpStatus.OK);
     }
+
+    @GetMapping("/menu/all")
+    public ResponseEntity findAllMenu(@RequestParam Long compId) {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
+    }
+
+
 }

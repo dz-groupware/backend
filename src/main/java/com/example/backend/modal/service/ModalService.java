@@ -8,8 +8,8 @@ import com.example.backend.modal.dto.TreeItemRes;
 import java.util.List;
 
 public interface ModalService {
-    List<PositionRes> getProfile(Long empId);
-    List<TreeItemRes> getOrgTree(String type, Long empId, Long compId, Long deptId);
-    List<ProfileRes> getEmpList(String type, Long compId, Long deptId);
-    SingleResponseDto<?> getSearchResult(String type, String text);
+    List<PositionRes> findProfileByEmpId(Long empId);
+    List<TreeItemRes> findOrgTree(String type, Long empId, Long compId, Long deptId);
+    List<ProfileRes> findEmpList(String type, Long compId, Long deptId);
+    SingleResponseDto<?> findOrgSearchResult(String type, String text);
 }

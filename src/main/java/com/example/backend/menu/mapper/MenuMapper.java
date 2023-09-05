@@ -7,7 +7,8 @@ import java.util.List;
 
 @Mapper
 public interface MenuMapper {
-    List<MenuRes> getMenuByEmpId(Long empId);
-    List<MenuRes> getFavorByEmpId(Long empId);
-    int deleteFavor(Long empId, Long menuId);
+    List<MenuRes> findMenuByEmpId(Long empId);
+    List<MenuRes> findFavorByEmpId(Long empId);
+    int removeFavor(Long empId, Long menuId);
+    List<MenuRes> findMenuByParId (Long menuId, Long compId);
 }

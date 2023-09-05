@@ -15,20 +15,21 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public List<MenuRes> getMenuByEmpId(Long empId){
-        return menuMapper.getMenuByEmpId(empId);
+    public List<MenuRes> findMenuByEmpId(Long empId){
+        return menuMapper.findMenuByEmpId(empId);
     }
 
     @Override
-    public List<MenuRes> getFavorByEmpId(Long empId){
-        return menuMapper.getFavorByEmpId(empId);
+    public List<MenuRes> findFavorByEmpId(Long empId){
+        return menuMapper.findFavorByEmpId(empId);
     }
 
     @Override
-    public int deleteFavor(Long empId, Long menuId){
-        System.out.println("[Impl] empId : "+empId+" || menuId : "+menuId);
-        return menuMapper.deleteFavor(empId, menuId);
+    public int removeFavor(Long empId, Long menuId){
+        return menuMapper.removeFavor(empId, menuId);
     }
-
-
+    @Override
+    public List<MenuRes> findMenuByParId (Long menuId, Long compId) {
+        return menuMapper.findMenuByParId(menuId, compId);
+    }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Menu")
+@RequestMapping("/menu")
 public class MenuController {
     private final MenuService menuService;
 
@@ -18,19 +18,22 @@ public class MenuController {
         this.menuService = menuService;
     }
 
-    @GetMapping("/GNB")
-    public ResponseEntity getMenuByEmpId(@RequestParam Long empId) {
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.getMenuByEmpId(empId)), HttpStatus.OK);
+    @GetMapping("/gnb")
+    public ResponseEntity findMenuByEmpId(@RequestParam Long empId) {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.findMenuByEmpId(empId)), HttpStatus.OK);
     }
 
-    @GetMapping("/Favor")
-    public ResponseEntity getFavorByEmpId(@RequestParam Long empId){
-        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.getFavorByEmpId(empId)), HttpStatus.OK);
+    @GetMapping("/favor")
+    public ResponseEntity findFavorByEmpId(@RequestParam Long empId){
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.findFavorByEmpId(empId)), HttpStatus.OK);
     }
-    @DeleteMapping("/Favor")
-    public ResponseEntity deleteFavor(@RequestParam Long empId, @RequestParam Long menuId){
-        System.out.println("[Controller] empId : "+empId+" || menuId : "+menuId);
-        return new ResponseEntity(new SingleResponseDto<Integer>(menuService.deleteFavor(empId, menuId)), HttpStatus.OK);
+    @DeleteMapping("/favor")
+    public ResponseEntity removeFavor(@RequestParam Long empId, @RequestParam Long menuId){
+        return new ResponseEntity(new SingleResponseDto<Integer>(menuService.removeFavor(empId, menuId)), HttpStatus.OK);
     }
 
+    @GetMapping("/lnb")
+    public ResponseEntity findMenuByParId(@RequestParam Long menuId, @RequestParam Long compId) {
+        return new ResponseEntity(new SingleResponseDto<List<MenuRes>>(menuService.findMenuByParId(menuId, compId)), HttpStatus.OK);
+    }
 }

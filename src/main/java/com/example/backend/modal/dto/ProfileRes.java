@@ -16,5 +16,6 @@ public class ProfileRes {
     private String position;
     private String lastIp;
     private String compName;
+    private String compId;
 
 }
