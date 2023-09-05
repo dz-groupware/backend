@@ -1,16 +1,18 @@
-server:
-  port: 8010
-  servlet:
-    context-path: /api/v1
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dz_groupware
     username: root
-    password: password
+    password: 1234
+    url: jdbc:mysql://localhost:3306/test_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     serialization:
       write-dates-as-timestamps: false
+
+resources:
+  static-location:
+    - C:/dz_groupware/data/image/
+    - classpath:/static/
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
@@ -19,5 +21,3 @@ mybatis:
 jwt:
   secret:
     key: abc
-
-

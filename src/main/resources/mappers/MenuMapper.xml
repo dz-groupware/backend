@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.menu.mapper.MenuMapper">
+
+    <select id="findMenuByEmpId" resultType="com.example.backend.menu.dto.MenuRes">
+        SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU INNER JOIN
+        (SELECT MENU_ID FROM AUTH_MENU
+        INNER JOIN (SELECT AUTH_ID FROM AUTH_EMPLOYEE WHERE EMP_ID= #{empId} UNION
+        SELECT AUTH_ID FROM AUTH_DEPARTMENT INNER JOIN
+        (SELECT DEPT_ID FROM EMPLOYEE_DEPARTMENT WHERE EMP_ID = #{empId})DEPT
+        WHERE DEPT.DEPT_ID = AUTH_DEPARTMENT.DEPT_ID)ADMIN WHERE AUTH_MENU.AUTH_ID = ADMIN.AUTH_ID)MENU_LIST
+        WHERE MENU.ID=MENU_LIST.MENU_ID AND ID = PAR_ID;
+    </select>
+
+    <select id="findFavorByEmpId" resultType="com.example.backend.menu.dto.MenuRes">
+        SELECT menu.id, name, icon_url, sort_order FROM MENU, (SELECT * FROM FAVOR WHERE EMP_ID= #{empId})FAVOR_LIST WHERE MENU.ID = FAVOR_LIST.MENU_ID;
+    </select>
+
+    <delete id="removeFavor">
+        DELETE FROM FAVOR
+        <where>
+            EMP_ID=#{empId} AND MENU_ID=#{menuId}
+        </where>
+    </delete>
+    <select id="findMenuByParId" resultType="com.example.backend.menu.dto.MenuRes">
+        select id, par_id, name, sort_order, child_node_yn from menu where par_id=#{menuId}
+        and comp_id=#{compId} and enabled_yn=1 and deleted_yn=0;
+    </select>
+</mapper>
