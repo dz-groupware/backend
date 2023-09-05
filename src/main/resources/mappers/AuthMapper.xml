@@ -18,7 +18,7 @@
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
-  <select id="getCompanyAuthList"
+  <select id="findCompanyAuthList"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
     adb.id as id ,

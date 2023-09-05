@@ -34,12 +34,12 @@ public class AuthServiceImpl implements AuthService {
 
 
   @Override
-  public List<CompanyAuthSummaryDto> getCompanyAuthList(Long companyId,
+  public List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId,
       Long lastId,
       String orderBy,
       int pageSize) {
 
-    return authMapper.getCompanyAuthList(companyId, lastId, orderBy, pageSize);
+    return authMapper.findCompanyAuthList(companyId, lastId, orderBy, pageSize);
   }
 
   @Override

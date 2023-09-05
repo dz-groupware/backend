@@ -13,7 +13,7 @@ public interface AuthService {
   Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(Long companyId, int pageNumber,
       int pageSize);
 
-  List<CompanyAuthSummaryDto> getCompanyAuthList(Long companyId, Long lastId, String orderBy,
+  List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy,
       int pageSize);
 
   long getCompanyAuthCount(Long companyId, Long departmentId, Long employeeId, String orderBy);

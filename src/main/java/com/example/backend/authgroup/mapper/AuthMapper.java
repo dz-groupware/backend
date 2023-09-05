@@ -14,7 +14,7 @@ public interface AuthMapper {
   List<CompanyAuthSummaryDto> getCompanyAuthSummaryListForPage(Long companyId, long offset,
       int limit);
 
-  List<CompanyAuthSummaryDto> getCompanyAuthList(Long companyId, Long lastId, String orderBy,
+  List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy,
       int limit);
 
   long getCompanyAuthCount(Long companyId, Long departmentId, Long employeeId, String orderBy);

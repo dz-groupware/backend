@@ -1,9 +1,14 @@
+server:
+  port: 8010
+  servlet:
+    context-path: /api/v1
+
 spring:
   datasource:
-    username: root
-    password: 1234
-    url: jdbc:mysql://localhost:3306/test_db
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dz_groupware
+    username: root
+    password: password
   jackson:
     serialization:
       write-dates-as-timestamps: false

@@ -18,14 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthGroupController {
 
   private final AuthService authService;
-  private final AuthMapper authMapper;
 
   public AuthGroupController(AuthService authService,
       AuthMapper companyMapper) {
     this.authService = authService;
-    this.authMapper = companyMapper;
   }
-
 
   @GetMapping("/companies/{company-id}")
   public ResponseEntity<?> getCompanyAuthSummaryPage(@PathVariable("company-id") Long companyId,
@@ -39,12 +36,12 @@ public class AuthGroupController {
   }
 
   @GetMapping("/companies/{company-id}/auth")
-  public ResponseEntity<?> getCompanyAuthList(@PathVariable("company-id") Long companyId,
+  public ResponseEntity<?> findCompanyAuthList(@PathVariable("company-id") Long companyId,
       @RequestParam(required = true) Long lastId,
       @RequestParam(required = true) int pageSize,
       @RequestParam(required = false) String orderBy) {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authService.getCompanyAuthList(companyId, lastId, orderBy, pageSize)
+        authService.findCompanyAuthList(companyId, lastId, orderBy, pageSize)
     ), HttpStatus.OK);
   }
 
