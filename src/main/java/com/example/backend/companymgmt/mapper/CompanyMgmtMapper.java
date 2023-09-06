@@ -1,6 +1,7 @@
 package com.example.backend.companymgmt.mapper;
 
 
+import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
 import java.util.List;
@@ -9,19 +10,19 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CompanyMgmtMapper {
 
-  List<CompanyMgmtResDto> findCompanyMgmtList();
+  List<CompanyMgmtListResDto> getCompanyMgmtList();
 
-  CompanyMgmtResDto findCompanyDetailsById(int id);
+  CompanyMgmtResDto getCompanyDetailsById(Long id);
 
-  List<CompanyMgmtResDto> searchAllCompanyMgmt(String name);
+  List<CompanyMgmtListResDto> findAllCompanyMgmtList(String name);
 
-  List<CompanyMgmtResDto> searchCompanyMgmt(String name, int enabledYn);
+  List<CompanyMgmtListResDto> findCompanyMgmtList(String name, Boolean enabledYn);
 
   void addCompanyMgmt(CompanyMgmtReqDto companyMgmt);
 
   void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt);
 
-  int removeCompanyMgmt(CompanyMgmtReqDto companyMgmt);
+  int removeCompanyMgmt(Long id);
 
 
 }

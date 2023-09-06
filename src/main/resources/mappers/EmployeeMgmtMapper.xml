@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.employeemgmt.mapper.EmployeeMgmtMapper">
+
+
+    <insert id="addEmployeeMgmt">
+        INSERT INTO employee (id, imageUrl,name,empIdNum,gender,accountYn,loginI,loginPw,email,privEmail,
+        mobileNumber,homeNumber,address,joinDate,resignationDate )VALUES(#{code}, #{enabledYn}, #{name}, #{abbr},
+        #{businessType}, #{repName}, #{repIdNum}, #{repTel}, #{businessNum}, #{corpType}, #{corpNum},
+        #{establishmentDate}, #{openingDate}, #{closingDate}, #{address} )
+    </insert>
+
+    <select id="getEmployeeDetailsById"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
+        SELECT id,code, enabled_yn, name, abbr, business_type,
+        rep_name, rep_id_num,
+        rep_tel, business_num, corp_type, corp_num, establishment_date,
+        opening_date, closing_date, address from company WHERE id=#{id}
+    </select>
+
+    <select id="findEmployeeMgmtList" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+
+
+        SELECT id,image_url,user_id,login_id,name,join_date from employee where deleted_yn=false and compId LIKE #{name}
+        and searchType=#{enabledYn}
+    </select>
+
+    <select id="findAllEmployeeMgmtList"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT id,code,name,corp_type,rep_name from company where deleted_yn=false and name LIKE #{name}
+    </select>
+
+    <select id="getEmployeeMgmtList"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT id,image_url,user_id,login_id,name,join_date from company where deleted_yn=false and transfered_yn=false
+    </select>
+
+    <update id="modifyEmployeeMgmt">
+        UPDATE company SET enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr},
+        business_type=#{businessType},
+        rep_name=#{repName}, rep_id_num=#{repIdNum},
+        rep_tel=#{repTel}, business_num=#{businessNum}, corp_type=#{corpType}, corp_num=#{corpNum},
+        establishment_date= #{establishmentDate},
+        opening_date=#{openingDate}, closing_date=#{closingDate}, address=#{address} WHERE id=#{id}
+    </update>
+
+    <update id="removeEmployeeMgmt">
+        UPDATE company SET deleted_yn=true
+        WHERE id=#{id}
+    </update>
+
+</mapper>

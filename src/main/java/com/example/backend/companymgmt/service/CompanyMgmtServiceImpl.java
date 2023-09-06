@@ -1,5 +1,6 @@
 package com.example.backend.companymgmt.service;
 
+import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
@@ -16,39 +17,39 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
   }
 
   @Override
-  public List<CompanyMgmtResDto> findCompanyMgmtList() {
-    return companyMgmtMapper.findCompanyMgmtList();
+  public List<CompanyMgmtListResDto> getCompanyMgmtList() {
+    return companyMgmtMapper.getCompanyMgmtList();
   }
 
   @Override
-  public CompanyMgmtResDto findCompanyDetailsById(int id) {
-    return companyMgmtMapper.findCompanyDetailsById(id);
+  public CompanyMgmtResDto getCompanyDetailsById(Long id) {
+    return companyMgmtMapper.getCompanyDetailsById(id);
   }
 
   @Override
-  public List<CompanyMgmtResDto> searchCompanyMgmt(String name, int enabledYn) {
-    if (enabledYn == 2) {
-      return companyMgmtMapper.searchAllCompanyMgmt(name);
+  public List<CompanyMgmtListResDto> findCompanyMgmtList(String name, int enabledType) {
+    if (enabledType == 2) {
+      return companyMgmtMapper.findAllCompanyMgmtList(name);
     }
-    return companyMgmtMapper.searchCompanyMgmt(name, enabledYn);
+
+    Boolean enabled = enabledType==1?true:false;
+
+    return companyMgmtMapper.findCompanyMgmtList(name, enabled);
   }
 
   @Override
   public void addCompanyMgmt(CompanyMgmtReqDto companyMgmt) {
     companyMgmtMapper.addCompanyMgmt(companyMgmt);
-
   }
 
   @Override
-  public void modifyCompanyMgmt(int id, CompanyMgmtReqDto companyMgmt) {
+  public void modifyCompanyMgmt(Long id, CompanyMgmtReqDto companyMgmt) {
     companyMgmt.setId(id);
     companyMgmtMapper.modifyCompanyMgmt(companyMgmt);
   }
 
   @Override
-  public void removeCompanyMgmt(int id, CompanyMgmtReqDto companyMgmt) {
-    companyMgmt.setId(id);
-    companyMgmtMapper.removeCompanyMgmt(companyMgmt);
-
+  public void removeCompanyMgmt(Long id) {
+    companyMgmtMapper.removeCompanyMgmt(id);
   }
 }

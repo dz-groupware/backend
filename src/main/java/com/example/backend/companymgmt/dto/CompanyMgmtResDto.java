@@ -2,18 +2,19 @@ package com.example.backend.companymgmt.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+
+
 @Getter
-@Setter
+@AllArgsConstructor
 public class CompanyMgmtResDto {
 
-  private int id;
+  private Long id;
   private String code;
-  private int enabledYn;
+  private Boolean enabledYn;
   private String name;
   private String abbr;
   private String businessType;
@@ -21,8 +22,7 @@ public class CompanyMgmtResDto {
   private String repIdNum;
   private String repTel;
   private String businessNum;
-
-  private int corpType;
+  private Integer corpType;
   private String corpNum;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date establishmentDate;
@@ -31,6 +31,6 @@ public class CompanyMgmtResDto {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date closingDate;
   private String address;
-  private boolean deletedYn;
+  private Boolean deletedYn;
 
 }

@@ -6,14 +6,7 @@ import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.service.CompanyMgmtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/companies")
@@ -26,46 +19,46 @@ public class CompanyMgmtController {
     this.companyMgmtService = companyMgmtService;
   }
 
-  @GetMapping("/")
-  public ResponseEntity findCompanyMgmtList() {
-    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.findCompanyMgmtList()),
+  @GetMapping
+  public ResponseEntity getCompanyMgmtList() {
+
+    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtList()),
         HttpStatus.OK);
   }
 
 
-  @PostMapping("/{code}")
-  public ResponseEntity insert(@RequestBody CompanyMgmtReqDto company) {
+  @PostMapping
+  public ResponseEntity addCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
     companyMgmtService.addCompanyMgmt(company);
     return new ResponseEntity<>(new SingleResponseDto("성공"),
         HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity findCompanyDetailsById(@PathVariable int id) {
+  public ResponseEntity getCompanyDetailsById(@PathVariable Long id) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(companyMgmtService.findCompanyDetailsById(id)),
+        new SingleResponseDto<>(companyMgmtService.getCompanyDetailsById(id)),
         HttpStatus.OK);
   }
 
 
-  @GetMapping("/search")
-  public ResponseEntity searchCompanyMgmt(@RequestParam String name, int enabledYn) {
+  @GetMapping("/company-list")
+  public ResponseEntity findCompanyMgmtList(@RequestParam String name, int enabledType) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(companyMgmtService.searchCompanyMgmt(name, enabledYn)),
+        new SingleResponseDto<>(companyMgmtService.findCompanyMgmtList(name, enabledType)),
         HttpStatus.OK);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity update(@PathVariable int id, @RequestBody CompanyMgmtReqDto company) {
+  public ResponseEntity modifyCompanyMgmt(@PathVariable Long id, @RequestBody CompanyMgmtReqDto company) {
     companyMgmtService.modifyCompanyMgmt(id, company);
     return new ResponseEntity<>(new SingleResponseDto("성공"),
         HttpStatus.OK);
   }
 
-  @PutMapping("/del/{code}")
-  public ResponseEntity remove(@PathVariable int id, @RequestBody CompanyMgmtReqDto company) {
-    companyMgmtService.removeCompanyMgmt(id, company);
-
+  @DeleteMapping("/{id}")
+  public ResponseEntity removeCompanyMgmt(@PathVariable Long id) {
+    companyMgmtService.removeCompanyMgmt(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
