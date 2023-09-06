@@ -7,17 +7,18 @@ import com.example.backend.authgroup.dto.AuthMenuDto;
 import com.example.backend.authgroup.dto.CompanyAuthSummaryDto;
 import com.example.backend.authgroup.dto.CompanyMenuDto;
 import com.example.backend.authgroup.dto.MenuAuthStatusDto;
-import com.example.backend.authgroup.mapper.AuthMapper;
+import com.example.backend.authgroup.mapper.AuthGroupMapper;
+import com.example.backend.config.jwt.SecurityUtil;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthGroupServiceImpl implements AuthGroupService {
 
-  private final AuthMapper authMapper;
+  private final AuthGroupMapper authGroupMapper;
 
-  public AuthServiceImpl(AuthMapper authMapper) {
-    this.authMapper = authMapper;
+  public AuthGroupServiceImpl(AuthGroupMapper authGroupMapper) {
+    this.authGroupMapper = authGroupMapper;
   }
 
   @Override
@@ -26,9 +27,9 @@ public class AuthServiceImpl implements AuthService {
       int pageSize) {
     long offset = (long) (pageNumber - 1) * pageSize;
 
-    return new Page<>(authMapper.getCompanyAuthSummaryListForPage(companyId, offset, pageSize),
+    return new Page<>(authGroupMapper.getCompanyAuthSummaryListForPage(companyId, offset, pageSize),
         new PageDto(pageNumber, pageSize,
-            authMapper.getCompanyAuthCount(companyId, null, null, null))
+            authGroupMapper.getCompanyAuthCount(companyId, null, null, null))
     );
   }
 
@@ -39,38 +40,46 @@ public class AuthServiceImpl implements AuthService {
       String orderBy,
       int pageSize) {
 
-    return authMapper.findCompanyAuthList(companyId, lastId, orderBy, pageSize);
+    return authGroupMapper.findCompanyAuthList(companyId, lastId, orderBy, pageSize);
   }
 
+//  @Override
+//  public long getCompanyAuthCount(Long companyId, Long departmentId, Long employeeId,
+//      String orderBy) {
+//    return authGroupMapper.getCompanyAuthCount(companyId, departmentId, employeeId, orderBy);
+//  }
+
   @Override
-  public long getCompanyAuthCount(Long companyId, Long departmentId, Long employeeId,
+  public long getCompanyAuthCount(Long departmentId, Long employeeId,
       String orderBy) {
-    return authMapper.getCompanyAuthCount(companyId, departmentId, employeeId, orderBy);
+    Long companyId = SecurityUtil.getCompanyId();
+    return authGroupMapper.getCompanyAuthCount(companyId, departmentId, employeeId, orderBy);
   }
+
 
   @Override
   public List<CompanyMenuDto> getCompanyGnbList(Long companyId) {
-    return authMapper.getCompanyGnbList(companyId);
+    return authGroupMapper.getCompanyGnbList(companyId);
   }
 
   @Override
   public List<CompanyMenuDto> getCompanyLnbList(Long companyId, Long parId) {
-    return authMapper.getCompanyLnbList(companyId, parId);
+    return authGroupMapper.getCompanyLnbList(companyId, parId);
   }
 
   @Override
   public List<AuthMenuDto> getGnbListOfAuth(Long companyId, Long authId) {
-    return authMapper.getGnbListOfAuth(companyId,authId);
+    return authGroupMapper.getGnbListOfAuth(companyId,authId);
   }
 
   @Override
   public List<MenuAuthStatusDto> getGnbListOfAuthWithAll(Long companyId, Long authId) {
-    return authMapper.getGnbListOfAuthWithAll(companyId, authId);
+    return authGroupMapper.getGnbListOfAuthWithAll(companyId, authId);
   }
 
   @Override
   public List<UserListOfAuthDto> getEmpListOfAuth(Long authId) {
-    return authMapper.getEmpListOfAuth(authId);
+    return authGroupMapper.getEmpListOfAuth(authId);
   }
 
 

@@ -3,13 +3,12 @@ package com.example.backend.config.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.config.auth.PrincipalDetails;
-import com.example.backend.employee.dto.EmployeeResDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Date;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     this.jwtKey = jwtKey;
     this.authenticationManager = authenticationManager;
     this.objectMapper = objectMapper;
-    setFilterProcessesUrl("/api/v1/login"); // 로그인 URL 변경
+    setFilterProcessesUrl("/login"); // 로그인 URL 변경
   }
 
   // ("/login") 요청을 하면 로그인 시도를 위해서 실행되는 함수
@@ -40,7 +39,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     try {
 
       LoginReqDto loginReqDto = objectMapper.readValue(request.getInputStream(), LoginReqDto.class);
-      System.out.println(loginReqDto.toString());
       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
           loginReqDto.getLoginId(), loginReqDto.getLoginPw());
 
@@ -48,7 +46,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       // principalDetailsService 의 loadUserByUsername() 가 실행된 후 정상이면 authentication 이 리텀됨
       Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-      // authentication 객체를 session 영역에 저장(권한 관리를 security 가 대신해 줌)
       return authentication;
     } catch (IOException e) {
       e.printStackTrace();
@@ -65,15 +62,25 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     String jwtToken = JWT.create()
         .withSubject(principalDetails.getUsername()) // 토큰 이름 설정
         .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
-        .withClaim("id", principalDetails.getUsername())
+        .withClaim("userId", principalDetails.getUserId())
+        .withClaim("empId", principalDetails.getEmployeeId())
+        .withClaim("compId", principalDetails.getCompanyId())
+        .withClaim("deptId", principalDetails.getDepartmentId())
         .sign(Algorithm.HMAC512(jwtKey));// 고유한 시크릿 값 적용
+
+    //헤더
     response.addHeader("Authorization", "Bearer " + jwtToken);
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
-    EmployeeResDto employee = principalDetails.getEmployee();
 
-    SingleResponseDto<EmployeeResDto> responseBody = new SingleResponseDto<>(
-        principalDetails.getEmployee());
+    //쿠키
+    Cookie jwtCookie = new Cookie("JWT", jwtToken);
+    jwtCookie.setHttpOnly(true);
+    response.addCookie(jwtCookie);
+
+
+    SingleResponseDto<PrincipalUserDto> responseBody = new SingleResponseDto<>(
+        principalDetails.getPrincipalUser());
     response.getWriter().write(objectMapper.writeValueAsString(responseBody));
     response.getWriter().flush();
   }
