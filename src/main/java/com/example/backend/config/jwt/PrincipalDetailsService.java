@@ -1,7 +1,6 @@
-package com.example.backend.config.auth;
+package com.example.backend.config.jwt;
 
-import com.example.backend.employee.dto.EmployeeResDto;
-import com.example.backend.employee.mapper.EmployeeMapper;
+import com.example.backend.user.UserMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,20 +10,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class PrincipalDetailsService implements UserDetailsService {
 
-  private final EmployeeMapper employeeMapper;
+  private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
 
-  public PrincipalDetailsService(EmployeeMapper employeeMapper, PasswordEncoder passwordEncoder) {
-    this.employeeMapper = employeeMapper;
+  public PrincipalDetailsService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    this.userMapper = userMapper;
     this.passwordEncoder = passwordEncoder;
   }
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    EmployeeResDto employee = employeeMapper.findByLoginId(username);
-    if (employee == null) {
+    PrincipalUserDto principalUser = userMapper.findByLoginId(username);
+    if (principalUser == null) {
       throw new UsernameNotFoundException("Employee not found");
     }
-    return new PrincipalDetails(employee); // PrincipalDetails should implement UserDetails
+    return new PrincipalDetails(principalUser); // PrincipalDetails should implement UserDetails
   }
 }

@@ -38,11 +38,6 @@ public class EmployeeController {
         ), HttpStatus.OK);
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity findById(@PathVariable Long id) {
-    return new ResponseEntity<>(new SingleResponseDto<>(employeeService.findById(id)),
-        HttpStatus.OK);
-  }
 
   @PostMapping
   public ResponseEntity insert(@RequestBody EmployeeReqDto employee) {

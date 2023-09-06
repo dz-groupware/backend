@@ -1,6 +1,5 @@
-package com.example.backend.config.auth;
+package com.example.backend.config.jwt;
 
-import com.example.backend.employee.dto.EmployeeResDto;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Data;
@@ -10,10 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Data
 public class PrincipalDetails implements UserDetails {
 
-  private final EmployeeResDto employee;
+  private final PrincipalUserDto principalUser;
 
-  public PrincipalDetails(EmployeeResDto employee) {
-    this.employee = employee;
+  public PrincipalDetails(PrincipalUserDto employee) {
+    this.principalUser = employee;
   }
 
   @Override // 해당 member의 권한을 리턴하는곳
@@ -25,12 +24,28 @@ public class PrincipalDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-    return employee.getLoginId();
+    return principalUser.getLoginId();
+  }
+
+  public Long getUserId() {
+    return principalUser.getUserId();
+  }
+
+  public Long getEmployeeId() {
+    return principalUser.getEmpId();
+  }
+
+  public Long getCompanyId() {
+    return principalUser.getCompId();
+  }
+
+  public Long getDepartmentId(){
+    return principalUser.getDeptId();
   }
 
   @Override
   public String getPassword() {
-    return employee.getLoginPw();
+    return principalUser.getLoginPw();
   }
 
 

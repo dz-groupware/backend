@@ -14,11 +14,9 @@
     #{salary})
   </insert>
 
-  <select id="findByLoginId" resultType="com.example.backend.employee.dto.EmployeeResDto">
-    SELECT * FROM employee WHERE login_Id = #{loginId}
-  </select>
 
-  <select id="findEmpList" resultType="com.example.backend.employee.dto.EmployeeResDto">
+
+  <select id="findEmpList" resultType="com.example.backend.config.jwt.PrincipalUserDto">
     SELECT
     c.name AS comp_name,
     e.name AS emp_name,
@@ -32,7 +30,7 @@
     employee e ON ce.emp_id = e.id
   </select>
 
-  <select id="findById" resultType="com.example.backend.employee.dto.EmployeeResDto">
+  <select id="findById" resultType="com.example.backend.config.jwt.PrincipalUserDto">
     SELECT * FROM employee WHERE id = #{id}
   </select>
 
@@ -46,4 +44,7 @@
     id = #{id}
   </update>
 
+  <select id="">
+
+  </select>
 </mapper>

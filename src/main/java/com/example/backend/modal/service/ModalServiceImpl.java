@@ -5,6 +5,7 @@ import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.PositionRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
+import java.util.HashMap;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,6 +55,8 @@ public class ModalServiceImpl implements ModalService {
             System.out.println(type + " : " + text);
 
             List<SingleResponseDto<?>> result = new ArrayList<SingleResponseDto<?>>();
+            HashMap<String, List<?>> map = new HashMap<>();
+
             result.add(new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfAllDept(text)));
             result.add(new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultOfAllEmp(text)));
 //            SingleResponseDto result2 = new SingleResponseDto<List<SingleResponseDto>>();
