@@ -1,7 +1,7 @@
 package com.example.backend.employee.mapper;
 
 import com.example.backend.employee.dto.EmployeeReqDto;
-import com.example.backend.employee.dto.EmployeeResDto;
+import com.example.backend.config.jwt.PrincipalUserDto;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -9,16 +9,10 @@ import org.apache.ibatis.annotations.Mapper;
 public interface EmployeeMapper {
 
   List<EmployeeReqDto> findEmployeeList(Long companyId, long offset, int limit);
-
-  EmployeeResDto findById(Long companyId);
-
-  EmployeeResDto findByLoginId(String loginId);
-
+  PrincipalUserDto findById(Long companyId);
+  PrincipalUserDto findByLoginId(String loginId);
   void addEmployee(EmployeeReqDto employee);
-
   void modifyEmployee(EmployeeReqDto employee);
-
   void removeEmployee(Long id);
-
   long getTotalElements();
 }

@@ -1,7 +1,6 @@
 package com.example.backend.employee.service;
 
 import com.example.backend.employee.dto.EmployeeReqDto;
-import com.example.backend.employee.dto.EmployeeResDto;
 import com.example.backend.employee.mapper.EmployeeMapper;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -19,16 +18,6 @@ public class EmployeeServiceImpl implements EmployeeService {
   public List<EmployeeReqDto> findEmployeeList(Long companyId, int pageNumber, int pageSize) {
     long offset = (long) (pageNumber - 1) * pageSize;
     return employeeMapper.findEmployeeList(companyId, offset, pageSize);
-  }
-
-  @Override
-  public EmployeeResDto findById(Long id) {
-    return employeeMapper.findById(id);
-  }
-
-  @Override
-  public EmployeeResDto findByLoginId(String loginId) {
-    return employeeMapper.findByLoginId(loginId);
   }
 
   @Override
