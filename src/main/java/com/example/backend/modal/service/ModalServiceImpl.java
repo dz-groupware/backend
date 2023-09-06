@@ -53,6 +53,7 @@ public class ModalServiceImpl implements ModalService {
     if (type.equals("all")) {
       System.out.println(type + " : " + text);
 
+      // map으로 하면 'data' 대신 이름을 넣을 수 있으니까 좋을 듯
       List<SingleResponseDto<?>> result = new ArrayList<SingleResponseDto<?>>();
       result.add(new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfAllDept(text)));
       result.add(new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultOfAllEmp(text)));

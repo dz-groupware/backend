@@ -18,13 +18,11 @@ public class S3 {
 
   public String upload(MultipartFile multipartFile) throws IOException {
     String s3FileName = multipartFile.getOriginalFilename();
-    System.out.println("file name : " + s3FileName);
 
     ObjectMetadata objMeta = new ObjectMetadata();
     objMeta.setContentLength(multipartFile.getInputStream().available());
 
     amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
-    System.out.println("url : " + amazonS3.getUrl(bucket, s3FileName).toString());
 
     return amazonS3.getUrl(bucket, s3FileName).toString();
   }

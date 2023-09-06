@@ -2,11 +2,15 @@ package com.example.backend.menu.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.http.annotation.Contract;
 
 @Getter
 @Setter
-public class MenuRes {
-
+public class MenuDto {
+  @Contract(pure = true)
+  public MenuDto(String error) {
+    this.name = error;
+  }
   private Long id = 0L;
   private Long parId = 0L;
   private String name = "";
@@ -14,4 +18,5 @@ public class MenuRes {
   private int sortOrder = 0;
   private String nameTree = "";
   private int childNodeYn = 0;
+
 }

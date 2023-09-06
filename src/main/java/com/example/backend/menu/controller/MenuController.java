@@ -1,7 +1,7 @@
 package com.example.backend.menu.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.menu.dto.MenuRes;
+import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.service.MenuService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -23,15 +23,14 @@ public class MenuController {
   }
 
   @GetMapping("/gnb")
-  public ResponseEntity findMenuByEmpId(@RequestParam Long empId) {
-    return new ResponseEntity(
-        new SingleResponseDto<List<MenuRes>>(menuService.findMenuByEmpId(empId)), HttpStatus.OK);
+  public ResponseEntity<?> getMenuByEmpId(Long userId, @RequestParam Long empId, Long deptId, Long compId) {
+    return new ResponseEntity<>(menuService.getMenuByEmpId(userId, empId, deptId, compId), HttpStatus.OK);
   }
 
   @GetMapping("/favor")
-  public ResponseEntity findFavorByEmpId(@RequestParam Long empId) {
+  public ResponseEntity getFavorByEmpId(@RequestParam Long empId) {
     return new ResponseEntity(
-        new SingleResponseDto<List<MenuRes>>(menuService.findFavorByEmpId(empId)), HttpStatus.OK);
+        new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId(empId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
@@ -43,7 +42,7 @@ public class MenuController {
   @GetMapping("/lnb")
   public ResponseEntity findMenuByParId(@RequestParam Long menuId, @RequestParam Long compId) {
     return new ResponseEntity(
-        new SingleResponseDto<List<MenuRes>>(menuService.findMenuByParId(menuId, compId)),
+        new SingleResponseDto<List<MenuDto>>(menuService.findMenuByParId(menuId, compId)),
         HttpStatus.OK);
   }
 }

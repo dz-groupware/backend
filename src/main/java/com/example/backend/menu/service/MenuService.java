@@ -1,15 +1,16 @@
 package com.example.backend.menu.service;
 
-import com.example.backend.menu.dto.MenuRes;
+import com.example.backend.common.SingleResponseDto;
+import com.example.backend.menu.dto.MenuDto;
 import java.util.List;
 
 public interface MenuService {
 
-  List<MenuRes> findMenuByEmpId(Long empId);
+  List<MenuDto> getMenuByEmpId(Long userId, Long empId, Long deptId, Long compId);
 
-  List<MenuRes> findFavorByEmpId(Long empId);
+  List<MenuDto> getFavorByEmpId(Long empId);
 
   int removeFavor(Long empId, Long menuId);
 
-  List<MenuRes> findMenuByParId(Long menuId, Long compId);
+  List<MenuDto> findMenuByParId(Long menuId, Long compId);
 }

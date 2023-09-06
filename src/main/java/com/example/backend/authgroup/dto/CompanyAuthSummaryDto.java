@@ -1,4 +1,4 @@
-package com.example.backend.company.dto;
+package com.example.backend.authgroup.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,9 @@ import lombok.Setter;
 @Setter
 public class CompanyAuthSummaryDto {
 
-  private String companyId;
+  private Long id;
+  private Long companyId;
+  private Long authId;
   private String companyName;
   private String authName;
-  private String authId;
 }
