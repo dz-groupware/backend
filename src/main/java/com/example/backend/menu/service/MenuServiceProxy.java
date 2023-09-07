@@ -1,11 +1,11 @@
-/*
+
 package com.example.backend.menu.service;
 
 import com.example.backend.common.SingleResponseDto;
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -21,16 +21,19 @@ public class MenuServiceProxy implements MenuService{
   }
 
   @Override
-  public List<MenuDto> getMenuByEmpId(Long userId, Long empId, Long deptId, Long compId) {
+  public List<MenuDto> getMenuByEmpId() {
+
+    Long userId = SecurityUtil.getUserId();
+    Long empId = SecurityUtil.getEmployeeId();
+    Long compId = SecurityUtil.getCompanyId();
+    Long deptId = SecurityUtil.getDepartmentId();
+
     List<Long> check = menuMapper.check(userId, empId, deptId, compId);
 
-    if (check.size() == 1) {
-      if (check.get(0) == 1L) {
-        return menuService.getMenuByEmpId(userId, empId, deptId, compId);
-      }
-      return new ArrayList<MenuDto>(new MenuDto("-1"));
+    if (check.size() == 2 && check.get(0) == 1L) {
+      return menuService.getMenuByEmpId();
     }
-    return new SingleResponseDto<Map<String, List<Long>>>(check);
+    return new ArrayList<MenuDto>();
   }
 
   @Override
@@ -48,4 +51,3 @@ public class MenuServiceProxy implements MenuService{
     return null;
   }
 }
-*/

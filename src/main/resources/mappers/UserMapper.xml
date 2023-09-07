@@ -10,6 +10,5 @@
     LEFT JOIN employee_department ed ON ed.emp_id = e.id
     WHERE u.login_id = #{loginId} and org = 1
     ORDER BY e.last_access desc
-    limit 1
   </select>
 </mapper>
