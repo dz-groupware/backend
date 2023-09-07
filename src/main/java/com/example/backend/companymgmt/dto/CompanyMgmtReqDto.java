@@ -1,33 +1,44 @@
 package com.example.backend.companymgmt.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 
-@Getter
-@Setter
-public class CompanyMgmtReqDto {
-    private int id;
-    private String code = "";
-    private int enabledYn;
-    private String name;
-    private String abbr;
-    private String businessType;
-    private String repName;
-    private String repIdNum;
-    private String repTel;
-    private String businessNum;
-    private int corpType;
-    private String corpNum;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date establishmentDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date openingDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date closingDate;
-    private String address;
-    private boolean deletedYn;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class CompanyMgmtReqDto {
+
+  private Long id;
+  private String code;
+  private Boolean enabledYn;
+  private String name;
+  private String abbr;
+  private String businessType;
+  private String repName;
+  private String repIdNum;
+  private String repTel;
+  private String businessNum;
+  private Integer corpType;
+  private String corpNum;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private Date establishmentDate;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private Date openingDate;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private Date closingDate;
+  private String address;
+  private Boolean deletedYn;
+  private Long companyId;
+
+  public void setId(Long id) {
+    this.id=id;
+  }
+  public void setCompanyId(Long id){
+    this.companyId=id;
+  }
 }

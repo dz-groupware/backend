@@ -15,7 +15,7 @@ public interface AuthGroupMapper {
       int limit);
   List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy,
       int limit);
-  long getCompanyAuthCount(Long companyId, Long departmentId, Long employeeId, String orderBy);
+  long getCompanyAuthCount(Long companyId);
   List<CompanyMenuDto> getCompanyGnbList(Long companyId);
   List<CompanyMenuDto> getCompanyLnbList(Long companyId, Long parId);
   List<AuthMenuDto> getGnbListOfAuth(Long companyId, Long authId);
