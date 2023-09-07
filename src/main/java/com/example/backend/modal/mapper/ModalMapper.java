@@ -1,6 +1,5 @@
 package com.example.backend.modal.mapper;
 
-import com.example.backend.modal.dto.PositionRes;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import java.util.List;
@@ -8,14 +7,14 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface ModalMapper {
+  List<ProfileRes> getProfileByUserId(Long userId);
+  List<TreeItemRes> getCompToGnb(Long compId);
+  List<TreeItemRes> getGnbToLnb(Long compId);
+  List<TreeItemRes> getLnbToLnb(Long compId, Long deptId);
 
-  List<PositionRes> findProfileByEmpId(Long empId);
 
-  List<TreeItemRes> findCompList(Long empId);
 
-  List<TreeItemRes> findDeptList1(Long compId);
 
-  List<TreeItemRes> findDeptList2(Long compId, Long deptId);
 
   List<ProfileRes> findCompEmpList(Long compId);
 

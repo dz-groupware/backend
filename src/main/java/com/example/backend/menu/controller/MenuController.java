@@ -24,24 +24,26 @@ public class MenuController {
 
   @GetMapping("/gnb")
   public ResponseEntity<?> getMenuByEmpId(Long userId, @RequestParam Long empId, Long deptId, Long compId) {
-    return new ResponseEntity<>(menuService.getMenuByEmpId(userId, empId, deptId, compId), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getMenuByEmpId()), HttpStatus.OK);
   }
 
+
+
   @GetMapping("/favor")
-  public ResponseEntity getFavorByEmpId(@RequestParam Long empId) {
-    return new ResponseEntity(
+  public ResponseEntity<?> getFavorByEmpId(@RequestParam Long empId) {
+    return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId(empId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity removeFavor(@RequestParam Long empId, @RequestParam Long menuId) {
-    return new ResponseEntity(
+  public ResponseEntity<?> removeFavor(@RequestParam Long empId, @RequestParam Long menuId) {
+    return new ResponseEntity<>(
         new SingleResponseDto<Integer>(menuService.removeFavor(empId, menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/lnb")
-  public ResponseEntity findMenuByParId(@RequestParam Long menuId, @RequestParam Long compId) {
-    return new ResponseEntity(
+  public ResponseEntity<?> findMenuByParId(@RequestParam Long menuId, @RequestParam Long compId) {
+    return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.findMenuByParId(menuId, compId)),
         HttpStatus.OK);
   }

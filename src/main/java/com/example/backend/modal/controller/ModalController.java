@@ -1,7 +1,6 @@
 package com.example.backend.modal.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.modal.dto.PositionRes;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.service.ModalService;
@@ -24,25 +23,22 @@ public class ModalController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity findProfileByEmpId(@RequestParam("empId") Long empId) {
+  public ResponseEntity getProfileByUserId() {
     return new ResponseEntity(
-        new SingleResponseDto<List<PositionRes>>(modalService.findProfileByEmpId(empId)),
+        new SingleResponseDto<List<ProfileRes>>(modalService.getProfileByUserId()),
         HttpStatus.OK);
   }
 
   @GetMapping("/org/tree")
-  public ResponseEntity findOrgTree(@RequestParam String type,
-      @RequestParam(required = false) Long empId, @RequestParam(required = false) Long compId,
-      @RequestParam(required = false) Long deptId) {
+  public ResponseEntity getOrgTree(@RequestParam String type) {
     return new ResponseEntity(new SingleResponseDto<List<TreeItemRes>>(
-        modalService.findOrgTree(type, empId, compId, deptId)), HttpStatus.OK);
+        modalService.getOrgTree(type)), HttpStatus.OK);
   }
 
   @GetMapping("/org/empList")
-  public ResponseEntity findEmpList(@RequestParam String type,
-      @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
+  public ResponseEntity findEmpList(@RequestParam String type) {
     return new ResponseEntity(
-        new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type, compId, deptId)),
+        new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type)),
         HttpStatus.OK);
   }
 

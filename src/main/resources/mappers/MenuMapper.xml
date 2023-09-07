@@ -5,7 +5,7 @@
 
   <!-- 사원/부서/회사 존재여부 확인 -->
   <select id="check">
-    SELECT COUNT(*) FROM EMPLOYEE WHERE ACCOUNT_YN=1 AND DELETED_YN = 0 AND ID=12 AND USER_ID=#{userId}
+    SELECT COUNT(*) FROM EMPLOYEE WHERE ACCOUNT_YN=1 AND DELETED_YN = 0 AND ID= #{empId} AND USER_ID=#{userId}
     UNION
     SELECT COUNT(*)FROM EMPLOYEE_DEPARTMENT
     WHERE transferred_yn = 0 and deleted_yn = 0 and emp_id = #{empId} and org = 1 AND DEPT_ID= #{deptId}
@@ -14,22 +14,24 @@
   </select>
 
   <!-- GNB 메뉴 리스트 -->
-  <select id="findMenuByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
+  <select id="getMenuByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
     SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU
     INNER JOIN
     (SELECT MENU_ID FROM AUTH_MENU INNER JOIN
-    (select auth_id from auth_employee where emp_id = 12 and deleted_yn = 0
+    (select auth_id from auth_employee where emp_id = #{empId} and deleted_yn = 0
     union
-    SELECT AUTH_ID FROM AUTH_DEPARTMENT where dept_id = 6 and deleted_yn = 0
+    SELECT AUTH_ID FROM AUTH_DEPARTMENT where dept_id = #{deptId} and deleted_yn = 0
     union
-    select AUTH_ID from auth_company where comp_id = 1 and deleted_yn = 0
+    select AUTH_ID from auth_company where comp_id = #{compId} and deleted_yn = 0
     )ADMIN
     WHERE AUTH_MENU.DELETED_YN = 0 AND AUTH_MENU.AUTH_ID = ADMIN.AUTH_ID)MENU_LIST
     WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=MENU_LIST.MENU_ID AND ID = PAR_ID;
   </select>
 
+
+
   <!-- GNB 즐겨찾기 리스트 -->
-  <select id="getMenuByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
+  <select id="getFavorByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
     SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU INNER JOIN
     (select favor.menu_id from favor inner join
     (SELECT auth_menu.MENU_ID FROM AUTH_MENU INNER JOIN

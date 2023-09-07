@@ -8,6 +8,7 @@ import lombok.Setter;
 public class TreeItemRes {
 
   private Long id;
-  private String code;
+  private Long parId;
   private String name;
+  private int sortOrder;
 }

@@ -7,10 +7,7 @@ import org.apache.http.annotation.Contract;
 @Getter
 @Setter
 public class MenuDto {
-  @Contract(pure = true)
-  public MenuDto(String error) {
-    this.name = error;
-  }
+
   private Long id = 0L;
   private Long parId = 0L;
   private String name = "";

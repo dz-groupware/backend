@@ -1,13 +1,17 @@
 package com.example.backend.modal.service;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.modal.dto.PositionRes;
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
+
+import java.util.HashMap;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.stereotype.Service;
+
 
 @Service
 public class ModalServiceImpl implements ModalService {
@@ -19,30 +23,37 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<PositionRes> findProfileByEmpId(Long empId) {
-    return modalMapper.findProfileByEmpId(empId);
+  public List<ProfileRes> getProfileByUserId() {
+    Long userId = SecurityUtil.getUserId();
+    return modalMapper.getProfileByUserId(userId);
   }
 
   @Override
-  public List<TreeItemRes> findOrgTree(String type, Long empId, Long compId, Long deptId) {
+  public List<TreeItemRes> getOrgTree(String type) {
+    Long compId = SecurityUtil.getCompanyId();
     if (type.equals("comp")) {
-      return modalMapper.findCompList(empId);
+      return modalMapper.getCompToGnb(compId);
     }
     if (type.equals("Dept1")) {
-      return modalMapper.findDeptList1(compId);
+      return modalMapper.getGnbToLnb(compId);
     }
     if (type.equals("Dept2")) {
-      return modalMapper.findDeptList2(compId, deptId);
+      Long deptId = SecurityUtil.getDepartmentId();
+      return modalMapper.getLnbToLnb(compId, deptId);
     }
     return new ArrayList<TreeItemRes>();
   }
 
+
+
   @Override
-  public List<ProfileRes> findEmpList(String type, Long compId, Long deptId) {
+  public List<ProfileRes> findEmpList(String type) {
     if (type.equals("comp")) {
+      Long compId = SecurityUtil.getCompanyId();
       return modalMapper.findCompEmpList(compId);
     }
     if (type.equals("dept")) {
+      Long deptId = SecurityUtil.getDepartmentId();
       return modalMapper.findDeptEmpList(deptId);
     }
     return new ArrayList<>();
@@ -53,10 +64,13 @@ public class ModalServiceImpl implements ModalService {
     if (type.equals("all")) {
       System.out.println(type + " : " + text);
 
-      // map으로 하면 'data' 대신 이름을 넣을 수 있으니까 좋을 듯
-      List<SingleResponseDto<?>> result = new ArrayList<SingleResponseDto<?>>();
-      result.add(new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfAllDept(text)));
-      result.add(new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultOfAllEmp(text)));
+
+            List<SingleResponseDto<?>> result = new ArrayList<SingleResponseDto<?>>();
+            HashMap<String, List<?>> map = new HashMap<>();
+
+            result.add(new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfAllDept(text)));
+            result.add(new SingleResponseDto<List<ProfileRes>>(modalMapper.findResultOfAllEmp(text)));
+
 //            SingleResponseDto result2 = new SingleResponseDto<List<SingleResponseDto>>();
       return new SingleResponseDto<List<SingleResponseDto<?>>>(result);
 

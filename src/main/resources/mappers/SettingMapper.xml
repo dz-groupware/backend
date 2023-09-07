@@ -15,9 +15,9 @@
   </insert>
 
   <!-- 메뉴 검색 : GNB 선택 결과와 메뉴명 검색 결과 (메뉴트리를 그릴 수 있는 리스트 반환) -->
-  <insert id="modifyFavorOn">
-    insert into favor(emp_id, menu_id) values(#{empId}, #{menuId});
-  </insert>
+  <select id="findAllMenu">
+    select id, par_id, name from menu where comp_id=#{compId} and deleted_yn=0;
+  </select>
 
   <!-- 메뉴 추가 -->
   <select id="findGnbList" resultType="com.example.backend.setting.dto.MenuRes">
@@ -47,9 +47,9 @@
   </select>
 
   <!-- 즐겨찾기 추가 -->
-  <select id="findAllMenu">
-    select id, par_id, name from menu where comp_id=#{compId} and deleted_yn=0;
-  </select>
+  <insert id="modifyFavorOn">
+    insert into favor(emp_id, menu_id) values(#{empId}, #{menuId});
+  </insert>
 
   <!-- 즐겨찾기 삭제 -->
   <update id="modifyParId">

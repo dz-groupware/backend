@@ -1,3 +1,4 @@
+/*
 package com.example.backend.menu.service;
 
 import com.example.backend.common.SingleResponseDto;
@@ -47,3 +48,4 @@ public class MenuServiceProxy implements MenuService{
     return null;
   }
 }
+*/
