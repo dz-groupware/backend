@@ -27,11 +27,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
-
-    System.out.println("#########################");
-    System.out.println("#########################");
-    System.out.println("#########################");
-    System.out.println("#########################필터들어옴");
 //    if ("/api/v1/login".equals(request.getRequestURI())) {
 //      // 로그인 요청이므로 다르게 처리
 //      chain.doFilter(request, response);
@@ -60,12 +55,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
   private void setSecurityContext(HttpServletResponse response, String username) {
     PrincipalUserDto principalUser = userMapper.findByLoginId(username);
-    System.out.println("#######################"+ principalUser.getUserId());
-    System.out.println("#######################"+ principalUser.getUserId());
-    System.out.println("#######################"+ principalUser.getUserId());
-    System.out.println("#######################"+ principalUser.getUserId());
-    System.out.println("#######################"+ principalUser.getUserId());
-    System.out.println("#######################"+ principalUser.getUserId());
     if (principalUser == null) {
       response.setHeader("WWW-Authenticate", "Bearer error=\"invalid_token\"");
       response.setStatus(403);
@@ -89,10 +78,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if ("JWT".equals(cookie.getName())) {
-          System.out.println("#####################");
-          System.out.println("#####################");
-          System.out.println("#####################");
-          System.out.println("#####################" + cookie.getValue());
           return cookie.getValue();
         }
       }

@@ -61,6 +61,8 @@
     and comp_id=#{compId} and enabled_yn=1 and deleted_yn=0;
   </select>
 
-
+  <select id="getMenuByEmpIdForMaster" resultType="com.example.backend.menu.dto.MenuDto">
+    select * from menu where comp_id= #{compId} and id=par_id;
+  </select>
 
 </mapper>

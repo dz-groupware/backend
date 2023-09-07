@@ -14,5 +14,5 @@ public interface MenuMapper {
   List<MenuDto> getFavorByEmpId(Long empId);
   int removeFavor(Long empId, Long menuId);
   List<MenuDto> findMenuByParId(Long menuId, Long compId);
-
+  List<MenuDto> getMenuByEmpIdForMaster(Long compId);
 }
