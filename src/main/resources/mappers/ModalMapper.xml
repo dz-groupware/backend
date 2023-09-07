@@ -1,80 +1,101 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.backend.modal.mapper.ModalMapper">
 
-    <!-- emp_id 에 대한 모든 프로필 정보 가져오기-->
-    <select id="findProfileByEmpId" resultType="com.example.backend.modal.dto.ProfileRes">
-        select id, name, login_id, image_url, last_ip, compName, nameTree, comp_id as compId from
-        (select * from employee where id = #{empId} and deleted_yn = 0)emp join
-        (SELECT COMPANY.NAME AS compName, dept.id as deptId, comp_id,
-        dept.name_tree as nameTree, dept.position as position  FROM COMPANY,
-        (SELECT  id, comp_id, name, name_tree, position FROM DEPARTMENT INNER JOIN
-        (SELECT DEPT_ID, position FROM EMPLOYEE_DEPARTMENT WHERE EMP_ID=#{empId} AND DELETED_YN = 0)EXISTS_DEPT
-        WHERE DEPARTMENT.ID = EXISTS_DEPT.DEPT_ID)DEPT WHERE COMPANY.ID = DEPT.COMP_ID)posi;
-    </select>
+  <!-- 모든 프로필 정보 가져오기-->
+  <select id="getProfileByUserId" resultType="com.example.backend.modal.dto.ProfileRes">
+    select comp_id, name as comp_name, dept_id, dept_name, emp_id, emp_name,
+    last_ip, last_access, position, image_url from company
+    inner join
+    (select comp_id, name as dept_name, emp_id, dept_id, emp_name, last_ip,
+    last_access, position, image_url from department
+    inner join
+    (select emp_id, dept_id, emp_name, last_ip, last_access, emp_list.position, image_url from employee_department
+    inner join
+    (select id, name as emp_name, last_ip, last_access, position, image_url from employee where user_id = #{userId})emp_list
+    where emp_list.id = employee_department.emp_id and org = 1 and deleted_yn = 0 and transferred_yn = 0)emp_dept
+    where enabled_yn = 1 and deleted_yn = 0 and department.id = emp_dept.dept_id)emp_dept_comp
+    where company.id = emp_dept_comp.comp_id;
+  </select>
 
-    <!-- emp_id가 속한 회사 리스트 가져오기 -->
-    <select id="findCompList" resultType="com.example.backend.modal.dto.TreeItemRes">
-        SELECT comp_id as id, code, name FROM EMPLOYEE_COMPANY
-        JOIN COMPANY ON EMPLOYEE_COMPANY.COMP_ID = COMPANY.ID
-        WHERE EMP_ID=#{empId} and EMPLOYEE_COMPANY.resigned_yn = 0 and EMPLOYEE_COMPANY.deleted_yn = 0
-        and COMPANY.enabled_yn = 1 and COMPANY.deleted_yn = 0;
-    </select>
+  <!-- 조직도 트리 : 회사 리스트-->
+  <select id="getCompToGnb" resultType="com.example.backend.modal.dto.TreeItemRes">
+    select id, company.par_id, name, sort_order from company
+    inner join
+    (select par_id from company where id = #{compId})comp
+    where enabled_yn = 1 and deleted_yn = 0 and company.par_id = comp.par_id;
+  </select>
 
-    <!-- 회사 선택 시 가장 상위 부서 가져오기 -->
-    <select id="findDeptList1" resultType="com.example.backend.modal.dto.TreeItemRes">
-        select id, code, name from department
-        where comp_id=#{compId} and id = par_id and enabled_yn = 1 and deleted_yn = 0;
-    </select>
+  <!-- 조직도 트리 : 회사 선택 시 부서 -->
+  <select id="getGnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
+    select id, par_id, name, sort_order from department
+    where comp_id=#{compId} and id = par_id and enabled_yn = 1 and deleted_yn = 0;
+  </select>
 
-    <!-- 부서 선택 시 하위 부서 가져오기 -->
-    <select id="findDeptList2" resultType="com.example.backend.modal.dto.TreeItemRes">
-        select id, code, name from department where comp_id=#{compId} and par_id=#{deptId} and id!=#{deptId} and enabled_yn = 1 and deleted_yn = 0;
-    </select>
+  <!-- 조직도 트리 : 부서 선택 시 부서 -->
+  <select id="getLnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
+    select id, par_id, name, sort_order from department
+    where comp_id=#{compId} and par_id = #{deptId} and id != #{deptId} and enabled_yn = 1 and deleted_yn = 0;
+  </select>
 
-    <!-- 회사 선택 시 사원 리스트 가져오기 -->
-    <select id="findCompEmpList" resultType="com.example.backend.modal.dto.ProfileRes">
-        SELECT employee.id, name, login_id as loginId, mobile_number as number, image_url as imageUrl, position email FROM employee
-        join EMPLOYEE_COMPANY on employee.id = EMPLOYEE_COMPANY.emp_id
-        WHERE EMPLOYEE_COMPANY.COMP_ID = #{compId}
-        AND EMPLOYEE_COMPANY.RESIGNED_YN=0 AND EMPLOYEE_COMPANY.DELETED_YN=0
-        AND EMPLOYEE.DELETED_YN = 0;
-    </select>
+  <!-- 사원 리스트 : 회사 선택 시 -->
+  <select id="findCompEmpList" resultType="com.example.backend.modal.dto.ProfileRes">
+    SELECT employee.id, name, mobile_number as number, image_url as imageUrl,
+    position email FROM employee
+    join EMPLOYEE_COMPANY on employee.id = EMPLOYEE_COMPANY.emp_id
+    WHERE EMPLOYEE_COMPANY.COMP_ID = #{compId}
+    AND EMPLOYEE_COMPANY.RESIGNED_YN=0 AND EMPLOYEE_COMPANY.DELETED_YN=0
+    AND EMPLOYEE.DELETED_YN = 0;
+  </select>
 
-    <!-- 부서 선택 시 사원 리스트 가져오기 -->
-    <select id="findDeptEmpList" resultType="com.example.backend.modal.dto.ProfileRes">
-        select emp_id, a.name, loginId, number, imageUrl
-        , email, position, name_tree as nameTree from (
-        SELECT employee.id as emp_id, name, login_id as loginId, mobile_number as number, image_url as imageUrl,
-        dept_id, email, employee.position as position FROM employee
-        join EMPLOYEE_DEPARTMENT on dept_id =  #{deptId}
-        where employee.id = EMPLOYEE_DEPARTMENT.emp_id
-        AND EMPLOYEE_DEPARTMENT.DELETED_YN=0 AND EMPLOYEE.DELETED_YN = 0)a
-        inner join department where department.id = a.dept_id;
-    </select>
 
-    <!-- 조직도 검색 (전체 옵션 - 부서) -->
-    <select id="findResultOfAllDept" resultType="com.example.backend.modal.dto.TreeItemRes">
-        select id, code, name from department where name_tree like #{text} and enabled_yn = 1 and deleted_yn = 0
-        union
-        select id, code, name from company where name_tree like #{text} and enabled_yn = 1 and deleted_yn = 0;
-    </select>
 
-    <!-- 조직도 검색 (전체 옵션 - 사원) -->
-    <select id="findResultOfAllEmp" resultType="com.example.backend.modal.dto.ProfileRes">
-        select id, name, login_id, mobile_number as number, image_url, email, position from employee where (
-        name like #{text} or id like #{text} or login_id like  #{text} or mobile_number like #{text} or
-        email like #{text} or position like #{text}) and deleted_yn = 0;
-    </select>
 
-    <!-- 조직도 검색 (부서 옵션) -->
-    <select id="findResultOfDept" resultType="com.example.backend.modal.dto.TreeItemRes">
-        select id, code, name from department where name_tree like #{text} and enabled_yn = 1 and deleted_yn = 0;
-    </select>
 
-    <!-- 조직도 검색 (사원 옵션) -->
-    <select id="findResultOfEmp" resultType="com.example.backend.modal.dto.ProfileRes">
-        select id, name, login_id, mobile_number as number, image_url, email, position from employee where
-        name like #{text1} and deleted_yn = 0;
-    </select>
+
+  <!-- 부서 선택 시 사원 리스트 가져오기 -->
+  <select id="findDeptEmpList" resultType="com.example.backend.modal.dto.ProfileRes">
+    select emp_id, a.name, number, imageUrl
+    , email, position, name_tree as nameTree from (
+    SELECT employee.id as emp_id, name, mobile_number as number, image_url as
+    imageUrl,
+    dept_id, email, employee.position as position FROM employee
+    join EMPLOYEE_DEPARTMENT on dept_id = #{deptId}
+    where employee.id = EMPLOYEE_DEPARTMENT.emp_id
+    AND EMPLOYEE_DEPARTMENT.DELETED_YN=0 AND EMPLOYEE.DELETED_YN = 0)a
+    inner join department where department.id = a.dept_id;
+  </select>
+
+
+
+  <!-- 조직도 검색 (전체 옵션 - 부서) -->
+  <select id="findResultOfAllDept" resultType="com.example.backend.modal.dto.TreeItemRes">
+    select id, code, name from department where name_tree like #{text} and enabled_yn = 1 and
+    deleted_yn = 0
+    union
+    select id, code, name from company where name_tree like #{text} and enabled_yn = 1 and
+    deleted_yn = 0;
+  </select>
+
+  <!-- 조직도 검색 (전체 옵션 - 사원) -->
+  <select id="findResultOfAllEmp" resultType="com.example.backend.modal.dto.ProfileRes">
+    select id, name, mobile_number as number, image_url, email, position from employee
+    where (
+    name like #{text} or id like #{text} or mobile_number like #{text} or
+    email like #{text} or position like #{text}) and deleted_yn = 0;
+  </select>
+
+  <!-- 조직도 검색 (부서 옵션) -->
+  <select id="findResultOfDept" resultType="com.example.backend.modal.dto.TreeItemRes">
+    select id, code, name from department where name_tree like #{text} and enabled_yn = 1 and
+    deleted_yn = 0;
+  </select>
+
+  <!-- 조직도 검색 (사원 옵션) -->
+  <select id="findResultOfEmp" resultType="com.example.backend.modal.dto.ProfileRes">
+    select id, name, mobile_number as number, image_url, email, position from employee
+    where
+    name like #{text1} and deleted_yn = 0;
+  </select>
 </mapper>

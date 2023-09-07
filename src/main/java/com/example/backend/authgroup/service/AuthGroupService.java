@@ -14,7 +14,7 @@ public interface AuthGroupService {
       int pageSize);
   List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy,
       int pageSize);
-//  long getCompanyAuthCount( Long departmentId, Long employeeId, String orderBy);
+  //  long getCompanyAuthCount( Long departmentId, Long employeeId, String orderBy);
   long getCompanyAuthCount(Long departmentId, Long employeeId, String orderBy);
   List<CompanyMenuDto> getCompanyGnbList(Long companyId);
   List<CompanyMenuDto> getCompanyLnbList(Long companyId, Long parId);
