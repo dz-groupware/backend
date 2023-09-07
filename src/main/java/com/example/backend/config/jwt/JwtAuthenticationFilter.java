@@ -6,6 +6,8 @@ import com.example.backend.common.SingleResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -80,10 +82,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     jwtCookie.setHttpOnly(true);
     response.addCookie(jwtCookie);
 
-
+    Map<String, Object> responseMap = new HashMap<>();
     SingleResponseDto<PrincipalUserDto> responseBody = new SingleResponseDto<>(
         principalDetails.getPrincipalUser());
-    response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+
+    responseMap.put("status", HttpServletResponse.SC_OK);
+    responseMap.put("data",responseBody);
+
+    response.getWriter().write(objectMapper.writeValueAsString(responseMap));
     response.getWriter().flush();
   }
 

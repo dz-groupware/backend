@@ -27,8 +27,6 @@ public class MenuController {
     return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getMenuByEmpId()), HttpStatus.OK);
   }
 
-
-
   @GetMapping("/favor")
   public ResponseEntity<?> getFavorByEmpId(@RequestParam Long empId) {
     return new ResponseEntity<>(

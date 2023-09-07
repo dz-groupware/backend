@@ -66,23 +66,6 @@
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     WHERE c.id = #{companyId}
-    <choose>
-      <when test="orderBy == 'authNameAsc'">
-        ORDER BY a.name ASC
-      </when>
-      <when test="orderBy == 'authNameDesc'">
-        ORDER BY a.name DESC
-      </when>
-      <when test="orderBy == 'authCompanyIdAsc'">
-        ORDER BY adb.id ASC
-      </when>
-      <when test="orderBy == 'authCompanyIdDesc'">
-        ORDER BY adb.id DESC
-      </when>
-      <when test="orderBy == 'none'">
-        ORDER BY adb.id ASC
-      </when>
-    </choose>
   </select>
 
   <select id="getCompanyGnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
