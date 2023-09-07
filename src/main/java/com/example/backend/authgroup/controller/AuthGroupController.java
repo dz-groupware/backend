@@ -24,76 +24,61 @@ public class AuthGroupController {
     this.authGroupService = authGroupService;
   }
 
-  @GetMapping("/companies/{company-id}")
-  public ResponseEntity<?> getCompanyAuthSummaryPage(@PathVariable("company-id") Long companyId,
-      int pageNumber, int pageSize) {
-    Page<?> page = authGroupService.getCompanyAuthSummaryPage(companyId, pageNumber, pageSize);
-
+  /**
+   * @deprecated 페이지네이션 사용x
+   * */
+  @GetMapping("/companies/auth/page")
+  public ResponseEntity<?> getCompanyAuthSummaryPage(int pageNumber, int pageSize) {
+    Page<?> page = authGroupService.getCompanyAuthSummaryPage(pageNumber, pageSize);
     return new ResponseEntity<>(new MultiResponseDto<>(
         page.getData(),
         page.getPageInfo()
     ), HttpStatus.OK);
   }
 
-  @GetMapping("/companies/{company-id}/auth")
+  @GetMapping("/companies/auth/list")
   public ResponseEntity<?> findCompanyAuthList(@PathVariable("company-id") Long companyId,
       @RequestParam(required = true) Long lastId,
       @RequestParam(required = true) int pageSize,
       @RequestParam(required = false) String orderBy) {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.findCompanyAuthList(companyId, lastId, orderBy, pageSize)
+        authGroupService.findCompanyAuthList(lastId, orderBy, pageSize)
     ), HttpStatus.OK);
   }
-
-//  @GetMapping("/companies/{company-id}/auth/count")
-//  public ResponseEntity<?> getCompanyAuthCount(@PathVariable("company-id") Long companyId,
-//      @RequestParam(required = false) Long departmentId,
-//      @RequestParam(required = false) Long employeeId,
-//      @RequestParam(required = false) String orderBy) {
-//    return new ResponseEntity<>(new SingleResponseDto<>(
-//        authGroupService.getCompanyAuthCount(companyId, departmentId, employeeId, orderBy)
-//    ), HttpStatus.OK);
-//  }
 
   @GetMapping("/companies/auth/count")
-  public ResponseEntity<?> getCompanyAuthCount(
-      @RequestParam(required = false) Long departmentId,
-      @RequestParam(required = false) Long employeeId,
-      @RequestParam(required = false) String orderBy) {
+  public ResponseEntity<?> getCompanyAuthCount() {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.getCompanyAuthCount(departmentId, employeeId, orderBy)
+        authGroupService.getCompanyAuthCount()
     ), HttpStatus.OK);
   }
 
 
-  @GetMapping("/companies/{company-id}/gnb-list")
-  public ResponseEntity<?> getCompanyGnbList(@PathVariable("company-id") Long companyId) {
+  @GetMapping("/companies/gnb-list")
+  public ResponseEntity<?> getCompanyGnbList() {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.getCompanyGnbList(companyId)
+        authGroupService.getCompanyGnbList()
     ), HttpStatus.OK);
   }
 
-  @GetMapping("/companies/{company-id}/gnb/{gnb-id}/lnb-list")
-  public ResponseEntity<?> getCompanyLnbList(@PathVariable("company-id") Long companyId,
-      @PathVariable("gnb-id") Long parId) {
+  @GetMapping("/companies/gnb/{gnb-id}/lnb-list")
+  public ResponseEntity<?> getCompanyLnbList(@PathVariable("gnb-id") Long parId) {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.getCompanyLnbList(companyId, parId)
+        authGroupService.getCompanyLnbList(parId)
     ), HttpStatus.OK);
   }
 
-  @GetMapping("/companies/{company-id}/auth/{auth-id}/gnb")
-  public ResponseEntity<?> getGnbListOfAuth(@PathVariable("company-id") Long companyId,
-      @PathVariable("auth-id") Long authId) {
+  @GetMapping("/companies/auth/{auth-id}/gnb")
+  public ResponseEntity<?> getGnbListOfAuth(@PathVariable("auth-id") Long authId) {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.getGnbListOfAuth(companyId, authId)
+        authGroupService.getGnbListOfAuth(authId)
     ), HttpStatus.OK);
   }
 
-  @GetMapping("/companies/{company-id}/auth/{auth-id}/gnb-all")
-  public ResponseEntity<?> getGnbListOfAuthWithAll(@PathVariable("company-id") Long companyId,
-      @PathVariable("auth-id") Long authId) {
+  @GetMapping("/companies/auth/{auth-id}/gnb-all")
+  public ResponseEntity<?> getGnbListOfAuthWithAll(@PathVariable("auth-id") Long authId) {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.getGnbListOfAuthWithAll(companyId, authId)
+        authGroupService.getGnbListOfAuthWithAll(authId)
     ), HttpStatus.OK);
   }
 

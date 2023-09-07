@@ -10,15 +10,15 @@ import java.util.List;
 
 public interface AuthGroupService {
 
-  Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(Long companyId, int pageNumber,
+  Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(int pageNumber,
       int pageSize);
-  List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy,
+  List<CompanyAuthSummaryDto> findCompanyAuthList(Long lastId, String orderBy,
       int pageSize);
 //  long getCompanyAuthCount( Long departmentId, Long employeeId, String orderBy);
-  long getCompanyAuthCount(Long departmentId, Long employeeId, String orderBy);
-  List<CompanyMenuDto> getCompanyGnbList(Long companyId);
-  List<CompanyMenuDto> getCompanyLnbList(Long companyId, Long parId);
-  List<AuthMenuDto> getGnbListOfAuth(Long companyId, Long authId);
-  List<MenuAuthStatusDto> getGnbListOfAuthWithAll(Long companyId, Long authId);
+  long getCompanyAuthCount();
+  List<CompanyMenuDto> getCompanyGnbList();
+  List<CompanyMenuDto> getCompanyLnbList(Long parId);
+  List<AuthMenuDto> getGnbListOfAuth(Long authId);
+  List<MenuAuthStatusDto> getGnbListOfAuthWithAll(Long authId);
   List<UserListOfAuthDto> getEmpListOfAuth(Long authId);
 }
