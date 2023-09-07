@@ -1,6 +1,7 @@
 package com.example.backend.menu.service;
 
 import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.employee.mapper.EmployeeMapper;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import java.util.ArrayList;
@@ -11,9 +12,11 @@ import org.springframework.stereotype.Service;
 public class MenuServiceImpl implements MenuService {
 
   private final MenuMapper menuMapper;
-
-  public MenuServiceImpl(MenuMapper menuMapper) {
+  private final EmployeeMapper employeeMapper;
+  public MenuServiceImpl(MenuMapper menuMapper,
+      EmployeeMapper employeeMapper) {
     this.menuMapper = menuMapper;
+    this.employeeMapper = employeeMapper;
   }
 
   @Override
@@ -25,6 +28,9 @@ public class MenuServiceImpl implements MenuService {
     Long empId = SecurityUtil.getEmployeeId();
     Long compId = SecurityUtil.getCompanyId();
     Long deptId = SecurityUtil.getDepartmentId();
+    if(employeeMapper.checkMaster(empId)){
+      return menuMapper.getMenuByEmpIdForMaster(compId);
+    }
 
     // 유효한 사원/부서/회사인지 확인
     List<Long> result = menuMapper.check(userId, empId, compId, deptId);

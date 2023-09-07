@@ -15,4 +15,5 @@ public interface EmployeeMapper {
   void modifyEmployee(EmployeeReqDto employee);
   void removeEmployee(Long id);
   long getTotalElements();
+  Boolean checkMaster(Long empId);
 }

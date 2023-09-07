@@ -37,8 +37,7 @@ public class AuthGroupController {
   }
 
   @GetMapping("/companies/auth/list")
-  public ResponseEntity<?> findCompanyAuthList(@PathVariable("company-id") Long companyId,
-      @RequestParam(required = true) Long lastId,
+  public ResponseEntity<?> findCompanyAuthList(@RequestParam(required = true) Long lastId,
       @RequestParam(required = true) int pageSize,
       @RequestParam(required = false) String orderBy) {
     return new ResponseEntity<>(new SingleResponseDto<>(
