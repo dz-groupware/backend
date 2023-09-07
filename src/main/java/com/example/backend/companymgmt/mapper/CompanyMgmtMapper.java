@@ -10,19 +10,20 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CompanyMgmtMapper {
 
-  List<CompanyMgmtListResDto> getCompanyMgmtList();
+  List<CompanyMgmtListResDto> getCompanyMgmtList(Long companyId);
 
-  CompanyMgmtResDto getCompanyDetailsById(Long id);
+  CompanyMgmtResDto getCompanyDetailsById(Long id,Long companyId);
 
-  List<CompanyMgmtListResDto> findAllCompanyMgmtList(String name);
+  List<CompanyMgmtListResDto> findAllCompanyMgmtList(Long companyId,String name);
 
-  List<CompanyMgmtListResDto> findCompanyMgmtList(String name, Boolean enabledYn);
+  List<CompanyMgmtListResDto> findCompanyMgmtList(Long companyId,String name, Boolean enabledYn);
 
-  void addCompanyMgmt(CompanyMgmtReqDto companyMgmt);
+  void addCompanyMgmt(Long companyId,CompanyMgmtReqDto companyMgmt);
 
   void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt);
 
-  int removeCompanyMgmt(Long id);
+
+  void removeCompanyMgmt(Long companyId,Long id);
 
 
 }

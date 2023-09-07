@@ -5,10 +5,12 @@ import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CompanyMgmtReqDto {
 
   private Long id;
@@ -31,8 +33,12 @@ public class CompanyMgmtReqDto {
   private Date closingDate;
   private String address;
   private Boolean deletedYn;
+  private Long companyId;
 
   public void setId(Long id) {
     this.id=id;
+  }
+  public void setCompanyId(Long id){
+    this.companyId=id;
   }
 }
