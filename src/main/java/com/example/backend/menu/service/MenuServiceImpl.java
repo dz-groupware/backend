@@ -1,35 +1,54 @@
 package com.example.backend.menu.service;
 
-import com.example.backend.menu.dto.MenuRes;
+import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class MenuServiceImpl implements MenuService{
-    private final MenuMapper menuMapper;
+public class MenuServiceImpl implements MenuService {
 
-    public MenuServiceImpl(MenuMapper menuMapper) {
-        this.menuMapper = menuMapper;
-    }
+  private final MenuMapper menuMapper;
 
-    @Override
-    public List<MenuRes> findMenuByEmpId(Long empId){
-        return menuMapper.findMenuByEmpId(empId);
-    }
+  public MenuServiceImpl(MenuMapper menuMapper) {
+    this.menuMapper = menuMapper;
+  }
 
-    @Override
-    public List<MenuRes> findFavorByEmpId(Long empId){
-        return menuMapper.findFavorByEmpId(empId);
-    }
+  @Override
+  public List<MenuDto> getMenuByEmpId() {
+    // 마스터인 경우 :  dept가 null일 수 있음.
 
-    @Override
-    public int removeFavor(Long empId, Long menuId){
-        return menuMapper.removeFavor(empId, menuId);
+    // 토큰에서 정보 가져오기
+    Long userId = SecurityUtil.getUserId();
+    Long empId = SecurityUtil.getEmployeeId();
+    Long compId = SecurityUtil.getCompanyId();
+    Long deptId = SecurityUtil.getDepartmentId();
+
+    // 유효한 사원/부서/회사인지 확인
+    List<Long> result = menuMapper.check(userId, empId, compId, deptId);
+    if (result.size() == 2 && result.get(0) == 1L) {
+      return menuMapper.getMenuByEmpId(empId, compId, deptId);
     }
-    @Override
-    public List<MenuRes> findMenuByParId (Long menuId, Long compId) {
-        return menuMapper.findMenuByParId(menuId, compId);
-    }
+    return new ArrayList<MenuDto>();
+  }
+
+
+
+  @Override
+  public List<MenuDto> getFavorByEmpId(Long empId) {
+    return menuMapper.getFavorByEmpId(empId);
+  }
+
+  @Override
+  public int removeFavor(Long empId, Long menuId) {
+    return menuMapper.removeFavor(empId, menuId);
+  }
+
+  @Override
+  public List<MenuDto> findMenuByParId(Long menuId, Long compId) {
+    return menuMapper.findMenuByParId(menuId, compId);
+  }
+
 }

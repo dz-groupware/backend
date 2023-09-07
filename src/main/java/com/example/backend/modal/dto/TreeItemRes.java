@@ -6,7 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TreeItemRes {
-    private Long id;
-    private String code;
-    private String name;
+
+  private Long id;
+  private Long parId;
+  private String name;
+  private int sortOrder;
 }

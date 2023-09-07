@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class PageDto {
+
   private int pageNumber;
   private int pageSize;
   private long totalElements;
