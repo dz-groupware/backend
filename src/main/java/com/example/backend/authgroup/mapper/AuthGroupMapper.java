@@ -13,7 +13,7 @@ public interface AuthGroupMapper {
 
   List<CompanyAuthSummaryDto> getCompanyAuthSummaryListForPage(Long companyId, long offset,
       int limit);
-  List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy,
+  List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy, String searchTerm,
       int limit);
   long getCompanyAuthCount(Long companyId);
   List<CompanyMenuDto> getCompanyGnbList(Long companyId);

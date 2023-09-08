@@ -30,6 +30,9 @@
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE #{searchTerm}
+    </if>
     <choose>
       <when test="orderBy == 'authNameDesc' or orderBy == 'authDashboardIdDesc'">
         AND adb.id &lt; #{lastId}

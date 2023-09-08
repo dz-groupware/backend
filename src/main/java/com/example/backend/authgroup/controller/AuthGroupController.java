@@ -39,9 +39,10 @@ public class AuthGroupController {
   @GetMapping("/companies/auth/list")
   public ResponseEntity<?> findCompanyAuthList(@RequestParam(required = true) Long lastId,
       @RequestParam(required = true) int pageSize,
+      @RequestParam(required = false) String searchTerm,
       @RequestParam(required = false) String orderBy) {
     return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.findCompanyAuthList(lastId, orderBy, pageSize)
+        authGroupService.findCompanyAuthList(lastId, orderBy, searchTerm, pageSize)
     ), HttpStatus.OK);
   }
 

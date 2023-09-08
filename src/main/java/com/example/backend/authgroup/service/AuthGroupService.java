@@ -12,7 +12,7 @@ public interface AuthGroupService {
 
   Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(int pageNumber,
       int pageSize);
-  List<CompanyAuthSummaryDto> findCompanyAuthList(Long lastId, String orderBy,
+  List<CompanyAuthSummaryDto> findCompanyAuthList(Long lastId, String orderBy, String searchTerm,
       int pageSize);
   long getCompanyAuthCount();
   List<CompanyMenuDto> getCompanyGnbList();

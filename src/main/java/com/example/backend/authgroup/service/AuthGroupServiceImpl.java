@@ -34,9 +34,10 @@ public class AuthGroupServiceImpl implements AuthGroupService {
   @Override
   public List<CompanyAuthSummaryDto> findCompanyAuthList(Long lastId,
       String orderBy,
+      String searchTerm,
       int pageSize) {
     Long companyId = SecurityUtil.getCompanyId();
-    return authGroupMapper.findCompanyAuthList(companyId, lastId, orderBy, pageSize);
+    return authGroupMapper.findCompanyAuthList(companyId, lastId, orderBy, searchTerm, pageSize);
   }
 
   @Override
