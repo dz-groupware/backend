@@ -6,10 +6,10 @@ import com.example.backend.modal.dto.TreeItemRes;
 import java.util.List;
 
 public interface ModalService {
-  List<ProfileRes> getProfileByUserId();
+  List<ProfileRes> getAllProfile();
   List<TreeItemRes> getOrgTree(String type);
 
   List<ProfileRes> findEmpList(String type);
 
-  SingleResponseDto<?> findOrgSearchResult(String type, String text);
+  SingleResponseDto<?> findOrgResult(String type, String text);
 }

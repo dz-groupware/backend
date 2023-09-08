@@ -5,13 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PositionRes {
-
+public class EmpList {
+  private String empName;
   private String compName;
   private String deptName;
-  private Long deptId;
-  private String nameTree;
-  private String pImg;
-
-
+  private String position;
+  private Long loginId;
+  private String number;
+  private String email;
 }

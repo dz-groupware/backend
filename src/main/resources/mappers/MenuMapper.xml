@@ -3,8 +3,13 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.backend.menu.mapper.MenuMapper">
 
+  <!-- 마스터인지 확인 -->
+  <select id="checkMaster">
+    select master_yn from employee where id=#{empId};
+  </select>
+
   <!-- 사원/부서/회사 존재여부 확인 -->
-  <select id="check">
+  <select id="checkExits">
     SELECT COUNT(*) FROM EMPLOYEE WHERE ACCOUNT_YN=1 AND DELETED_YN = 0 AND ID= #{empId} AND USER_ID=#{userId}
     UNION
     SELECT COUNT(*)FROM EMPLOYEE_DEPARTMENT
@@ -14,7 +19,7 @@
   </select>
 
   <!-- GNB 메뉴 리스트 -->
-  <select id="getMenuByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
+  <select id="getGnbByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
     SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU
     INNER JOIN
     (SELECT MENU_ID FROM AUTH_MENU INNER JOIN
@@ -28,26 +33,30 @@
     WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=MENU_LIST.MENU_ID AND ID = PAR_ID;
   </select>
 
-
+  <!-- GNB 메뉴 리스트 : 마스터 -->
+  <select id="getGnbForMaster">
+    select * from menu where id=par_id and comp_id=#{compId};
+  </select>
 
   <!-- GNB 즐겨찾기 리스트 -->
   <select id="getFavorByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU INNER JOIN
-    (select favor.menu_id from favor inner join
+    select menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn from
+    (select id, par_id, name, icon_url, sort_order, name_tree, child_node_yn from menu inner join
     (SELECT auth_menu.MENU_ID FROM AUTH_MENU INNER JOIN
-    ((select auth_id from auth_employee where emp_id = 12 and deleted_yn = 0)
-    union
-    (SELECT AUTH_ID FROM AUTH_DEPARTMENT INNER JOIN
-    (SELECT id, dept_id, position FROM EMPLOYEE_DEPARTMENT
-    WHERE transferred_yn = 0 and deleted_yn = 0 and emp_id = 12 and org = 1)dept
-    WHERE DEPT.DEPT_ID = AUTH_DEPARTMENT.DEPT_ID)
-    union
-    (select AUTH_ID from auth_company inner join
-    (select comp_id from employee_company where emp_id=12 and resigned_yn=0 and deleted_yn = 0)emp_com
-    where emp_com.comp_id = auth_company.comp_id))ADMIN
-    WHERE AUTH_MENU.DELETED_YN = 0 AND AUTH_MENU.AUTH_ID = ADMIN.AUTH_ID)menu_list
-    where favor.menu_id = menu_list.menu_id)favor_menu_lsit
-    WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=favor_menu_lsit.MENU_ID;
+    (select auth_id from auth_company where comp_id= #{compId}
+    union select auth_id from AUTH_DEPARTMENT where dept_id= #{deptId}
+    union select auth_id from auth_employee where emp_id= #{empId} )auth
+    where auth.auth_id = auth_menu.auth_id)menu_list
+    where menu_list.menu_id = menu.id)menu
+    inner join (select * from favor where emp_id= #{empId})favor
+    where menu.id=favor.menu_id;
+  </select>
+
+  <!-- GNB 즐겨찾기 리스트 : 마스터 -->
+  <select id="getFavorForMaster" resultType="com.example.backend.menu.dto.MenuDto">
+    select menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn from menu
+    inner join (select * from favor where emp_id= #{empId})favor
+    where menu.id=favor.menu_id;
   </select>
 
   <!-- GNB 즐겨찾기 삭제 -->
@@ -56,11 +65,20 @@
   </delete>
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) -->
-  <select id="findMenuByParId" resultType="com.example.backend.menu.dto.MenuDto">
+  <select id="getMenuById" resultType="com.example.backend.menu.dto.MenuDto">
+    select id, par_id, name, icon_url, sort_order, name_tree, child_node_yn from menu inner join
+    (SELECT auth_menu.MENU_ID FROM AUTH_MENU INNER JOIN
+    (select auth_id from auth_company where comp_id= #{compId}
+    union select auth_id from AUTH_DEPARTMENT where dept_id=#{deptId}
+    union select auth_id from auth_employee where emp_id=#{empId})auth
+    where auth.auth_id = auth_menu.auth_id)menu_list
+    where menu_list.menu_id = menu.id and par_id={menuId} and id != par_id and enabled_yn=1 and deleted_yn=0;
+  </select>
+
+  <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) : 마스터-->
+  <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
     select id, par_id, name, sort_order, child_node_yn from menu where par_id=#{menuId}
     and comp_id=#{compId} and enabled_yn=1 and deleted_yn=0;
   </select>
-
-
 
 </mapper>

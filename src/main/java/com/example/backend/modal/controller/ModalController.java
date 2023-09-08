@@ -23,9 +23,9 @@ public class ModalController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity getProfileByUserId() {
+  public ResponseEntity getAllProfile() {
     return new ResponseEntity(
-        new SingleResponseDto<List<ProfileRes>>(modalService.getProfileByUserId()),
+        new SingleResponseDto<List<ProfileRes>>(modalService.getAllProfile()),
         HttpStatus.OK);
   }
 
@@ -44,7 +44,7 @@ public class ModalController {
 
   @GetMapping("/org/search")
   public ResponseEntity findOrgSearchResult(@RequestParam String type, @RequestParam String text) {
-    return new ResponseEntity(modalService.findOrgSearchResult(type, text), HttpStatus.OK);
+    return new ResponseEntity(modalService.findOrgResult(type, text), HttpStatus.OK);
 
   }
 }

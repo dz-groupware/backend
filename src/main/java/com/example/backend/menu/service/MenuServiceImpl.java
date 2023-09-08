@@ -1,5 +1,6 @@
 package com.example.backend.menu.service;
 
+import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
@@ -11,37 +12,82 @@ import org.springframework.stereotype.Service;
 public class MenuServiceImpl implements MenuService {
 
   private final MenuMapper menuMapper;
+  private final CheckMapper checkMapper;
 
-  public MenuServiceImpl(MenuMapper menuMapper) {
+  public MenuServiceImpl(MenuMapper menuMapper, CheckMapper checkMapper) {
     this.menuMapper = menuMapper;
+    this.checkMapper = checkMapper;
   }
 
   @Override
-  public List<MenuDto> getMenuByEmpId() {
-    // 마스터인 경우 :  dept가 null일 수 있음.
+  public List<MenuDto> getGnbById() {
+    Long empId = SecurityUtil.getEmployeeId();
+    Long compId = SecurityUtil.getCompanyId();
+
+    if(checkMapper.checkMaster(empId)) {
+      // 마스터인 경우
+      return menuMapper.getGnbForMaster(compId);
+    }
+
+    Long userId = SecurityUtil.getUserId();
+    Long deptId = SecurityUtil.getDepartmentId();
+    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
+
+    if( result.size() == 1 && result.get(0) == 1L ){
+      return menuMapper.getGnbByEmpId(empId, compId, deptId);
+    }
+
+    return new ArrayList<>();
+  }
+
+  @Override
+  public List<MenuDto> getFavorByEmpId() {
 
     Long empId = SecurityUtil.getEmployeeId();
     Long compId = SecurityUtil.getCompanyId();
+
+    if(checkMapper.checkMaster(empId)) {
+      // 마스터인 경우
+      return menuMapper.getFavorForMaster(compId);
+    }
+
+    Long userId = SecurityUtil.getUserId();
     Long deptId = SecurityUtil.getDepartmentId();
+    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
 
-    return menuMapper.getMenuByEmpId(empId, compId, deptId);
+    if( result.size() == 1 && result.get(0) == 1L ){
+      return menuMapper.getFavorByEmpId(empId, compId, deptId);
+    }
 
-  }
-
-
-  @Override
-  public List<MenuDto> getFavorByEmpId(Long empId) {
-    return menuMapper.getFavorByEmpId(empId);
+    return new ArrayList<>();
   }
 
   @Override
-  public int removeFavor(Long empId, Long menuId) {
+  public int removeFavor(Long menuId) {
+    Long empId = SecurityUtil.getEmployeeId();
     return menuMapper.removeFavor(empId, menuId);
   }
 
   @Override
-  public List<MenuDto> findMenuByParId(Long menuId, Long compId) {
-    return menuMapper.findMenuByParId(menuId, compId);
+  public List<MenuDto> getMenuById(Long menuId) {
+
+    Long empId = SecurityUtil.getEmployeeId();
+    Long compId = SecurityUtil.getCompanyId();
+
+    if(checkMapper.checkMaster(empId)) {
+      // 마스터인 경우
+      return menuMapper.getMenuForMaster(menuId, compId);
+    }
+
+    Long userId = SecurityUtil.getUserId();
+    Long deptId = SecurityUtil.getDepartmentId();
+    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
+
+    if( result.size() == 1 && result.get(0) == 1L ){
+      return menuMapper.getMenuById(menuId, empId, compId, deptId);
+    }
+
+    return new ArrayList<>();
   }
 
 }
