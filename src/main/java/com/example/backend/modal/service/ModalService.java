@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ModalService {
   List<ProfileRes> getAllProfile();
-  List<TreeItemRes> getOrgTree(String type);
+  List<TreeItemRes> getOrgTree(String type, Long compId, Long deptId);
 
-  List<ProfileRes> findEmpList(String type);
+  List<ProfileRes> findEmpList(String type, Long compId, Long deptId);
 
   SingleResponseDto<?> findOrgResult(String type, String text);
 }

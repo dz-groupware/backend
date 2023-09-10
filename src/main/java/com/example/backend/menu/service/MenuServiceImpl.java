@@ -32,6 +32,8 @@ public class MenuServiceImpl implements MenuService {
     Long userId = SecurityUtil.getUserId();
     Long deptId = SecurityUtil.getDepartmentId();
     List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
+    System.out.println("[check] UID : "+userId+" EID : "+empId+" DID : "+deptId+" CID : "+compId);
+    System.out.println("result size : "+result.size()+" and get(0) : "+result.get(0));
 
     if( result.size() == 1 && result.get(0) == 1L ){
       return menuMapper.getGnbByEmpId(empId, compId, deptId);

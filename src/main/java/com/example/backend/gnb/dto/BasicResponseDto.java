@@ -8,8 +8,9 @@ import lombok.Getter;
 public class BasicResponseDto<T> {
   private final Map<String, Object> data = new HashMap<>();
 
-  public BasicResponseDto(T menu, T profile){
+  public BasicResponseDto(T menu, T favor, T profile){
     this.data.put("menu", menu);
+    this.data.put("favor", favor);
     this.data.put("profile", profile);
   }
 }

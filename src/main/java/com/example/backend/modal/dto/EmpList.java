@@ -10,7 +10,8 @@ public class EmpList {
   private String compName;
   private String deptName;
   private String position;
-  private Long loginId;
+  private String loginId;
   private String number;
   private String email;
+  private String imageUrl;
 }

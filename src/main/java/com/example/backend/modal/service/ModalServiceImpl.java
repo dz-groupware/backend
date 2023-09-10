@@ -9,12 +9,13 @@ import com.example.backend.modal.mapper.ModalMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Slf4j
 @Service
 public class ModalServiceImpl implements ModalService {
 
@@ -43,54 +44,49 @@ public class ModalServiceImpl implements ModalService {
     List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
 
     if( result.size() == 1 && result.get(0) == 1L ){
-      return modalMapper.getProfileForMaster(userId);
+      return modalMapper.getProfileByUserId(userId);
     }
 
     return new ArrayList<>();
   }
 
   @Override
-  public List<TreeItemRes> getOrgTree(String type) {
-    Long compId = SecurityUtil.getCompanyId();
-    if (type.equals("comp")) {
+  public List<TreeItemRes> getOrgTree(String type, Long compId, Long deptId) {
+    if(type.equals("basic")) {
+      compId = SecurityUtil.getCompanyId();
       return modalMapper.getCompToGnb(compId);
     }
-    if (type.equals("Dept1")) {
+    if (type.equals("comp")) {
       return modalMapper.getGnbToLnb(compId);
     }
-    if (type.equals("Dept2")) {
-      Long deptId = SecurityUtil.getDepartmentId();
+    if (type.equals("dept")) {
       return modalMapper.getLnbToLnb(compId, deptId);
     }
     return new ArrayList<TreeItemRes>();
   }
 
 
-
   @Override
-  public List<ProfileRes> findEmpList(String type) {
+  public List<ProfileRes> findEmpList(String type, Long compId, Long deptId) {
     if (type.equals("comp")) {
-      Long compId = SecurityUtil.getCompanyId();
       return modalMapper.getEmpListByCompId(compId);
     }
     if (type.equals("dept")) {
-      Long deptId = SecurityUtil.getDepartmentId();
-      return modalMapper.getEmpListByDeptId(deptId);
+      return modalMapper.getEmpListByDeptId(compId, deptId);
     }
     return new ArrayList<>();
   }
 
   @Override
   public SingleResponseDto<?> findOrgResult(String type, String text) {
+    log.info(type + text);
     if (type.equals("all")) {
       Map<String, List<?>> result = new HashMap<>();
       Long compId = SecurityUtil.getCompanyId();
       result.put("Tree", modalMapper.findDeptAllByText(compId, text));
-      result.put("Tree", modalMapper.findEmpAllByText(compId, text, text, text, text, text, text, text));
+      result.put("List", modalMapper.findEmpAllByText(compId, text, text, text, text, text, text, text));
       return new SingleResponseDto<Map>(result);
     }
-
-
 
     if (type.equals("dept")) {
       return new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfDept(text));

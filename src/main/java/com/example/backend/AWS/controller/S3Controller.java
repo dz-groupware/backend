@@ -1,7 +1,9 @@
 package com.example.backend.AWS.controller;
 
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.example.backend.AWS.service.S3;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +21,9 @@ public class S3Controller {
 
   private final S3 s3;
 
-  @GetMapping("/test")
-  public ResponseEntity<String> test(@RequestParam("text") String text) {
-    return new ResponseEntity<String>("test " + text, HttpStatus.OK);
+  @GetMapping("/imgList")
+  public ResponseEntity<List<S3ObjectSummary>> test() {
+    return new ResponseEntity<>(s3.getImageList(), HttpStatus.OK);
   }
 
   @PostMapping("/img")

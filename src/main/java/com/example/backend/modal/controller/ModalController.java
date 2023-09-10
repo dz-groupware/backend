@@ -30,15 +30,15 @@ public class ModalController {
   }
 
   @GetMapping("/org/tree")
-  public ResponseEntity getOrgTree(@RequestParam String type) {
+  public ResponseEntity getOrgTree(@RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
     return new ResponseEntity(new SingleResponseDto<List<TreeItemRes>>(
-        modalService.getOrgTree(type)), HttpStatus.OK);
+        modalService.getOrgTree(type, compId, deptId)), HttpStatus.OK);
   }
 
   @GetMapping("/org/empList")
-  public ResponseEntity findEmpList(@RequestParam String type) {
+  public ResponseEntity findEmpList(String type, Long compId, Long deptId) {
     return new ResponseEntity(
-        new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type)),
+        new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type, compId, deptId)),
         HttpStatus.OK);
   }
 

@@ -20,10 +20,11 @@ public class gnbController {
     this.modalService = modalService;
   }
 
-  @GetMapping("/")
+  @GetMapping("")
   public ResponseEntity<?> getBasicInfoById() {
     return new ResponseEntity<>(new BasicResponseDto<>(
         menuService.getGnbById(),
+        menuService.getFavorByEmpId(),
         modalService.getAllProfile()), HttpStatus.OK);
   }
 }
