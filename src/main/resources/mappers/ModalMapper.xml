@@ -101,4 +101,10 @@
     where
     name like #{text1} and deleted_yn = 0;
   </select>
+
+  <!-- 유저의 모든 사원id 가져오기-->
+  <select id="checkEmpIds" resultType="java.lang.Long">
+    select id from employee where user_id = #{userId} and account_yn = 1 and deleted_yn = 0;
+
+  </select>
 </mapper>

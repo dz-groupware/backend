@@ -22,4 +22,6 @@ public interface ModalMapper {
   List<TreeItemRes> findResultOfDept(String text);
 
   List<ProfileRes> findResultOfEmp(String text1, String text2, String text3, String text4);
+
+  List<Long> checkEmpIds(Long userId);
 }

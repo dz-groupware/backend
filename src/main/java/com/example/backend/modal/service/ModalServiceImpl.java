@@ -97,4 +97,16 @@ public class ModalServiceImpl implements ModalService {
     }
     return new SingleResponseDto<>("");
   }
+
+  @Override
+  public boolean checkEmpIds(Long empId){
+    Long userId = SecurityUtil.getUserId();
+    List<Long> result = modalMapper.checkEmpIds(userId);
+    for (int i=0; i<result.size(); i++){
+      if (result.get(i) == empId) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

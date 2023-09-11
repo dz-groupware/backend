@@ -12,4 +12,6 @@ public interface ModalService {
   List<ProfileRes> findEmpList(String type, Long compId, Long deptId);
 
   SingleResponseDto<?> findOrgResult(String type, String text);
+
+  boolean checkEmpIds(Long empId);
 }
