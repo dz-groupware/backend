@@ -47,33 +47,11 @@ public class SettingController {
     return new ResponseEntity<>(settingService.saveMenu(menu, type), HttpStatus.OK);
   }
 
-  @PostMapping("/menu/img")
-  public ResponseEntity<?> addImgById(@RequestParam MultipartFile iconFile) throws IOException {
-    // 이미지 추가
-    String path =
-        "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\" + iconFile.getOriginalFilename();
-    iconFile.transferTo(new File(path));
-    return new ResponseEntity<>("iconFile saved", HttpStatus.OK);
-  }
-
   @GetMapping("/menu/search")
   public ResponseEntity<?> findMenuByName(@RequestParam String gnbName, @RequestParam String name) {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuRes>>(settingService.findMenuByName(gnbName, name)),
         HttpStatus.OK);
-  }
-
-  @GetMapping("/menu/iconList")
-  public ResponseEntity<?> findAllIcon() {
-    String path = "C:\\dz_groupware\\backend\\src\\main\\resources\\image\\";
-    File[] files = new File(path).listFiles();
-    List<String> iconList = new ArrayList<String>();
-    for (File file : files) {
-      if (file.isFile()) {
-        iconList.add("http://localhost:8010/api/v1/image/" + file.getName());
-      }
-    }
-    return new ResponseEntity<>(new SingleResponseDto<List<String>>(iconList), HttpStatus.OK);
   }
 
   @GetMapping("/favor")
@@ -99,6 +77,5 @@ public class SettingController {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
   }
-
 
 }
