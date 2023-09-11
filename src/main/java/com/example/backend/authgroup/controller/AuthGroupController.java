@@ -37,14 +37,28 @@ public class AuthGroupController {
   }
 
   @GetMapping("/companies/auth/list")
-  public ResponseEntity<?> findCompanyAuthList(@RequestParam(required = true) Long lastId,
+  public ResponseEntity<?> findCompanyAuthList(
+      @RequestParam(required = false) Long lastId,
+      @RequestParam(required = false) String lastAuthName,
       @RequestParam(required = true) int pageSize,
       @RequestParam(required = false) String searchTerm,
       @RequestParam(required = false) String orderBy) {
-    return new ResponseEntity<>(new SingleResponseDto<>(
-        authGroupService.findCompanyAuthList(lastId, orderBy, searchTerm, pageSize)
-    ), HttpStatus.OK);
+
+    if (lastAuthName != null && !lastAuthName.isEmpty()) {
+      return new ResponseEntity<>(new SingleResponseDto<>(
+          authGroupService.findCompanyAuthListOrderByAuthName(lastAuthName, orderBy, searchTerm, pageSize)
+      ), HttpStatus.OK);
+    }
+    if (lastId != null) {
+      return new ResponseEntity<>(new SingleResponseDto<>(
+          authGroupService.findCompanyAuthListOrderById(lastId, orderBy, searchTerm, pageSize)
+      ), HttpStatus.OK);
+    }
+
+    return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 둘 다 null인 경우 BadRequest 응답을 보냅니다.
   }
+
+
 
   @GetMapping("/companies/auth/count")
   public ResponseEntity<?> getCompanyAuthCount() {

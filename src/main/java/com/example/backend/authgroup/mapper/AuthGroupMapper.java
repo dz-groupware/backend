@@ -13,12 +13,13 @@ public interface AuthGroupMapper {
 
   List<CompanyAuthSummaryDto> getCompanyAuthSummaryListForPage(Long companyId, long offset,
       int limit);
-  List<CompanyAuthSummaryDto> findCompanyAuthList(Long companyId, Long lastId, String orderBy, String searchTerm,
-      int limit);
   long getCompanyAuthCount(Long companyId);
   List<CompanyMenuDto> getCompanyGnbList(Long companyId);
   List<CompanyMenuDto> getCompanyLnbList(Long companyId, Long parId);
   List<AuthMenuDto> getGnbListOfAuth(Long companyId, Long authId);
   List<MenuAuthStatusDto> getGnbListOfAuthWithAll(Long companyId, Long authId);
   List<UserListOfAuthDto> getEmpListOfAuth(Long authId);
+
+  List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long companyId, Long lastId, String orderBy, String searchTerm, int pageSize);
+  List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(Long companyId, String lastAuthName, String orderBy, String searchTerm, int pageSize);
 }

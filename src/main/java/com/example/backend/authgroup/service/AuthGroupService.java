@@ -10,10 +10,9 @@ import java.util.List;
 
 public interface AuthGroupService {
 
-  Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(int pageNumber,
-      int pageSize);
-  List<CompanyAuthSummaryDto> findCompanyAuthList(Long lastId, String orderBy, String searchTerm,
-      int pageSize);
+  Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(int pageNumber, int pageSize);
+  List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long lastId, String orderBy, String searchTerm, int pageSize);
+  List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, int pageSize);
   long getCompanyAuthCount();
   List<CompanyMenuDto> getCompanyGnbList();
   List<CompanyMenuDto> getCompanyLnbList(Long parId);

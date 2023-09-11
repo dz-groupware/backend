@@ -1,11 +1,8 @@
 package com.example.backend.config.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.backend.common.SingleResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.FilterChain;
@@ -25,15 +22,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   private final String jwtKey;
   private final AuthenticationManager authenticationManager;
   private final ObjectMapper objectMapper;
-
+  private final TokenService tokenService;
   public JwtAuthenticationFilter(String jwtKey, AuthenticationManager authenticationManager,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper, TokenService tokenService) {
     this.jwtKey = jwtKey;
     this.authenticationManager = authenticationManager;
     this.objectMapper = objectMapper;
+    this.tokenService = tokenService;
     setFilterProcessesUrl("/login"); // 로그인 URL 변경
   }
-
   // ("/login") 요청을 하면 로그인 시도를 위해서 실행되는 함수
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
@@ -61,14 +58,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
     PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
-    String jwtToken = JWT.create()
-        .withSubject(principalDetails.getUsername()) // 토큰 이름 설정
-        .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
-        .withClaim("userId", principalDetails.getUserId())
-        .withClaim("empId", principalDetails.getEmployeeId())
-        .withClaim("compId", principalDetails.getCompanyId())
-        .withClaim("deptId", principalDetails.getDepartmentId())
-        .sign(Algorithm.HMAC512(jwtKey));// 고유한 시크릿 값 적용
+    String jwtToken = tokenService.createToken(principalDetails);
 
     //헤더
     response.addHeader("Authorization", "Bearer " + jwtToken);
@@ -76,10 +66,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     response.setCharacterEncoding("UTF-8");
 
     //쿠키
-    Cookie jwtCookie = new Cookie("JWT", jwtToken);
-    jwtCookie.setMaxAge(60*60*24*7);
-    jwtCookie.setPath("/");
-    jwtCookie.setHttpOnly(true);
+    Cookie jwtCookie = tokenService.createJwtCookie(jwtToken);
     response.addCookie(jwtCookie);
 
     Map<String, Object> responseMap = new HashMap<>();
