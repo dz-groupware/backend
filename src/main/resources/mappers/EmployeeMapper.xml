@@ -44,7 +44,7 @@
     id = #{id}
   </update>
 
-  <select id="">
-
+  <select id="checkMaster" resultType="Boolean">
+    select master_yn from employee where id=#{empId};
   </select>
 </mapper>
