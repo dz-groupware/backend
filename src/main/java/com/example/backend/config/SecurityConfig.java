@@ -2,7 +2,7 @@ package com.example.backend.config;
 
 import com.example.backend.config.jwt.JwtAuthenticationFilter;
 import com.example.backend.config.jwt.JwtAuthorizationFilter;
-import com.example.backend.employee.mapper.EmployeeMapper;
+import com.example.backend.config.jwt.TokenService;
 import com.example.backend.user.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class SecurityConfig {
   private final CorsFilter corsFilter;
   private final UserMapper userMapper;
   private final ObjectMapper objectMapper;
-
+  private final TokenService tokenService;
   @Value("${jwt.secret.key}")
   private String jwtKey;
 
@@ -49,7 +49,7 @@ public class SecurityConfig {
         .exceptionHandling()
 //                .authenticationEntryPoint(entryPoint) // 사용자 정의 인증 진입점 설정
         .and()
-        .apply(new CustomFilterConfigurer(jwtKey, userMapper)) // 사용자 정의 필터 적용
+        .apply(new CustomFilterConfigurer(jwtKey, userMapper, tokenService)) // 사용자 정의 필터 적용
         .and()
         .authorizeRequests(authorize -> authorize // 인증 규칙 정의
                 .antMatchers(
@@ -66,10 +66,12 @@ public class SecurityConfig {
 
     private final String jwtKey;
     private final UserMapper userMapper;
+    private final TokenService tokenService;
 
-    public CustomFilterConfigurer(String jwtKey, UserMapper userMapper) {
+    public CustomFilterConfigurer(String jwtKey, UserMapper userMapper, TokenService tokenService) {
       this.jwtKey = jwtKey;
       this.userMapper = userMapper;
+      this.tokenService = tokenService;
     }
 
     @Override
@@ -77,10 +79,9 @@ public class SecurityConfig {
       AuthenticationManager authenticationManager = builder.getSharedObject(
           AuthenticationManager.class);
       builder
-          .addFilterBefore(new JwtAuthenticationFilter(jwtKey, authenticationManager, objectMapper),
-              UsernamePasswordAuthenticationFilter.class)
-          .addFilterAfter(new JwtAuthorizationFilter(jwtKey, userMapper),
-              UsernamePasswordAuthenticationFilter.class);
+          .addFilterBefore(new JwtAuthenticationFilter(jwtKey, authenticationManager, objectMapper,
+                  tokenService), UsernamePasswordAuthenticationFilter.class)
+          .addFilterAfter(new JwtAuthorizationFilter(jwtKey, userMapper), UsernamePasswordAuthenticationFilter.class);
     }
   }
 

@@ -4,6 +4,7 @@
 
 <mapper namespace="com.example.backend.authgroup.mapper.AuthGroupMapper">
   <!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
+
   <select id="getCompanyAuthSummaryListForPage"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
@@ -15,10 +16,10 @@
     JOIN company c ON ac.comp_id = c.id
     JOIN auth a ON ac.auth_id = a.id
     WHERE ac.comp_id = #{companyId}
-    LIMIT #{limit} OFFSET #{offset}
+    LIMIT #{pageSize} OFFSET #{offset}
   </select>
 
-  <select id="findCompanyAuthList"
+  <select id="findCompanyAuthListOrderById"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
     adb.id as id ,
@@ -30,35 +31,57 @@
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE #{searchTerm}
+    </if>
     <choose>
-      <when test="orderBy == 'authNameDesc' or orderBy == 'authDashboardIdDesc'">
-        AND adb.id &lt; #{lastId}
-      </when>
-      <otherwise>
-        AND adb.id &gt; #{lastId}
-      </otherwise>
-    </choose>
-    <choose>
-      <when test="orderBy == 'authNameAsc'">
-        ORDER BY a.name ASC
-      </when>
-      <when test="orderBy == 'authNameDesc'">
-        ORDER BY a.name DESC
-      </when>
       <when test="orderBy == 'authDashboardIdAsc'">
+        AND adb.id &gt; #{lastId}
         ORDER BY adb.id ASC
       </when>
       <when test="orderBy == 'authDashboardIdDesc'">
+        AND adb.id &lt; #{lastId}
         ORDER BY adb.id DESC
       </when>
-      <when test="orderBy == 'none'">
+      <otherwise>
+        AND adb.id &gt; #{lastId}
         ORDER BY adb.id ASC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+  <select id="findCompanyAuthListOrderByAuthName"
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
+    SELECT
+    adb.id as id ,
+    c.id as company_id,
+    a.id as auth_id,
+    a.name as auth_name,
+    c.name as company_name
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    WHERE adb.comp_id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE #{searchTerm}
+    </if>
+    <choose>
+      <when test="orderBy == 'authNameAsc'">
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
       </when>
+      <when test="orderBy == 'authNameDesc'">
+        AND a.name &lt; #{lastAuthName}
+        ORDER BY a.name DESC
+      </when>
+      <otherwise>
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </otherwise>
     </choose>
     LIMIT #{limit}
   </select>
-
-
 
   <select id="getCompanyAuthCount" resultType="long">
     SELECT COUNT(*)
