@@ -47,6 +47,11 @@ public class SettingController {
     return new ResponseEntity<>(settingService.saveMenu(menu, type), HttpStatus.OK);
   }
 
+  @DeleteMapping("/menu")
+  public ResponseEntity<?> deleteMenu(@RequestParam Long menuId) {
+    return new ResponseEntity<>(settingService.deleteMenu(menuId), HttpStatus.OK);
+  }
+
   @GetMapping("/menu/search")
   public ResponseEntity<?> findMenuByName(@RequestParam String gnbName, @RequestParam String name) {
     return new ResponseEntity<>(

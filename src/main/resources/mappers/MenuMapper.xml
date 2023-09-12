@@ -86,4 +86,21 @@
     WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=MENU_LIST.MENU_ID AND PAR_ID = #{menuId};
   </select>
 
+  <!-- GNB 리스트 (모든 권한) -->
+  <select id="getGnbByAdmin" resultType="com.example.backend.menu.dto.MenuDto">
+    select distinct menu.id, par_id, name from auth_dashboard
+    inner join auth_menu on auth_menu.auth_id = auth_dashboard.auth_id and comp_id= #{compId}
+    inner join menu on menu.id = auth_menu.menu_id
+    where auth_menu.deleted_yn = 0 and auth_dashboard.deleted_yn = 0
+    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id = par_id;
+  </select>
+
+  <!-- GNB 리스트 (모든 권한) -->
+  <select id="getLnbByAdmin" resultType="com.example.backend.menu.dto.MenuDto">
+    select distinct menu.id, par_id, name from auth_dashboard
+    inner join auth_menu on auth_menu.auth_id = auth_dashboard.auth_id and comp_id= #{compId}
+    inner join menu on menu.id = auth_menu.menu_id
+    where auth_menu.deleted_yn = 0 and auth_dashboard.deleted_yn = 0
+    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and par_id = #{menuId} and menu.id != par_id;
+  </select>
 </mapper>

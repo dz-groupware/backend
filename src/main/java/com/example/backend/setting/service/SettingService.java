@@ -22,4 +22,5 @@ public interface SettingService {
   int modifyFavorOff(Long empId, Long menuId);
 
   List<MenuRes> findAllMenu(Long compId);
+  int deleteMenu(Long menuId);
 }

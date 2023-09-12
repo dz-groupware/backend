@@ -1,9 +1,16 @@
 package com.example.backend.setting.service;
 
+import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.setting.dto.Menu;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.mapper.SettingMapper;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Service
@@ -28,21 +35,47 @@ public class SettingServiceImpl implements SettingService {
   @Override
   public int saveMenu(MenuRes menu, String type) {
     if (type.equals("1")) {
-      try {
+//      try {
+        menu.setCompId(SecurityUtil.getCompanyId());
+        menu.setNameTree(menu.getName());
         settingMapper.addMenu(menu);
-        return settingMapper.modifyParId();
-      } catch (Exception e) {
-        return 10;
-      }
+        // 방금 추가 된 id 가져오기
+        Long id = menu.getId();
+        System.out.println("saved menu id : "+id);
+        // par_id 와 id_tree 수정
+        settingMapper.modifyParId(id, id.toString());
+        return 1;
+//      } catch (Exception e) {
+//        return 10;
+//      }
     }
     if (type.equals("2")) {
       return settingMapper.modifyMenuById(menu);
     }
     if (type.equals("3")) {
-      return settingMapper.addMenu(menu);
+      System.out.println("type 3 : "+menu.getParId());
+      // 부모 호출
+      MenuRes parMenu = settingMapper.getUpperMenuById(menu.getParId());
+      menu.setNameTree(parMenu.getNameTree()+">"+menu.getName());
+      menu.setCompId(SecurityUtil.getCompanyId());
+      settingMapper.addMenu(menu);
+      Long id = menu.getId();
+      settingMapper.modifyMenuParId(menu.getParId(), id, parMenu.getIdTree()+">"+id);
+      settingMapper.modifyUpperMenu(menu.getParId());
+
+      return 1;
     }
     if (type.equals("4")) {
-      return settingMapper.modifyMenuById(menu);
+      System.out.println("::"+menu.getParId()+"::"+menu.getId());
+      // 부모 호출
+      MenuRes parMenu = settingMapper.getUpperMenuById(menu.getParId());
+      menu.setCompId(SecurityUtil.getCompanyId());
+      menu.setNameTree(parMenu.getNameTree()+">"+menu.getName());
+      menu.setIdTree(parMenu.getIdTree()+">"+menu.getId());
+      System.out.println("::"+menu.getNameTree() + menu.getIdTree());
+      settingMapper.modifyMenuById(menu);
+      settingMapper.modifyUpperMenu(menu.getParId());
+      return 1;
     }
     return 10;
   }
@@ -87,4 +120,15 @@ public class SettingServiceImpl implements SettingService {
     return settingMapper.findAllMenu(compId);
   }
 
+  // 메뉴 삭제
+  @Override
+  public int deleteMenu(Long menuId) {
+    // id_tree를 이용해서, 모두 deleted_yn = 0
+    List<Long> menuIdList = settingMapper.getMenuIdByIdTree("%"+menuId.toString()+"%");
+
+    for (int i=0; i<menuIdList.size(); i++){
+      settingMapper.deleteMenu(menuIdList.get(i));
+    }
+    return 1;
+  }
 }
