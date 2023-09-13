@@ -10,5 +10,16 @@
     LEFT JOIN employee_department ed ON ed.emp_id = e.id
     WHERE u.login_id = #{loginId} and (org = 1 or org is NULL)
     ORDER BY e.last_access desc
+    limit 1
+  </select>
+
+  <select id="getAnotherLogin" resultType="com.example.backend.config.jwt.PrincipalUserDto">
+    SELECT u.id as user_id, u.name, u.login_id, u.login_pw, e.id as emp_id, c.id as comp_id, ed.dept_id as dept_id
+    FROM user u
+    JOIN employee e ON e.user_id = u.id
+    JOIN employee_company ec ON e.id = ec.emp_id
+    JOIN company c ON c.id = ec.comp_id
+    LEFT JOIN employee_department ed ON ed.emp_id = e.id
+    WHERE u.id=#{userId} and e.id=#{empId} and (org = 1 or org is NULL)
   </select>
 </mapper>
