@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class CompanyMgmtReqDto {
 
   private Long id;
+  private Long parId;
   private String code;
   private Boolean enabledYn;
   private String name;
@@ -35,10 +36,9 @@ public class CompanyMgmtReqDto {
   private Boolean deletedYn;
   private Long companyId;
 
-  public void setId(Long id) {
-    this.id=id;
-  }
   public void setCompanyId(Long id){
     this.companyId=id;
   }
+
+
 }

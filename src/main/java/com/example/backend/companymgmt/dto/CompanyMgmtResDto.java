@@ -13,6 +13,7 @@ import lombok.Getter;
 public class CompanyMgmtResDto {
 
   private Long id;
+  private Long parId;
   private String code;
   private Boolean enabledYn;
   private String name;
