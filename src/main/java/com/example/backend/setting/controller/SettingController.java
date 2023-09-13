@@ -83,4 +83,8 @@ public class SettingController {
         new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
   }
 
+  @GetMapping("/menu/test/modify")
+  public void modify(){
+    settingService.modifyMenu();
+  }
 }

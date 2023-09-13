@@ -69,7 +69,7 @@
   <update id="modifyMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
     update menu set par_id = #{parId}, comp_id = #{compId}, name = #{name}, enabled_yn = #{enabledYN}, icon_url = #{iconUrl},
     sort_order = #{sortOrder}, name_tree = #{nameTree}, id_tree = #{idTree}
-    , child_node_yn = #{childNodeYn}, admin_yn = #{adminYn}, deleted_yn = #{deletedYn} where id = #{id};
+    where id = #{id};
   </update>
 
   <!-- 상위 메뉴 정보 가져오기 -->
@@ -89,4 +89,31 @@
   <update id="deleteMenu">
     update menu set deleted_yn = 1 where id = #{menuId}
   </update>
+
+  <select id="checkMenuInMenu" resultType="java.lang.Integer">
+    select count(*) from menu where id_tree like #{id} and id=#{parId};
+  </select>
+
+  <select id="getParIdOfUpperMenu" resultType="com.example.backend.setting.dto.MenuTrans">
+    select id, par_id, name, name_tree, id_tree from menu where id = #{id} and id != par_id;
+  </select>
+
+  <select id="getParMenu" resultType="com.example.backend.setting.dto.MenuTrans">
+    select id, par_id, name, id_tree, name_tree from menu where id = #{id};
+  </select>
+
+  <select id="getPreMoveMenuList" resultType="com.example.backend.setting.dto.MenuTrans">
+    select id, par_id, name, id_tree, name_tree from menu where id_tree like #{id}
+  </select>
+
+  <update id="modifyPreMoveMenu">
+    update menu set id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} where id = #{id};
+  </update>
+
+  <select id="getPreParMenu" resultType="com.example.backend.setting.dto.MenuTrans">
+    SELECT ID, MENU.PAR_ID, NAME, ID_TREE, NAME_TREE FROM MENU INNER JOIN
+    (SELECT PAR_ID FROM MENU WHERE ID=#{id})ORIGIN WHERE ORIGIN.PAR_ID = MENU.ID;
+  </select>
+
+
 </mapper>

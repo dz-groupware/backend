@@ -23,4 +23,6 @@ public interface SettingService {
 
   List<MenuRes> findAllMenu(Long compId);
   int deleteMenu(Long menuId);
+
+  void modifyMenu();
 }

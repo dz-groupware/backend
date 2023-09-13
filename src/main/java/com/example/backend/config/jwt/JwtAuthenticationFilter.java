@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     this.authenticationManager = authenticationManager;
     this.objectMapper = objectMapper;
     this.tokenService = tokenService;
-    setFilterProcessesUrl("/login"); // 로그인 URL 변경
+    setFilterProcessesUrl("/login2"); // 로그인 URL 변경
   }
   // ("/login") 요청을 하면 로그인 시도를 위해서 실행되는 함수
   @Override
