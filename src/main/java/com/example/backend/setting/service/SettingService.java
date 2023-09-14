@@ -1,6 +1,7 @@
 package com.example.backend.setting.service;
 
 import com.example.backend.setting.dto.MenuRes;
+import com.example.backend.setting.dto.MenuTrans;
 import java.util.List;
 
 public interface SettingService {
@@ -24,5 +25,5 @@ public interface SettingService {
   List<MenuRes> findAllMenu(Long compId);
   int deleteMenu(Long menuId);
 
-  void modifyMenu();
+  void modifyMenu(MenuTrans menu);
 }
