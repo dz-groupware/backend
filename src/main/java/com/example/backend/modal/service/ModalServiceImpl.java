@@ -30,24 +30,8 @@ public class ModalServiceImpl implements ModalService {
 
   @Override
   public List<ProfileRes> getAllProfile() {
-
     Long userId = SecurityUtil.getUserId();
-    Long empId = SecurityUtil.getEmployeeId();
-
-    if(checkMapper.checkMaster(empId)) {
-      // 마스터인 경우
-      return modalMapper.getProfileByUserId(userId);
-    }
-
-    Long compId = SecurityUtil.getCompanyId();
-    Long deptId = SecurityUtil.getDepartmentId();
-    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
-
-    if( result.size() == 1 && result.get(0) == 1L ){
-      return modalMapper.getProfileByUserId(userId);
-    }
-
-    return new ArrayList<>();
+    return modalMapper.getProfileByUserId(userId);
   }
 
   @Override
@@ -96,5 +80,17 @@ public class ModalServiceImpl implements ModalService {
           modalMapper.findResultOfEmp(text, text, text, text));
     }
     return new SingleResponseDto<>("");
+  }
+
+  @Override
+  public boolean checkEmpIds(Long empId){
+    Long userId = SecurityUtil.getUserId();
+    List<Long> result = modalMapper.checkEmpIds(userId);
+    for (int i=0; i<result.size(); i++){
+      if (result.get(i) == empId) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -10,11 +10,13 @@
     last_ip, last_access, employee.position, image_url from user
     inner join employee on user.id = employee.user_id and employee.user_id = #{userId}
     left join employee_department on employee.id = employee_department.emp_id and ( org = 1 or org is null)
+    left join employee_company on employee.id = employee_company.emp_id
     left join department on department.id = employee_department.dept_id
-    left join company on company.id = department.comp_id
+    left join company on company.id = employee_company.comp_id
     where (employee_department.deleted_yn = 0 or employee_department.deleted_yn is null)
     and (department.enabled_yn = 1 or department.enabled_yn is null)
     and (employee_department.transferred_yn = 0 or employee_department.transferred_yn is null)
+    and employee_company.resigned_yn = 0 and employee_company.deleted_yn = 0
     and (department.deleted_yn = 0 or department.deleted_yn is null);
   </select>
 
@@ -65,11 +67,13 @@
 
   <!-- 조직도 검색 (전체 옵션 - 부서) -->
   <select id="findDeptAllByText" resultType="com.example.backend.modal.dto.TreeItemRes">
-    select id, par_id, name, sort_order from department
-    where comp_id=#{compId} and name like #{text} and enabled_yn = 1 and deleted_yn = 0
+    select id, department.par_id, name, sort_order from department
+    inner join (select par_id from company where id = #{compId})comp
+    where department.comp_id = COMP.PAR_ID and name like #{text} and enabled_yn = 1 and deleted_yn = 0
     union
-    select id, par_id, name, sort_order from company
-    where id=#{compId} and name like #{text} and enabled_yn = 1 and deleted_yn = 0;
+    select id, company.par_id, name, sort_order from company
+    INNER JOIN (select par_id from company where id = #{comp_id})comp
+    where company.PAR_ID = comp.par_id and name like #{text} and enabled_yn = 1 and deleted_yn = 0;
   </select>
 
   <!-- 조직도 검색 (전체 옵션 - 사원) -->
@@ -100,5 +104,11 @@
     select id, name, mobile_number as number, image_url, email, position from employee
     where
     name like #{text1} and deleted_yn = 0;
+  </select>
+
+  <!-- 유저의 모든 사원id 가져오기-->
+  <select id="checkEmpIds" resultType="java.lang.Long">
+    select id from employee where user_id = #{userId} and account_yn = 1 and deleted_yn = 0;
+
   </select>
 </mapper>

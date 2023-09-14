@@ -1,5 +1,6 @@
 package com.example.backend.menu.service;
 
+import com.example.backend.common.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.employee.mapper.EmployeeMapper;
@@ -7,7 +8,10 @@ import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -27,6 +31,11 @@ public class MenuServiceImpl implements MenuService {
 
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
+      System.out.println(SecurityUtil.getUserId());
+      System.out.println(SecurityUtil.getEmployeeId());
+      System.out.println(SecurityUtil.getCompanyId());
+
+      System.out.println("master compId : "+ compId);
       return menuMapper.getGnbForMaster(compId);
     }
 
@@ -93,4 +102,15 @@ public class MenuServiceImpl implements MenuService {
     return new ArrayList<>();
   }
 
+  @Override
+  public List<MenuDto> getGnbByAdmin() {
+    Long compId = SecurityUtil.getCompanyId();
+    return menuMapper.getGnbByAdmin(compId);
+  }
+
+  @Override
+  public List<MenuDto> getLnbByAdmin(Long menuId) {
+    Long compId = SecurityUtil.getCompanyId();
+    return menuMapper.getLnbByAdmin(menuId, compId);
+  }
 }

@@ -38,6 +38,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 //    }
 
     String accessToken = getAccessTokenFromCookie(request);
+    System.out.println("accessToken : "+accessToken);
     if (accessToken == null || "".equals(accessToken)) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
@@ -49,7 +50,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       return;
     }
 
+    System.out.println("username : "+username);
+    System.out.println("response : " + response);
+    System.out.println("accessToken2 : "+accessToken);
+
     setSecurityContext(response, username);
+
     chain.doFilter(request, response);
   }
 
@@ -64,7 +70,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     PrincipalDetails principalDetails = new PrincipalDetails(principalUser);
     Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null,
         principalDetails.getAuthorities());
-
+    System.out.println(authentication.getPrincipal());
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
@@ -78,6 +84,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if ("JWT".equals(cookie.getName())) {
+          System.out.println("cooke.getValue : "+cookie.getValue());
           return cookie.getValue();
         }
       }

@@ -84,5 +84,4 @@ public class SecurityConfig {
           .addFilterAfter(new JwtAuthorizationFilter(jwtKey, userMapper), UsernamePasswordAuthenticationFilter.class);
     }
   }
-
 }
