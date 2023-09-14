@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,6 +35,11 @@ public class SecurityConfig {
   private String jwtKey;
 
   @Bean
+  public WebSecurityCustomizer webCustomizer(){
+    return req->req.ignoring().mvcMatchers("/api/v1/login");
+  }
+
+  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .headers().frameOptions()
@@ -47,15 +53,14 @@ public class SecurityConfig {
         .formLogin().disable() // 폼 기반 로그인 비활성화
         .httpBasic().disable() // HTTP Basic 인증 비활성화
         .exceptionHandling()
-//                .authenticationEntryPoint(entryPoint) // 사용자 정의 인증 진입점 설정
         .and()
         .apply(new CustomFilterConfigurer(jwtKey, userMapper, tokenService)) // 사용자 정의 필터 적용
         .and()
         .authorizeRequests(authorize -> authorize // 인증 규칙 정의
-                .antMatchers(
-                                "/api/v1/login"
-                ).permitAll()
-                .anyRequest().authenticated()
+          .antMatchers(
+            "/api/v1/login"
+          ).permitAll()
+          .anyRequest().authenticated()
         );
 
     return http.build();
