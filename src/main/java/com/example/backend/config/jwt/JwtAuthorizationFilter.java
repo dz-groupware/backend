@@ -27,15 +27,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
-//    if ("/api/v1/login".equals(request.getRequestURI())) {
-//      // 로그인 요청이므로 다르게 처리
-//      chain.doFilter(request, response);
-//      return;
-//    }
-//
-//    if (!isValidAuthorizationHeader(request, response, chain)) {
-//      return;
-//    }
 
     String accessToken = getAccessTokenFromCookie(request);
     System.out.println("accessToken : "+accessToken);
@@ -73,11 +64,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     System.out.println(authentication.getPrincipal());
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
-
-//  private String getAccessTokenFromHeader(HttpServletRequest request) {
-//    String authorizationHeader = request.getHeader("Authorization");
-//    return authorizationHeader.replace("Bearer ", "");
-//  }
 
   private String getAccessTokenFromCookie(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();

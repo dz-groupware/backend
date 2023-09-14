@@ -1,5 +1,6 @@
 package com.example.backend.authgroup.service;
 
+import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import com.example.backend.common.Page;
 import com.example.backend.common.PageDto;
@@ -11,6 +12,7 @@ import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.config.jwt.SecurityUtil;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthGroupServiceImpl implements AuthGroupService {
@@ -53,15 +55,15 @@ public class AuthGroupServiceImpl implements AuthGroupService {
   }
 
   @Override
-  public List<CompanyMenuDto> getCompanyGnbList() {
+  public List<CompanyMenuDto> getCompanyGnbList(Boolean enabledYn) {
     Long companyId = SecurityUtil.getCompanyId();
-    return authGroupMapper.getCompanyGnbList(companyId);
+    return authGroupMapper.getCompanyGnbList(companyId,enabledYn);
   }
 
   @Override
-  public List<CompanyMenuDto> getCompanyLnbList(Long parId) {
+  public List<CompanyMenuDto> getCompanyLnbList(Long parId, Boolean enabledYn) {
     Long companyId = SecurityUtil.getCompanyId();
-    return authGroupMapper.getCompanyLnbList(companyId, parId);
+    return authGroupMapper.getCompanyLnbList(companyId, parId, enabledYn);
   }
 
   @Override
@@ -71,13 +73,35 @@ public class AuthGroupServiceImpl implements AuthGroupService {
   }
 
   @Override
+  public List<AuthMenuDto> getLnbListOfAuth(Long authId, Long parMenuId) {
+    Long companyId = SecurityUtil.getCompanyId();
+    return authGroupMapper.getLnbListOfAuth(companyId,authId, parMenuId);
+  }
+
+  @Override
   public List<MenuAuthStatusDto> getGnbListOfAuthWithAll(Long authId) {
     Long companyId = SecurityUtil.getCompanyId();
     return authGroupMapper.getGnbListOfAuthWithAll(companyId, authId);
   }
 
   @Override
+  public List<MenuAuthStatusDto> getLnbListOfAuthWithAll(Long authId, Long parId) {
+    Long companyId = SecurityUtil.getCompanyId();
+    return authGroupMapper.getLnbListOfAuthWithAll(companyId, authId, parId);
+  }
+
+  @Override
   public List<UserListOfAuthDto> getEmpListOfAuth(Long authId) {
     return authGroupMapper.getEmpListOfAuth(authId);
+  }
+
+  @Transactional
+  @Override
+  public Long addAuth(AddAuthDto addAuthDto) {
+    Long companyId = SecurityUtil.getCompanyId();
+    authGroupMapper.addAuth(addAuthDto);
+    Long generatedAuthId = addAuthDto.getId();
+    authGroupMapper.insertIntoAuthDashboard(companyId, generatedAuthId);
+    return generatedAuthId;
   }
 }
