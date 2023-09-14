@@ -63,11 +63,10 @@ public class ModalServiceImpl implements ModalService {
 
   @Override
   public SingleResponseDto<?> findOrgResult(String type, String text) {
-    log.info(type + text);
     if (type.equals("all")) {
       Map<String, List<?>> result = new HashMap<>();
       Long compId = SecurityUtil.getCompanyId();
-      result.put("Tree", modalMapper.findDeptAllByText(compId, text));
+      result.put("Tree", modalMapper.findDeptAllByText(compId, text, compId, text));
       result.put("List", modalMapper.findEmpAllByText(compId, text, text, text, text, text, text, text));
       return new SingleResponseDto<Map>(result);
     }
