@@ -31,6 +31,11 @@ public class MenuServiceImpl implements MenuService {
 
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
+      System.out.println(SecurityUtil.getUserId());
+      System.out.println(SecurityUtil.getEmployeeId());
+      System.out.println(SecurityUtil.getCompanyId());
+
+      System.out.println("master compId : "+ compId);
       return menuMapper.getGnbForMaster(compId);
     }
 

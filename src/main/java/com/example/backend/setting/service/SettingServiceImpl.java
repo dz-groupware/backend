@@ -8,6 +8,7 @@ import com.example.backend.setting.mapper.SettingMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -125,126 +126,6 @@ public class SettingServiceImpl implements SettingService {
     settingMapper.modifyPreMoveMenu(menu);
   }
 
-  @Override
-  public void modifyMenu(){
-
-    // IT가 빅데이터 부서를 상위부서로 변경한 경우
-    String type = "4";
-    MenuRes menu = new MenuRes();
-    menu.setId(53L);
-    menu.setParId(54L);
-    menu.setName("데이터분석/빅데이터");
-    menu.setSortOrder(23);
-    menu.setEnabledYN(1);
-
-    if (type.equals("4")) {
-      // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
-      System.out.print("modify menu :");
-      if (checkMenuInMenu(menu.getId(), menu.getParId())) {
-        // 그렇다면 메뉴를 자신보다 상위로 이동시키는 과정 먼저 실행
-        // 어디 아래로 이동시킬지 찾기 이동 시킨곳 childNodeYn 변경 필요
-        // 실제 A보다 상위 (만약 A가 최상단이라면 자신의 id를 par_id로 넘겨주게 되므로 id=par_id는 제외한다.)
-        MenuTrans parMenu = settingMapper.getParIdOfUpperMenu(menu.getId());
-        // 이동시킬 메뉴를 찾고 (par_id, id_tree, name_tree 변경) 하위 모든 메뉴도 변경
-        String originIdTree;
-        String originNameTree;
-
-        if(parMenu == null){
-          System.out.println("parMenu is null");
-          // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다면,
-          // 이동시키는 메뉴를 대메뉴 처럼 만든다.
-          parMenu = settingMapper.getParMenu(menu.getParId());
-          originIdTree = parMenu.getIdTree()+">";
-          originNameTree = parMenu.getNameTree()+">";
-          parMenu.setParId(parMenu.getId());
-          parMenu.setIdTree(parMenu.getId().toString());
-          parMenu.setNameTree(parMenu.getName());
-        } else {
-          // 상위에 메뉴가 있으므로 그 메뉴의 정보를 받아옴
-          parMenu = settingMapper.getParMenu(menu.getParId());
-          MenuTrans preParMenu = settingMapper.getPreParMenu(menu.getId());
-          originIdTree = parMenu.getIdTree()+">";
-          originNameTree = parMenu.getNameTree()+">";
-          parMenu.setParId(preParMenu.getId());
-          parMenu.setIdTree(preParMenu.getIdTree()+">"+parMenu.getId().toString());
-          parMenu.setNameTree(preParMenu.getNameTree()+">"+parMenu.getName());
-        }
-
-        System.out.println("upper of origin (parMenu) : "+ parMenu.getId()+"::"+ parMenu.getParId()+"::"+parMenu.getName()+"::"+parMenu.getIdTree()+"::"+parMenu.getNameTree()+"::");
-
-        List<MenuTrans> preMenuList = settingMapper.getPreMoveMenuList("%" + menu.getParId().toString() + "%");
-        System.out.println("found preMenuList (size) : "+ preMenuList.size());
-        for (int i = 0; i < preMenuList.size(); i++) {
-          MenuTrans preMenu = preMenuList.get(i);
-          if (Objects.equals(preMenu.getId(), parMenu.getParId())) {
-            System.out.print("parMenu was null this excange ");
-            System.out.println("parMenu : "+ parMenu.getId()+"::"+ parMenu.getParId()+"::"+parMenu.getName()+"::"+parMenu.getIdTree()+"::"+parMenu.getNameTree()+"::");
-            // parMenu가 null이 였을 경우 이미 수정 되었으므로 바꾸지 않는다.
-            preMenu = parMenu;
-            settingMapper.modifyPreMoveMenu(preMenu);
-            continue;
-          }
-          if(Objects.equals(originIdTree.length(), preMenu.getIdTree().length())){
-            preMenu.setIdTree(parMenu.getIdTree() + ">" + preMenu.getIdTree().substring(originIdTree.length()));
-          } else {
-            preMenu.setIdTree(parMenu.getIdTree() + ">" + preMenu.getIdTree().substring(originIdTree.length()-1));
-          }
-
-          if(Objects.equals(originNameTree.length(), preMenu.getNameTree().length())){
-            preMenu.setNameTree(parMenu.getNameTree() + ">" + preMenu.getNameTree().substring(originNameTree.length()));
-          } else {
-            preMenu.setNameTree(parMenu.getNameTree() + ">" + preMenu.getNameTree().substring(originNameTree.length()-1));
-          }
-
-          if (Objects.equals(menu.getParId(), preMenu.getId())) {
-
-            // 이동시키는 메뉴 중에 상위로 지정된 (여기서는 C) 메뉴를 찾으면 parId 변경
-            preMenu.setParId(parMenu.getId());
-          }
-          settingMapper.modifyPreMoveMenu(preMenu);
-        }
-
-        // A를 C 아래로 이동 시킴
-//        parMenu = settingMapper.getParMenu(menu.getParId());
-        System.out.println("upper of new (parMenu) : "+ parMenu.getId()+"::"+ parMenu.getParId()+"::"+parMenu.getName()+"::"+parMenu.getIdTree()+"::"+parMenu.getNameTree()+"::");
-        List<MenuTrans> menuList = settingMapper.getPreMoveMenuList(
-            "%" + menu.getId().toString() + "%");
-        System.out.println("found menuList (size) : "+ menuList.size());
-        for (int i = 0; i < menuList.size(); i++) {
-          MenuTrans preMenu = menuList.get(i);
-          preMenu.setIdTree(parMenu.getIdTree() + ">" + preMenu.getIdTree());
-          preMenu.setNameTree(parMenu.getNameTree() + ">" + preMenu.getNameTree());
-          if (Objects.equals(menu.getId(), preMenu.getId())) {
-
-            // 이동시키는 메뉴 중에 이동하는 (여기서는 A) 메뉴를 찾으면 parId 변경
-            preMenu.setParId(menu.getParId());
-          }
-          settingMapper.modifyPreMoveMenu(preMenu);
-        }
-
-      } else {
-        // 아니라면 건너뛰고 실행
-        System.out.println("checking is wrong..");
-        MenuTrans parMenu = settingMapper.getParIdOfUpperMenu(menu.getParId());
-        List<MenuTrans> menuList = settingMapper.getPreMoveMenuList(
-            "%" + menu.getId().toString() + "%");
-        for (int i = 0; i < menuList.size(); i++) {
-
-          MenuTrans preMenu = menuList.get(i);
-          if (Objects.equals(preMenu.getId(), preMenu.getParId())) {
-            // parMenu가 null이 였을 경우 이미 수정 되었으므로 바꾸지 않는다.
-            continue;
-          }
-          preMenu.setIdTree(parMenu.getIdTree() + ">" + preMenu.getId().toString());
-          preMenu.setNameTree(parMenu.getNameTree() + ">" + preMenu.getName());
-          settingMapper.modifyPreMoveMenu(preMenu);
-        }
-      }
-    }
-  }
-
-
-
 
 
 
@@ -299,4 +180,199 @@ public class SettingServiceImpl implements SettingService {
     }
     return 1;
   }
+
+
+  // 수정 중
+  @Override
+  public void modifyMenu(){
+
+    // IT가 빅데이터 부서를 상위부서로 변경한 경우
+    String type = "4";
+    MenuRes menu = new MenuRes();
+    menu.setId(37L);
+    menu.setParId(57L);
+    menu.setName("데이터분석/빅데이터");
+    menu.setSortOrder(23);
+    menu.setEnabledYN(1);
+
+    // menu: 입력 정보 / parMenu : menu의 상위 메뉴 / preMenu : menu의 상위가 될 메뉴(menu의 하위 메뉴 중) / originMenu : 수정 전 menu 정보
+    if (type.equals("4")) {
+      // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
+      System.out.print("modify menu :");
+      if (checkMenuInMenu(menu.getId(), menu.getParId())) {
+        // 그렇다면 메뉴를 자신보다 상위로 이동시키는 과정 먼저 실행
+        // parMenu 상위로 갖도록. parMenu childNodeYn 변경 필요
+        // 만약 preMenu가 없다면 null 반환
+        // 자신이 최 상단인지 확인하는 수단
+        MenuTrans originMenu = settingMapper.getParIdOfUpperMenu(menu.getId());
+//        System.out.println("getParMenu : "+ parMenu.getId()+"::"+ parMenu.getParId()+"::"+parMenu.getName()+"::"+parMenu.getIdTree()+"::"+parMenu.getNameTree()+"::");
+
+//        String originIdTree;
+//        String originNameTree;
+
+        if(originMenu == null){
+          System.out.println("origin is gnb");
+          // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다면,
+          // 이동시키는 메뉴(menu의 상위메뉴가 될 메뉴)를 대메뉴 처럼 만든다.
+          // 메뉴 이동 : menu의 상위가 될 메뉴와 (preMenu) 그 하위 메뉴들 (menu_id를 포함한 id_tree 검색)
+          List<MenuTrans> preMenuList = settingMapper.getPreMoveMenuList("%" + menu.getParId().toString() + "%");
+
+          Optional<MenuTrans> preMenuStream = preMenuList.stream()
+              .filter(pre -> pre.getId() == menu.getParId())
+              .findFirst();
+
+          MenuTrans preMenu = new MenuTrans(preMenuStream.get());
+
+          preMenu.setParId(preMenu.getId());
+          preMenu.setIdTree(preMenu.getId().toString());
+          preMenu.setNameTree(preMenu.getName());
+
+          settingMapper.modifyPreMoveMenu(preMenu);
+
+          // preMenuList
+          for (int i = 0; i < preMenuList.size(); i++) {
+            MenuTrans menuTrans = preMenuList.get(i);
+            // 하위 메뉴 중, originMenu는 건너 뜀
+            if (Objects.equals(menuTrans.getId(), preMenu.getId())) {
+//              System.out.print("this is preRoot");
+              continue;
+            }
+            menuTrans.setIdTree(preMenu.getIdTree() +">"+ menuTrans.getIdTree());
+            menuTrans.setNameTree(preMenu.getNameTree() +">"+ menuTrans.getNameTree());
+            settingMapper.modifyPreMoveMenu(menuTrans);
+          }
+
+          // menu 이동
+          List<MenuTrans> MenuList = settingMapper.getPreMoveMenuList("%" + menu.getId().toString() + "%");
+
+          Optional<MenuTrans> originMenuStream = MenuList.stream()
+              .filter(origin -> origin.getId() == menu.getParId())
+              .findFirst();
+
+          String originIdTree = originMenu.getIdTree();
+          String originNameTree = originMenu.getNameTree();
+
+          originMenu.setParId(preMenu.getId());
+          originMenu.setIdTree(preMenu.getIdTree()+">"+originMenu.getId().toString());
+          originMenu.setNameTree(preMenu.getNameTree()+">"+originMenu.getName());
+          settingMapper.modifyPreMoveMenu(originMenu);
+
+          // MenuList
+          for (int i = 0; i < MenuList.size(); i++) {
+            MenuTrans menuTrans = MenuList.get(i);
+            // 하위 메뉴 중, originMenu는 건너 뜀
+            if (Objects.equals(menuTrans.getId(), originMenu.getId())) {
+//              System.out.print("this is originMenu");
+              continue;
+            }
+            String tmp = menuTrans.getIdTree().substring(originIdTree.length());
+            if (tmp.startsWith(">")){
+              tmp = tmp.substring(1);
+            }
+            menuTrans.setIdTree(originMenu.getIdTree() +">"+ tmp);
+            tmp = menuTrans.getNameTree().substring(originNameTree.length());
+            if (tmp.startsWith(">")){
+              tmp = tmp.substring(1);
+            }
+            menuTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
+            settingMapper.modifyPreMoveMenu(menuTrans);
+          }
+
+        } else {
+          // menu의 원래 상위 메뉴 찾기
+          MenuTrans parMenu = settingMapper.getParMenu(originMenu.getParId());
+          // 이동시킬 메뉴를 찾고 (par_id, id_tree, name_tree 변경) 하위 모든 메뉴도 변경
+          List<MenuTrans> preMenuList = settingMapper.getPreMoveMenuList("%" + menu.getParId().toString() + "%");
+          Optional<MenuTrans> preMenuStream = preMenuList.stream()
+              .filter(pre -> pre.getId() == menu.getParId())
+              .findFirst();
+
+
+          MenuTrans preMenu = new MenuTrans(preMenuStream.get());
+          String originPreIdTree = preMenu.getIdTree();
+          String originPreNameTree = preMenu.getNameTree();
+          // 상위 메뉴는 parMenu
+          preMenu.setParId(parMenu.getId());
+          preMenu.setIdTree(parMenu.getIdTree()+">"+preMenu.getId().toString());
+          preMenu.setNameTree(parMenu.getNameTree()+">"+preMenu.getName());
+
+          settingMapper.modifyPreMoveMenu(preMenu);
+
+          for (int i = 0; i < preMenuList.size(); i++) {
+            MenuTrans menuTrans = preMenuList.get(i);
+
+            if (Objects.equals(menuTrans.getId(), preMenu.getId())) {
+//              System.out.print("this is originMenu");
+              continue;
+            }
+
+            String tmp = menuTrans.getIdTree().substring(originPreIdTree.length());
+            if (tmp.startsWith(">")) {
+              tmp = tmp.substring(1);
+            }
+            menuTrans.setIdTree(preMenu.getIdTree() + ">" + tmp);
+            tmp = menuTrans.getNameTree().substring(originPreNameTree.length());
+            if (tmp.startsWith(">")) {
+              tmp = tmp.substring(1);
+            }
+            menuTrans.setNameTree(preMenu.getNameTree() + ">" + tmp);
+
+            settingMapper.modifyPreMoveMenu(menuTrans);
+          }
+
+
+          // menu 이동
+          List<MenuTrans> MenuList = settingMapper.getPreMoveMenuList("%" + menu.getId().toString() + "%");
+
+          String originIdTree = originMenu.getIdTree();
+          String originNameTree = originMenu.getNameTree();
+
+          originMenu.setParId(preMenu.getId());
+          originMenu.setIdTree(preMenu.getIdTree()+">"+originMenu.getId().toString());
+          originMenu.setNameTree(preMenu.getNameTree()+">"+originMenu.getName());
+
+          settingMapper.modifyPreMoveMenu(originMenu);
+
+          // MenuList
+          for (int i = 0; i < MenuList.size(); i++) {
+            MenuTrans menuTrans = MenuList.get(i);
+            // 하위 메뉴 중, originMenu는 건너 뜀
+            if (Objects.equals(menuTrans.getId(), originMenu.getId())) {
+//              System.out.print("this is originMenu");
+              continue;
+            }
+            String tmp = menuTrans.getIdTree().substring(originIdTree.length());
+            if (tmp.startsWith(">")){
+              tmp = tmp.substring(1);
+            }
+            menuTrans.setIdTree(originMenu.getIdTree() +">"+ tmp);
+            tmp = menuTrans.getNameTree().substring(originNameTree.length());
+            if (tmp.startsWith(">")){
+              tmp = tmp.substring(1);
+            }
+            menuTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
+            settingMapper.modifyPreMoveMenu(menuTrans);
+          }
+        }
+      } else {
+        // 아니라면 건너뛰고 실행
+        System.out.println("checking is wrong..");
+        MenuTrans parMenu = settingMapper.getParIdOfUpperMenu(menu.getParId());
+        List<MenuTrans> menuList = settingMapper.getPreMoveMenuList(
+            "%" + menu.getId().toString() + "%");
+        for (int i = 0; i < menuList.size(); i++) {
+
+          MenuTrans preMenu = menuList.get(i);
+          if (Objects.equals(preMenu.getId(), preMenu.getParId())) {
+            // parMenu가 null이 였을 경우 이미 수정 되었으므로 바꾸지 않는다.
+            continue;
+          }
+          preMenu.setIdTree(parMenu.getIdTree() + ">" + preMenu.getId().toString());
+          preMenu.setNameTree(parMenu.getNameTree() + ">" + preMenu.getName());
+          settingMapper.modifyPreMoveMenu(preMenu);
+        }
+      }
+    }
+  }
+
 }

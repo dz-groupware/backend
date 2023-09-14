@@ -12,4 +12,12 @@ public class MenuTrans {
   private String idTree = "";
   private String nameTree = "";
 
+  public MenuTrans(){}
+  public MenuTrans(MenuTrans stream) {
+    this.id = stream.id;
+    this.parId = stream.parId;
+    this.name = new String(stream.name);
+    this.idTree = new String(stream.idTree);
+    this.nameTree = new String(stream.nameTree);
+  }
 }

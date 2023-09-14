@@ -53,9 +53,9 @@ public class SecurityConfig {
         .and()
         .authorizeRequests(authorize -> authorize // 인증 규칙 정의
                 .antMatchers(
-                                "/**"
+                                "/api/v1/login"
                 ).permitAll()
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated()
         );
 
     return http.build();
@@ -84,5 +84,4 @@ public class SecurityConfig {
           .addFilterAfter(new JwtAuthorizationFilter(jwtKey, userMapper), UsernamePasswordAuthenticationFilter.class);
     }
   }
-
 }
