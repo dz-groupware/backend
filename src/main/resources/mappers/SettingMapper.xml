@@ -9,10 +9,19 @@
   </delete>
 
   <!-- 메뉴 설정 페이지 : 메뉴 선택 시 메뉴 상세 정보 가져오기 -->
-  <insert id="addMenu" parameterType="com.example.backend.setting.dto.MenuRes">
-    insert into menu(par_id, comp_id, name, enabled_YN, icon_url, sort_order)
-    values(50, #{compId}, #{name}, #{enabledYN}, #{iconUrl}, #{sortOrder});
+  <insert id="addMenu" parameterType="com.example.backend.setting.dto.MenuRes" useGeneratedKeys="true" keyProperty="id">
+    insert into menu(par_id, comp_id, name, enabled_YN, icon_url, sort_order, name_tree, child_node_yn, admin_yn, deleted_yn)
+    values(59, #{compId}, #{name}, #{enabledYN}, #{iconUrl}, #{sortOrder}, #{nameTree}, #{childNodeYn}, #{adminYn}, #{deletedYn});
   </insert>
+
+  <update id="modifyParId">
+    update menu set par_id = #{id}, id_tree = #{idTree} where id = #{id};
+  </update>
+
+  <update id="modifyMenuParId">
+    update menu set par_id = #{parId}, id_tree = #{idTree} where id = #{id};
+  </update>
+
 
   <!-- 메뉴 검색 : GNB 선택 결과와 메뉴명 검색 결과 (메뉴트리를 그릴 수 있는 리스트 반환) -->
   <select id="findAllMenu">
@@ -52,15 +61,59 @@
   </insert>
 
   <!-- 즐겨찾기 삭제 -->
-  <update id="modifyParId">
+  <update id="modifyGnbById">
     update menu set par_id = LAST_INSERT_ID() WHERE id = LAST_INSERT_ID();
   </update>
 
-  <!-- 전체 메뉴 가져오기 -->
+  <!-- 메뉴 수정 -->
   <update id="modifyMenuById" parameterType="com.example.backend.setting.dto.MenuRes">
-    update menu set par_id = #{parId}, comp_id = #{compId}, name = #{name}, enabled_yn =
-    #{enabledYN}, icon_url = #{iconUrl},
-    sort_order = #{sortOrder} where id = #{id};
+    update menu set par_id = #{parId}, comp_id = #{compId}, name = #{name}, enabled_yn = #{enabledYN}, icon_url = #{iconUrl},
+    sort_order = #{sortOrder}, name_tree = #{nameTree}, id_tree = #{idTree}
+    where id = #{id};
   </update>
+
+  <!-- 상위 메뉴 정보 가져오기 -->
+  <select id="getUpperMenuById" parameterType="com.example.backend.setting.dto.Menu">
+    select * from menu where id = #{parId};
+  </select>
+
+  <!-- 상위 메뉴 childNodeYn 변경 -->
+  <update id="modifyUpperMenu">
+    update menu set child_node_yn = 0 where id = #{parId};
+  </update>
+
+  <select id="getMenuIdByIdTree" resultType="java.lang.Long">
+    select id, name, id_tree from menu where id_tree like #{menuId};
+  </select>
+
+  <update id="deleteMenu">
+    update menu set deleted_yn = 1 where id = #{menuId}
+  </update>
+
+  <select id="checkMenuInMenu" resultType="java.lang.Integer">
+    select count(*) from menu where id_tree like #{id} and id=#{parId};
+  </select>
+
+  <select id="getParIdOfUpperMenu" resultType="com.example.backend.setting.dto.MenuTrans">
+    select id, par_id, name, name_tree, id_tree from menu where id = #{id} and id != par_id;
+  </select>
+
+  <select id="getParMenu" resultType="com.example.backend.setting.dto.MenuTrans">
+    select id, par_id, name, id_tree, name_tree from menu where id = #{id};
+  </select>
+
+  <select id="getPreMoveMenuList" resultType="com.example.backend.setting.dto.MenuTrans">
+    select id, par_id, name, id_tree, name_tree from menu where id_tree like #{id}
+  </select>
+
+  <update id="modifyPreMoveMenu">
+    update menu set id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} where id = #{id};
+  </update>
+
+  <select id="getPreParMenu" resultType="com.example.backend.setting.dto.MenuTrans">
+    SELECT ID, MENU.PAR_ID, NAME, ID_TREE, NAME_TREE FROM MENU INNER JOIN
+    (SELECT PAR_ID FROM MENU WHERE ID=#{id})ORIGIN WHERE ORIGIN.PAR_ID = MENU.ID;
+  </select>
+
 
 </mapper>

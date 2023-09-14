@@ -6,13 +6,14 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface MenuMapper {
-  List<Long> check(Long userId, Long empId, Long deptId, Long compId);
-  List<MenuDto> getMenuByEmpId(Long empId, Long compId, Long deptId);
-
-
-
-  List<MenuDto> getFavorByEmpId(Long empId);
+  List<MenuDto> getGnbByEmpId(Long empId, Long compId, Long deptId);
+  List<MenuDto> getGnbForMaster(Long compId);
+  List<MenuDto> getFavorByEmpId(Long empId, Long compId, Long deptId);
+  List<MenuDto> getFavorForMaster(Long compId);
   int removeFavor(Long empId, Long menuId);
-  List<MenuDto> findMenuByParId(Long menuId, Long compId);
-  List<MenuDto> getMenuByEmpIdForMaster(Long compId);
+  List<MenuDto> getMenuById(Long menuId, Long empId, Long compId, Long deptId);
+  List<MenuDto> getMenuForMaster(Long menuId, Long compId);
+  List<MenuDto> getGnbByAdmin(Long compId);
+  List<MenuDto> getLnbByAdmin(Long menuId, Long compId);
+
 }

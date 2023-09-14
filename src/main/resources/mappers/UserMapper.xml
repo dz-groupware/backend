@@ -9,8 +9,7 @@
     JOIN company c ON c.id = ec.comp_id
     LEFT JOIN employee_department ed ON ed.emp_id = e.id
     WHERE u.login_id = #{loginId} and (org = 1 or org is NULL)
-    ORDER BY e.last_access desc
-    limit 1
+    ORDER BY e.last_access desc limit 1
   </select>
 
   <select id="getAnotherLogin" resultType="com.example.backend.config.jwt.PrincipalUserDto">

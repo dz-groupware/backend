@@ -3,6 +3,7 @@ package com.example.backend.menu.controller;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.service.MenuService;
+import com.example.backend.modal.service.ModalService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,31 +19,45 @@ public class MenuController {
 
   private final MenuService menuService;
 
-  public MenuController(MenuService menuService) {
+  public MenuController(MenuService menuService, ModalService modalService) {
     this.menuService = menuService;
   }
 
   @GetMapping("/gnb")
-  public ResponseEntity<?> getMenuByEmpId(Long userId, @RequestParam Long empId, Long deptId, Long compId) {
-    return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getMenuByEmpId()), HttpStatus.OK);
+  public ResponseEntity<?> getGnbById() {
+    return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getGnbById()), HttpStatus.OK);
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> getFavorByEmpId(@RequestParam Long empId) {
+  public ResponseEntity<?> getFavorByEmpId() {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId(empId)), HttpStatus.OK);
+        new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId()), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> removeFavor(@RequestParam Long empId, @RequestParam Long menuId) {
+  public ResponseEntity<?> removeFavor(@RequestParam Long menuId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<Integer>(menuService.removeFavor(empId, menuId)), HttpStatus.OK);
+        new SingleResponseDto<Integer>(menuService.removeFavor(menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/lnb")
-  public ResponseEntity<?> findMenuByParId(@RequestParam Long menuId, @RequestParam Long compId) {
+  public ResponseEntity<?> getMenuById(@RequestParam Long menuId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.findMenuByParId(menuId, compId)),
+        new SingleResponseDto<List<MenuDto>>(menuService.getMenuById(menuId)),
+        HttpStatus.OK);
+  }
+
+  @GetMapping("/gnb/admin")
+  public ResponseEntity<?> getGnbByAdmin() {
+    return new ResponseEntity<>(
+        new SingleResponseDto<List<MenuDto>>(menuService.getGnbByAdmin()),
+        HttpStatus.OK);
+  }
+
+  @GetMapping("/lnb/admin")
+  public ResponseEntity<?> getLnbByAdmin(@RequestParam Long menuId) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<List<MenuDto>>(menuService.getLnbByAdmin(menuId)),
         HttpStatus.OK);
   }
 }

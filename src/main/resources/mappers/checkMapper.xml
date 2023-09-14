@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.common.mapper.CheckMapper">
+
+  <!-- 마스터인지 확인 -->
+  <select id="checkMaster" resultType="boolean">
+    select master_yn from employee where id=#{empId};
+  </select>
+
+  <!-- 사원/부서/회사 존재여부 확인 -->
+  <select id="checkExits">
+    SELECT COUNT(*) FROM EMPLOYEE WHERE ACCOUNT_YN=1 AND DELETED_YN = 0 AND ID= #{empId} AND USER_ID=#{userId}
+    UNION
+    SELECT COUNT(*)FROM EMPLOYEE_DEPARTMENT
+    WHERE transferred_yn = 0 and deleted_yn = 0 and emp_id = #{empId} and org = 1 AND DEPT_ID= #{deptId}
+    UNION
+    select COUNT(*)from employee_company where emp_id=#{empId} and resigned_yn=0 and deleted_yn = 0 AND COMP_ID=#{compId};
+  </select>
+
+</mapper>
