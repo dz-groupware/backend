@@ -4,20 +4,20 @@
 <mapper namespace="com.example.backend.companymgmt.mapper.CompanyMgmtMapper">
 
 
-  <insert id="addCompanyMgmt">
-    INSERT INTO company (code, enabled_yn, name, abbr, business_type, rep_name, rep_id_num,
-    rep_tel, business_num, corp_type, corp_num, establishment_date, opening_date, closing_date,
-    address )VALUES(#{code}, #{enabledYn}, #{name}, #{abbr},
-    #{businessType}, #{repName}, #{repIdNum}, #{repTel}, #{businessNum}, #{corpType}, #{corpNum},
-    #{establishmentDate}, #{openingDate}, #{closingDate}, #{address} ) where par_id=#{companyId}
-  </insert>
+
+
+
 
   <select id="getCompanyDetailsById"
     resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
-    SELECT id,code, enabled_yn, name, abbr, business_type,
+    SELECT id,par_id,code, enabled_yn, name, abbr, business_type,
     rep_name, rep_id_num,
     rep_tel, business_num, corp_type, corp_num, establishment_date,
     opening_date, closing_date, address, deleted_yn from company WHERE id=#{id} and par_id=#{companyId}
+  </select>
+
+  <select id="getAllCompanyMgmtParList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
+    SELECT id,code,name,corp_type,rep_name from company where deleted_yn=false and id_tree LIKE CONCAT('%', #{companyId}, '%')
   </select>
 
   <select id="findCompanyMgmtList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
@@ -35,19 +35,126 @@
     SELECT id,code,name,corp_type,rep_name from company where deleted_yn=false and par_id=#{companyId}
   </select>
 
+
+
+<!--post-->
+
+
+  <insert id="addCompanyMgmt" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO company
+    (par_id, code, enabled_yn, name, abbr, business_type, rep_name, rep_id_num,
+    rep_tel, business_num, corp_type, corp_num, establishment_date, opening_date, closing_date,
+    address,child_node_yn)
+    VALUES
+    (#{parId}, #{code}, #{enabledYn}, #{name}, #{abbr}, #{businessType}, #{repName}, #{repIdNum}, #{repTel},
+    #{businessNum}, #{corpType}, #{corpNum}, #{establishmentDate}, #{openingDate}, #{closingDate}, #{address},1 )
+  </insert>
+
+  <update id="addIdTreeAndNameTreeWithLastInsertId">
+    UPDATE company
+    SET par_id=LAST_INSERT_ID(),id_tree=LAST_INSERT_ID(),name_tree=#{name}
+    WHERE id = LAST_INSERT_ID()
+  </update>
+
+  <select id="findParIdTreeAndNameTreeWithParId" resultType="java.util.Map">
+    SELECT id_tree AS parIdTree ,name_tree AS parNameTree FROM company WHERE id=#{parId}
+  </select>
+
+  <update id="addIdTreeAndNameTreeWithParIdTree">
+    UPDATE company
+    SET id_tree = CONCAT(#{parIdTree}, '>', LAST_INSERT_ID()),
+    name_tree= CONCAT(#{parNameTree}, '>', #{name})
+    WHERE id = LAST_INSERT_ID()
+  </update>
+
+
+
+
+
+
+<!--modify-->
+
+
+  <select id="checkCircularReference" resultType="int">
+    SELECT COUNT(*)
+    FROM company
+    WHERE id = #{parId}
+    AND id_tree LIKE CONCAT('%', #{id} , '%')
+  </select>
+
+
+  <select id="getParIdFromDB" resultType="Long">
+    SELECT par_id FROM company WHERE id=#{id}
+  </select>
+
+  <select id="checkParHaveChild" resultType="Boolean">
+    SELECT CASE
+    WHEN EXISTS(
+    SELECT 1
+    FROM company
+    WHERE par_id=#{originalParId} AND id != #{originalParId}
+    ) THEN TRUE ELSE FALSE
+    END
+  </select>
+
+
+
+  <update id="doNotHaveChild">
+    UPDATE company
+    SET child_node_yn = 1
+    WHERE id= #{originalParId}
+  </update>
+
+
   <update id="modifyCompanyMgmt">
-    UPDATE company SET enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr},
+    UPDATE company SET
+    par_id=#{parId}, enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr},
     business_type=#{businessType},
     rep_name=#{repName}, rep_id_num=#{repIdNum},
     rep_tel=#{repTel}, business_num=#{businessNum}, corp_type=#{corpType}, corp_num=#{corpNum},
     establishment_date= #{establishmentDate},
-    opening_date=#{openingDate}, closing_date=#{closingDate}, address=#{address}
-    WHERE id=#{id} and par_id=#{companyId}
+    opening_date=#{openingDate}, closing_date=#{closingDate},address=#{address}
+    WHERE id=#{id}
   </update>
+
+
+  <select id="getTreeFromDB" resultType="java.util.Map">
+    SELECT id_tree AS originalIdTree,name_tree AS originalNameTree FROM company where id=#{id}
+  </select>
+
+  <update id="updateDoNotHaveParTree">
+    UPDATE company
+    SET id_tree = REPLACE(id_tree, #{originalIdTree}, #{id})
+    ,name_tree = REPLACE(name_tree, #{originalNameTree},#{name})
+    WHERE id_tree LIKE CONCAT('%', #{originalIdTree}, '%') or
+    name_tree LIKE CONCAT('%', #{originalNameTree}, '%')
+  </update>
+
+  <update id="haveChildNode">
+    UPDATE company SET child_node_yn=0 where id=#{parId}
+  </update>
+
+
+
+  <update id="updateHaveParTree">
+    UPDATE company
+    SET id_tree = REPLACE(id_tree, #{originalIdTree},CONCAT(#{parIdTree},'>', #{id}))
+    ,name_tree = REPLACE(name_tree, #{originalNameTree},CONCAT(#{parNameTree},'>', #{name}))
+    WHERE id_tree LIKE CONCAT('%', #{originalIdTree}, '%') or
+    name_tree LIKE CONCAT('%', #{originalNameTree}, '%')
+  </update>
+
+
+
+<!--delete-->
+
+  <select id="findIdAtIdTree" resultType="java.lang.Long">
+    SELECT id FROM company WHERE id_tree LIKE CONCAT('%', #{id}, '%')
+  </select>
 
   <update id="removeCompanyMgmt">
     UPDATE company SET deleted_yn=1
-    WHERE id=#{id} and par_id=#{companyId}
+    WHERE id=#{removeId}
   </update>
 
 </mapper>

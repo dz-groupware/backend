@@ -40,8 +40,7 @@
 
   <update id="modifyEmployee">
     UPDATE employee SET name = #{name}, position = #{position}, department = #{department}, salary =
-    #{salary} WHERE
-    id = #{id}
+    #{salary}
   </update>
 
   <select id="checkMaster" resultType="Boolean">
