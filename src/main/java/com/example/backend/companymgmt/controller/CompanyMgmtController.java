@@ -42,6 +42,12 @@ public class CompanyMgmtController {
   }
 
 
+  @GetMapping("/par")
+  public ResponseEntity getAllCompanyMgmtParList() {
+    return new ResponseEntity<>(
+            new SingleResponseDto<>(companyMgmtService.getAllCompanyMgmtParList()),
+            HttpStatus.OK);
+  }
   @GetMapping("/company-list")
   public ResponseEntity findCompanyMgmtList(@RequestParam String name, int enabledType) {
     return new ResponseEntity<>(
@@ -49,9 +55,9 @@ public class CompanyMgmtController {
         HttpStatus.OK);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity modifyCompanyMgmt(@PathVariable Long id, @RequestBody CompanyMgmtReqDto company) {
-    companyMgmtService.modifyCompanyMgmt(id, company);
+  @PutMapping
+  public ResponseEntity modifyCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
+    companyMgmtService.modifyCompanyMgmt(company);
     return new ResponseEntity<>(new SingleResponseDto("성공"),
         HttpStatus.OK);
   }
