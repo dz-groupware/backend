@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.department.mapper.DepartmentMapper">
+
+  <select id="getDepartmentBasicList">
+    select id, par_id, code, name, sort_order from department where id = par_id
+    and deleted_yn = 0 and enabled_yn = 1 and comp_id = #{compId};
+  </select>
+
+  <select id="getDepartmentById">
+    select id, par_id, code, name, sort_order from department where id = par_id
+    and deleted_yn = 0 and enabled_yn = 1 and comp_id = #{compId} and par_id = #{parId};
+  </select>
+
+  <insert id="addDepartment" parameterType="com.example.backend.department.dto.DeptRes">
+    insert into department(comp_id, par_id, name, code, abbr, enabled_yn, included_yn, managing_dept_yn, sort_order)
+    values (#{compId}, #{parId}, #{name}, #{code}, #{abbr}, #{enabledYn}, #{includedYn}, #{managementYn}, #{sortOrder});
+  </insert>
+</mapper>
