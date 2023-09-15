@@ -50,14 +50,14 @@ public class MenuController {
   @GetMapping("/gnb/admin")
   public ResponseEntity<?> getGnbByAdmin() {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getGnbByAdmin()),
+        new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuGnb()),
         HttpStatus.OK);
   }
 
   @GetMapping("/lnb/admin")
   public ResponseEntity<?> getLnbByAdmin(@RequestParam Long menuId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getLnbByAdmin(menuId)),
+        new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuLnb(menuId)),
         HttpStatus.OK);
   }
 }

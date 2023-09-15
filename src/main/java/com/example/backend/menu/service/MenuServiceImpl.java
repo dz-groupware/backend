@@ -100,14 +100,14 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public List<MenuDto> getGnbByAdmin() {
+  public List<MenuDto> getUpperMenuGnb() {
     Long compId = SecurityUtil.getCompanyId();
-    return menuMapper.getGnbByAdmin(compId);
+    return menuMapper.getUpperMenuGnb(compId);
   }
 
   @Override
-  public List<MenuDto> getLnbByAdmin(Long menuId) {
+  public List<MenuDto> getUpperMenuLnb(Long menuId) {
     Long compId = SecurityUtil.getCompanyId();
-    return menuMapper.getLnbByAdmin(menuId, compId);
+    return menuMapper.getUpperMenuLnb(menuId, compId);
   }
 }

@@ -86,9 +86,17 @@ public class SettingServiceImpl implements SettingService {
     }
     // 메뉴 수정
     if (type.equals("4")) {
-      MenuTrans updateMenu = new MenuTrans(menu);
-      modifyMenu(updateMenu);
-      return 1;
+      try{
+        MenuTrans updateMenu = new MenuTrans(menu);
+        MenuTrans preUpdateMenu = modifyMenu(updateMenu);
+        menu.setParId(preUpdateMenu.getParId());
+        menu.setIdTree(preUpdateMenu.getIdTree());
+        menu.setNameTree(preUpdateMenu.getNameTree());
+        settingMapper.modifyMenuById(menu);
+        return 1;
+      } catch (Exception e){
+        return 10;
+      }
     }
     return 10;
   }
@@ -162,7 +170,9 @@ public class SettingServiceImpl implements SettingService {
 
   // 테스트 대기, 중복코드 분리 예정
   @Override
-  public void modifyMenu(MenuTrans menu){
+  public MenuTrans modifyMenu(MenuTrans menu){
+    System.out.println(menu.getName());
+    System.out.println(menu.getId());
 
     //부모 노드 child_node_yn update : parMenu, preMenu로 불러와진 메뉴
     //updateChildNodeYnOfParMenu
@@ -270,7 +280,8 @@ public class SettingServiceImpl implements SettingService {
         originMenu.setNameTree(preMenu.getNameTree()+">"+originMenu.getName());
 
         settingMapper.modifyPreMoveMenu(originMenu);
-
+        settingMapper.modifyUpperMenu(parMenu.getId());
+        settingMapper.modifyUpperMenu(preMenu.getId());
         for (int i = 0; i < MenuList.size(); i++) {
           MenuTrans menuTrans = MenuList.get(i);
           if (Objects.equals(menuTrans.getId(), originMenu.getId())) {
@@ -289,6 +300,7 @@ public class SettingServiceImpl implements SettingService {
           settingMapper.modifyPreMoveMenu(menuTrans);
         }
       }
+      return originMenu;
     } else {
       // 일반적인 수정 로직
       List<MenuTrans> MenuList = settingMapper.getPreMoveMenuList("%" + menu.getId().toString() + "%");
@@ -305,7 +317,7 @@ public class SettingServiceImpl implements SettingService {
       originMenu.setNameTree(preMenu.getNameTree()+">"+originMenu.getName());
 
       settingMapper.modifyPreMoveMenu(originMenu);
-
+      settingMapper.modifyUpperMenu(preMenu.getId());
       for (int i = 0; i < MenuList.size(); i++) {
         MenuTrans menuTrans = MenuList.get(i);
         if (Objects.equals(menuTrans.getId(), originMenu.getId())) {
@@ -323,6 +335,7 @@ public class SettingServiceImpl implements SettingService {
         menuTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
         settingMapper.modifyPreMoveMenu(menuTrans);
       }
+      return originMenu;
     }
   }
 }

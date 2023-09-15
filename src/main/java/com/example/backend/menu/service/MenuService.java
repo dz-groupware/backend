@@ -8,6 +8,6 @@ public interface MenuService {
   List<MenuDto> getFavorByEmpId();
   int removeFavor(Long menuId);
   List<MenuDto> getMenuById(Long menuId);
-  List<MenuDto> getGnbByAdmin();
-  List<MenuDto> getLnbByAdmin(Long menuId);
+  List<MenuDto> getUpperMenuGnb();
+  List<MenuDto> getUpperMenuLnb(Long menuId);
 }
