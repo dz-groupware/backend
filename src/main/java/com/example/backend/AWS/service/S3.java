@@ -20,19 +20,17 @@ public class S3 {
   private String bucket;
 
   public String upload(MultipartFile multipartFile) throws IOException {
-    String s3FileName = multipartFile.getOriginalFilename();
+    String s3FileName = "icon/"+multipartFile.getOriginalFilename();
 
     ObjectMetadata objMeta = new ObjectMetadata();
     objMeta.setContentType("image/png");
     objMeta.setContentLength(multipartFile.getSize());
 
     amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
-
-    System.out.println("in spring : image "+ multipartFile.getName()+" is saved");
     return amazonS3.getUrl(bucket, s3FileName).toString();
   }
 
   public List<S3ObjectSummary> getImageList(){
-    return amazonS3.listObjects(bucket, "").getObjectSummaries();
+    return amazonS3.listObjects(bucket, "icon/").getObjectSummaries();
   }
 }

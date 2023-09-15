@@ -32,20 +32,20 @@
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
     <if test="searchTerm != null and searchTerm != ''">
-      AND a.name LIKE #{searchTerm}
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
     <choose>
-      <when test="orderBy == 'authDashboardIdAsc'">
-        AND adb.id &gt; #{lastId}
-        ORDER BY adb.id ASC
-      </when>
       <when test="orderBy == 'authDashboardIdDesc'">
         AND adb.id &lt; #{lastId}
         ORDER BY adb.id DESC
       </when>
-      <otherwise>
+      <when test="orderBy == 'authDashboardIdAsc'">
         AND adb.id &gt; #{lastId}
         ORDER BY adb.id ASC
+      </when>
+      <otherwise>
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
       </otherwise>
     </choose>
     LIMIT #{pageSize}
@@ -64,7 +64,7 @@
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
     <if test="searchTerm != null and searchTerm != ''">
-      AND a.name LIKE #{searchTerm}
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
     <choose>
       <when test="orderBy == 'authNameAsc'">
@@ -75,12 +75,18 @@
         AND a.name &lt; #{lastAuthName}
         ORDER BY a.name DESC
       </when>
+      <when test="orderBy == 'authNameAsc' and lastAuthName == null">
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc' and lastAuthName == null">
+        ORDER BY a.name DESC
+      </when>
       <otherwise>
         AND a.name &gt; #{lastAuthName}
         ORDER BY a.name ASC
       </otherwise>
     </choose>
-    LIMIT #{limit}
+    LIMIT #{pageSize}
   </select>
 
   <select id="getCompanyAuthCount" resultType="long">
@@ -107,6 +113,9 @@
     FROM menu m
     WHERE comp_id = #{companyId}
     AND id = par_id
+    <if test="enabledYn != null">
+      AND enabled_yn = #{enabledYn}
+    </if>
   </select>
 
   <select id="getCompanyLnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
@@ -126,6 +135,9 @@
     WHERE comp_id = #{companyId}
     AND par_id = #{parId}
     AND id != #{parId}
+    <if test="enabledYn != null">
+      AND enabled_yn = #{enabledYn}
+    </if>
   </select>
 
   <select id="getGnbListOfAuth" resultType="com.example.backend.authgroup.dto.AuthMenuDto">
@@ -151,6 +163,30 @@
     AND m.id = m.par_id;
   </select>
 
+  <select id="getLnbListOfAuth" resultType="com.example.backend.authgroup.dto.AuthMenuDto">
+    SELECT
+    m.id as menu_id,
+    m.par_id as menu_par_id,
+    m.comp_id as comp_id,
+    m.name as menu_name,
+    m.enabled_yn as enabled_yn,
+    m.sort_order as sort_order,
+    m.id_tree as menu_id_tree,
+    m.name_tree as menu_name_tree,
+    m.child_node_yn as child_node_yn,
+    m.admin_yn as admin_yn,
+    m.deleted_yn as deleted_yn,
+    a.id as auth_id
+    FROM auth a
+    JOIN auth_menu am ON a.id = am.auth_id
+    JOIN menu m ON am.menu_id = m.id
+    where m.deleted_yn = 0
+    AND m.comp_id = #{companyId}
+    AND a.id = #{authId}
+    AND m.id != m.par_id
+    AND par_id = #{parMenuId};
+  </select>
+
   <select id="getGnbListOfAuthWithAll" resultType="com.example.backend.authgroup.dto.MenuAuthStatusDto">
     SELECT
     m.id AS menu_id,
@@ -158,6 +194,7 @@
     m.comp_id AS comp_id,
     m.name AS menu_name,
     am.auth_id AS auth_id,
+    m.enabled_yn AS enabled_yn,
     m.child_node_yn AS child_node_yn,
     CASE
       WHEN am.auth_id = #{authId} THEN 1
@@ -165,7 +202,25 @@
     END AS has_menu
     FROM menu m
     LEFT JOIN auth_menu am ON m.id = am.menu_id AND am.auth_id = #{authId}
-    WHERE m.comp_id = #{companyId} AND m.deleted_yn = 0;
+    WHERE m.comp_id = #{companyId} AND m.deleted_yn = 0 AND m.par_id = m.id;
+  </select>
+
+  <select id="getLnbListOfAuthWithAll" resultType="com.example.backend.authgroup.dto.MenuAuthStatusDto">
+    SELECT
+    m.id AS menu_id,
+    m.par_id AS menu_par_id,
+    m.comp_id AS comp_id,
+    m.name AS menu_name,
+    am.auth_id AS auth_id,
+    m.enabled_yn AS enabled_yn,
+    m.child_node_yn AS child_node_yn,
+    CASE
+    WHEN am.auth_id = #{authId} THEN 1
+    ELSE 0
+    END AS has_menu
+    FROM menu m
+    LEFT JOIN auth_menu am ON m.id = am.menu_id AND am.auth_id = #{authId}
+    WHERE m.comp_id = #{companyId} AND m.deleted_yn = 0 AND m.par_id != m.id AND par_id = #{parId};
   </select>
 
   <select id="getEmpListOfAuth" resultType="com.example.backend.authgroup.dto.UserListOfAuthDto">
@@ -183,4 +238,13 @@
     JOIN department d ON d.id = ed.dept_id
     WHERE ae.auth_id = #{authId} AND ae.deleted_yn != 1 AND ed.deleted_yn !=1
   </select>
+  
+  <insert id="addAuth" parameterType="com.example.backend.authgroup.dto.AddAuthDto" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO auth(name, enabled_yn) values(#{authName}, #{enabledYn});
+  </insert>
+
+  <insert id="insertIntoAuthDashboard">
+    INSERT INTO auth_dashboard (comp_id, auth_id)
+    VALUES (#{compId}, #{authId});
+  </insert>
 </mapper>

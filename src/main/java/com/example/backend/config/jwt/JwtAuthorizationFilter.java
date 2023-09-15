@@ -27,17 +27,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
-//    if ("/api/v1/login".equals(request.getRequestURI())) {
-//      // 로그인 요청이므로 다르게 처리
-//      chain.doFilter(request, response);
-//      return;
-//    }
-//
-//    if (!isValidAuthorizationHeader(request, response, chain)) {
-//      return;
-//    }
 
     String accessToken = getAccessTokenFromCookie(request);
+    System.out.println("accessToken : "+accessToken);
     if (accessToken == null || "".equals(accessToken)) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
@@ -49,7 +41,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       return;
     }
 
+    System.out.println("username : "+username);
+    System.out.println("response : " + response);
+    System.out.println("accessToken2 : "+accessToken);
+
     setSecurityContext(response, username);
+
     chain.doFilter(request, response);
   }
 
@@ -64,20 +61,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     PrincipalDetails principalDetails = new PrincipalDetails(principalUser);
     Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null,
         principalDetails.getAuthorities());
-
+    System.out.println(authentication.getPrincipal());
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
-
-//  private String getAccessTokenFromHeader(HttpServletRequest request) {
-//    String authorizationHeader = request.getHeader("Authorization");
-//    return authorizationHeader.replace("Bearer ", "");
-//  }
 
   private String getAccessTokenFromCookie(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if ("JWT".equals(cookie.getName())) {
+          System.out.println("cooke.getValue : "+cookie.getValue());
           return cookie.getValue();
         }
       }

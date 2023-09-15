@@ -12,7 +12,8 @@ public class MenuAuthStatusDto {
   private Long compId;
   private String menuName;
   private Long authId;
-  private Boolean hasMenu;
+  private Boolean enabledYn;
   private Boolean childNodeYn;
+  private Boolean hasMenu;
 
 }

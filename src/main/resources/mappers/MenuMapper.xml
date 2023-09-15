@@ -77,8 +77,25 @@
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) : 마스터-->
   <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-      SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
-      where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId};
+    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
+    where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId};
   </select>
 
+  <!-- GNB 리스트 (모든 권한) -->
+  <select id="getGnbByAdmin" resultType="com.example.backend.menu.dto.MenuDto">
+    select distinct menu.id, par_id, name from auth_dashboard
+    inner join auth_menu on auth_menu.auth_id = auth_dashboard.auth_id and comp_id= #{compId}
+    inner join menu on menu.id = auth_menu.menu_id
+    where auth_menu.deleted_yn = 0 and auth_dashboard.deleted_yn = 0
+    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id = par_id;
+  </select>
+
+  <!-- GNB 리스트 (모든 권한) -->
+  <select id="getLnbByAdmin" resultType="com.example.backend.menu.dto.MenuDto">
+    select distinct menu.id, par_id, name from auth_dashboard
+    inner join auth_menu on auth_menu.auth_id = auth_dashboard.auth_id and comp_id= #{compId}
+    inner join menu on menu.id = auth_menu.menu_id
+    where auth_menu.deleted_yn = 0 and auth_dashboard.deleted_yn = 0
+    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and par_id = #{menuId} and menu.id != par_id;
+  </select>
 </mapper>
