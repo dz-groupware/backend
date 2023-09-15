@@ -16,4 +16,5 @@ public interface MenuMapper {
   List<MenuDto> getGnbByAdmin(Long compId);
   List<MenuDto> getLnbByAdmin(Long menuId, Long compId);
 
+
 }

@@ -163,6 +163,10 @@ public class SettingServiceImpl implements SettingService {
   // 테스트 대기, 중복코드 분리 예정
   @Override
   public void modifyMenu(MenuTrans menu){
+
+    //부모 노드 child_node_yn update : parMenu, preMenu로 불러와진 메뉴
+    //updateChildNodeYnOfParMenu
+
     // menu: 입력 정보 / parMenu : menu의 상위 메뉴 / preMenu : menu의 상위가 될 메뉴(menu의 하위 메뉴 중) / originMenu : 수정 전 menu 정보
     // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
     if (checkMenuInMenu(menu.getId(), menu.getParId())) {

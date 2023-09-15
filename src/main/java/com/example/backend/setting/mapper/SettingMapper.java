@@ -46,6 +46,6 @@ public interface SettingMapper {
   void modifyPreMoveMenu(MenuTrans menu);
   MenuTrans getParMenu(Long id);
   MenuTrans getPreParMenu(Long id);
-
+  int updateChildNodeYnOfParMenu(Long id);
 }
 
