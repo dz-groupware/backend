@@ -77,13 +77,8 @@
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) : 마스터-->
   <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
-    INNER JOIN (SELECT MENU_ID FROM AUTH_MENU INNER JOIN
-    (select auth_id from auth_employee where emp_id = 12 and deleted_yn = 0
-    union SELECT AUTH_ID FROM AUTH_DEPARTMENT where dept_id = 6 and deleted_yn = 0
-    union select AUTH_ID from auth_company where comp_id = #{compId} and deleted_yn = 0 )ADMIN
-    WHERE AUTH_MENU.DELETED_YN = 0 AND AUTH_MENU.AUTH_ID = ADMIN.AUTH_ID)MENU_LIST
-    WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=MENU_LIST.MENU_ID AND PAR_ID = #{menuId};
+      SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
+      where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId};
   </select>
 
 </mapper>
