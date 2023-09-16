@@ -1,11 +1,9 @@
 package com.example.backend.department.controller;
 
-import com.example.backend.common.MultiResponseDto;
-import com.example.backend.common.PageDto;
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.department.dto.DeptRes;
+import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.service.DepartmentService;
-import com.example.backend.employee.service.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,16 +22,31 @@ public class DepartmentController {
     this.departmentService = departmentService;
   }
 
-  @GetMapping
+  @GetMapping("")
   public ResponseEntity<?> getDepartment() {
-    departmentService.getDepartment();
+    Long compId = SecurityUtil.getCompanyId();
     return new ResponseEntity(
-        new SingleResponseDto<>(""), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getDepartmentBasicList(compId)), HttpStatus.OK);
   }
 
   @PostMapping("/dept")
-  public ResponseEntity<?> addDepartment(@RequestBody DeptRes dept) {
+  public ResponseEntity<?> addDepartment(@RequestBody DeptDto dept) {
     return new ResponseEntity(
         new SingleResponseDto<>(departmentService.addDepartment(dept)), HttpStatus.OK);
   }
+
+  @GetMapping("dept-list")
+  public ResponseEntity<?> getDepartmentList(@RequestParam Long parId) {
+    Long compId = SecurityUtil.getCompanyId();
+    return new ResponseEntity(
+        new SingleResponseDto<>(departmentService.getDepartmentById(compId, parId)), HttpStatus.OK);
+  }
+
+  @GetMapping("detail-basic")
+  public ResponseEntity<?> getBasicDetailById(@RequestParam Long id) {
+    return new ResponseEntity(
+        new SingleResponseDto<>(departmentService.getBasicDetailById(id)), HttpStatus.OK);
+  }
+
+
 }

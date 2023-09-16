@@ -3,17 +3,25 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.backend.department.mapper.DepartmentMapper">
 
-  <select id="getDepartmentBasicList">
-    select id, par_id, code, name, sort_order from department where id = par_id
-    and deleted_yn = 0 and enabled_yn = 1 and comp_id = #{compId};
+  <!-- 가장 상위 부서 리스트 가져오기 -->
+  <select id="getDepartmentBasicList" resultType="com.example.backend.department.dto.DeptListDto">
+    select id, comp_id, par_id, name, code, sort_order, managing_dept_yn as managementYn from department
+    where id = par_id and deleted_yn = 0 and enabled_yn = 1 and comp_id = #{compId};
   </select>
 
-  <select id="getDepartmentById">
-    select id, par_id, code, name, sort_order from department where id = par_id
-    and deleted_yn = 0 and enabled_yn = 1 and comp_id = #{compId} and par_id = #{parId};
+  <!-- 부서의 하위 부서 리스트 가져오기 -->
+  <select id="getDepartmentById" resultType="com.example.backend.department.dto.DeptListDto">
+    select id, comp_id, par_id, name, code, sort_order, managing_dept_yn as managementYn from department
+    where and deleted_yn = 0 and enabled_yn = 1 and comp_id = #{compId} and par_id = #{parId};
   </select>
 
-  <insert id="addDepartment" parameterType="com.example.backend.department.dto.DeptRes">
+  <!-- 부서의 상세 정보 가져오기 : 기본 정보 -->
+  <select id="getBasicDetailById" resultType="com.example.backend.department.dto.DeptDto">
+    select id, comp_id, par_id, name, code, abbr, enabled_yn, included_yn,
+    managing_dept_yn as managementYn, sort_order from department where id = #{id};
+  </select>
+
+  <insert id="addDepartment" parameterType="com.example.backend.department.dto.DeptDto">
     insert into department(comp_id, par_id, name, code, abbr, enabled_yn, included_yn, managing_dept_yn, sort_order)
     values (#{compId}, #{parId}, #{name}, #{code}, #{abbr}, #{enabledYn}, #{includedYn}, #{managementYn}, #{sortOrder});
   </insert>

@@ -1,13 +1,11 @@
 package com.example.backend.department.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class DeptRes {
+public class DeptDto {
   private Long id;
   private Long compId;
   private Long parId;

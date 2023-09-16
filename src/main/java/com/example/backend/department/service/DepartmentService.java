@@ -1,10 +1,12 @@
 package com.example.backend.department.service;
 
-import com.example.backend.department.dto.DeptRes;
-import com.example.backend.employee.dto.EmployeeReqDto;
+import com.example.backend.department.dto.DeptDto;
+import com.example.backend.department.dto.DeptListDto;
 import java.util.List;
 
 public interface DepartmentService {
-  void getDepartment();
-  int addDepartment(DeptRes dept);
+  int addDepartment(DeptDto dept);
+  List<DeptListDto> getDepartmentBasicList(Long compId);
+  List<DeptListDto> getDepartmentById(Long compId, Long parId);
+  DeptDto getBasicDetailById(Long id);
 }
