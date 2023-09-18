@@ -1,7 +1,6 @@
 package com.example.backend.gnb.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.gnb.dto.BasicResponseDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;

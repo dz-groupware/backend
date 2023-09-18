@@ -2,7 +2,7 @@ package com.example.backend.modal.service;
 
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
-import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.config.redis.SecurityUtil;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;

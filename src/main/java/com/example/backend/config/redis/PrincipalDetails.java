@@ -1,12 +1,14 @@
-package com.example.backend.config.jwt;
+package com.example.backend.config.redis;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
+@ToString
 public class PrincipalDetails implements UserDetails {
 
   private final PrincipalUserDto principalUser;

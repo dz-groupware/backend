@@ -16,7 +16,7 @@
 
 
 
-  <select id="findEmpList" resultType="com.example.backend.config.jwt.PrincipalUserDto">
+  <select id="findEmpList" resultType="com.example.backend.config.redis.PrincipalUserDto">
     SELECT
     c.name AS comp_name,
     e.name AS emp_name,
@@ -30,7 +30,7 @@
     employee e ON ce.emp_id = e.id
   </select>
 
-  <select id="findById" resultType="com.example.backend.config.jwt.PrincipalUserDto">
+  <select id="findById" resultType="com.example.backend.config.redis.PrincipalUserDto">
     SELECT * FROM employee WHERE id = #{id}
   </select>
 

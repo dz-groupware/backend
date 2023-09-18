@@ -1,6 +1,6 @@
 package com.example.backend.user;
 
-import com.example.backend.config.jwt.PrincipalUserDto;
+import com.example.backend.config.redis.PrincipalUserDto;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

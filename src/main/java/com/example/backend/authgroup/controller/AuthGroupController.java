@@ -6,6 +6,7 @@ import com.example.backend.common.Page;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.authgroup.service.AuthGroupService;
+import com.example.backend.config.redis.SecurityUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import org.springframework.http.HttpStatus;
@@ -74,8 +75,14 @@ public class AuthGroupController {
   }
 
 
-  @GetMapping("/companies/gnb-list")
+    @GetMapping("/companies/gnb-list")
   public ResponseEntity<?> getCompanyGnbList(@RequestParam(required = false) Boolean enabledYn) {
+      System.out.println("#############################");
+      System.out.println(SecurityUtil.getCompanyId());
+      System.out.println(SecurityUtil.getEmployeeId());
+      System.out.println(SecurityUtil.getUserId());
+      System.out.println(SecurityUtil.getDepartmentId());
+
     return new ResponseEntity<>(new SingleResponseDto<>(
         authGroupService.getCompanyGnbList(enabledYn)
     ), HttpStatus.OK);

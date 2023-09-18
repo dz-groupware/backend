@@ -9,7 +9,7 @@ import com.example.backend.authgroup.dto.CompanyAuthSummaryDto;
 import com.example.backend.authgroup.dto.CompanyMenuDto;
 import com.example.backend.authgroup.dto.MenuAuthStatusDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
-import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.config.redis.SecurityUtil;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

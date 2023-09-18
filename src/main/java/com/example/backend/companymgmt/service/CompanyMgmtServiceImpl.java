@@ -6,7 +6,7 @@ import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
 import java.util.List;
 
-import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.config.redis.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 @Service

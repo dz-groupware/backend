@@ -1,7 +1,6 @@
 package com.example.backend.user;
 
-import com.example.backend.config.jwt.PrincipalUserDto;
-import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.config.redis.PrincipalUserDto;
 import javax.servlet.http.HttpServletResponse;
 
 public interface UserService {
