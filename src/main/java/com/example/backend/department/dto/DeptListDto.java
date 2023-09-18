@@ -12,6 +12,7 @@ public class DeptListDto {
   private String name;
   private String code;
   private int sortOrder;
-  private boolean managementYn;
+  private boolean managementYn = false;
+  private boolean childNodeYn = false;
 
 }

@@ -16,11 +16,11 @@ public interface SettingService {
 
   List<String> findAllIcon();
 
-  String findFavorById(Long empId, Long menuId);
+  String findFavorById(Long menuId);
 
-  int modifyFavorOn(Long empId, Long menuId);
+  int modifyFavorOn(Long menuId);
 
-  int modifyFavorOff(Long empId, Long menuId);
+  int modifyFavorOff(Long menuId);
 
   List<MenuRes> findAllMenu(Long compId);
   int deleteMenu(Long menuId);

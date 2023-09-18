@@ -60,21 +60,21 @@ public class SettingController {
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> findFavorById(@RequestParam Long empId, @RequestParam Long menuId) {
+  public ResponseEntity<?> findFavorById(@RequestParam Long menuId) {
     // 현재 즐겨찾기 상태를 가져오기
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(empId, menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(menuId)), HttpStatus.OK);
   }
 
   @PostMapping("/favor")
-  public ResponseEntity<?> modifyFavorOn(@RequestBody Map<String, Long> data) {
+  public ResponseEntity<?> modifyFavorOn(@RequestBody Long menuId) {
     // 즐겨찾기 저장 요청
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(data.get("empId"), data.get("menuId"))), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(menuId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> modifyFavorOff(@RequestParam Long empId, @RequestParam Long menuId) {
+  public ResponseEntity<?> modifyFavorOff(@RequestParam Long menuId) {
     // 즐겨찾기 삭제 요청
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(empId, menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/menu/all")

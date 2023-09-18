@@ -129,7 +129,8 @@ public class SettingServiceImpl implements SettingService {
 
   // 즐겨찾기
   @Override
-  public String findFavorById(Long empId, Long menuId) {
+  public String findFavorById(Long menuId) {
+    Long empId = SecurityUtil.getEmployeeId();
     int check = settingMapper.findFavorById(empId, menuId);
     if (check == 0) {
       return "false";
@@ -138,17 +139,19 @@ public class SettingServiceImpl implements SettingService {
       return "true";
     }
     // 의도하지 않은 상황이므로 관련 모든 데이터를 지우고 false 전달
-    modifyFavorOff(empId, menuId);
+    modifyFavorOff(menuId);
     return "false";
   }
 
   @Override
-  public int modifyFavorOn(Long empId, Long menuId) {
+  public int modifyFavorOn(Long menuId) {
+    Long empId = SecurityUtil.getEmployeeId();
     return settingMapper.modifyFavorOn(empId, menuId);
   }
 
   @Override
-  public int modifyFavorOff(Long empId, Long menuId) {
+  public int modifyFavorOff(Long menuId) {
+    Long empId = SecurityUtil.getEmployeeId();
     return settingMapper.modifyFavorOff(empId, menuId);
   }
 
