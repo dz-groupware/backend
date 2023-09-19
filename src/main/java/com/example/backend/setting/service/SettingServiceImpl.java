@@ -1,6 +1,9 @@
 package com.example.backend.setting.service;
 
 import com.example.backend.config.jwt.SecurityUtil;
+import com.example.backend.redis.JwtToServiceFilter;
+import com.example.backend.redis.RedisMapper;
+import com.example.backend.redis.RedisService;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import com.example.backend.setting.mapper.SettingMapper;
@@ -14,9 +17,31 @@ import org.springframework.stereotype.Service;
 public class SettingServiceImpl implements SettingService {
 
   private final SettingMapper settingMapper;
+  private final RedisMapper redisMapper;
+  private final RedisService redisService;
+  private final JwtToServiceFilter jwtToServiceFilter;
 
-  public SettingServiceImpl(SettingMapper settingMapper) {
+  public SettingServiceImpl(SettingMapper settingMapper,  RedisMapper redisMapper, RedisService redisService, JwtToServiceFilter jwtToServiceFilter) {
     this.settingMapper = settingMapper;
+    this.redisMapper = redisMapper;
+    this.redisService = redisService;
+    this.jwtToServiceFilter = jwtToServiceFilter;
+  }
+
+//  public String getToken(String jwt){
+//
+//    return jwt;
+//  }
+
+  public void testRedisAndJwt(){
+    String jwt = jwtToServiceFilter.getJwtToken();
+
+
+    System.out.println("in Service : "+jwt);
+    if (jwt == null) {
+      jwt = "null";
+    }
+    redisService.saveDataToRedis(jwt, redisMapper.findMenuId(12L,6L,1L));
   }
 
   @Override

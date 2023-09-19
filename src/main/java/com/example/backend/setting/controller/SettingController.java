@@ -1,14 +1,13 @@
 package com.example.backend.setting.controller;
 
+
 import com.example.backend.common.SingleResponseDto;
+import com.example.backend.redis.RedisService;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.service.SettingService;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/setting")
 public class SettingController {
-
   private final SettingService settingService;
 
   public SettingController(SettingService settingService) {
@@ -31,8 +28,12 @@ public class SettingController {
 
   @GetMapping("/menu/gnb")
   public ResponseEntity<?> findGnbList() {
-    return new ResponseEntity<>(new SingleResponseDto<List<MenuRes>>(settingService.findGnbList()),
-        HttpStatus.OK);
+    try{
+      return new ResponseEntity<>(new SingleResponseDto<List<MenuRes>>(settingService.findGnbList()),
+          HttpStatus.OK);
+    } catch (InvalidMediaTypeException e) {
+      return new ResponseEntity<>("유효하지 않은 요청입니다.", HttpStatus.BAD_REQUEST);
+    }
   }
 
   @GetMapping("/menu")
@@ -81,5 +82,11 @@ public class SettingController {
   public ResponseEntity<?> findAllMenu(@RequestParam Long compId) {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
+  }
+
+  @GetMapping("/test/redis")
+  public String testRedis(){
+    settingService.testRedisAndJwt();
+    return "";
   }
 }

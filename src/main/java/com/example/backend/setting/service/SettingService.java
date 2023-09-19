@@ -5,6 +5,7 @@ import com.example.backend.setting.dto.MenuTrans;
 import java.util.List;
 
 public interface SettingService {
+  void testRedisAndJwt();
 
   List<MenuRes> findGnbList();
 

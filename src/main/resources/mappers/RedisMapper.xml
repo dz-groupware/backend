@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.redis.RedisMapper">
+
+  <select id="findMenuId" resultType="java.lang.Long">
+    select menu_id from auth_menu
+    inner join
+    (select auth_id from auth_employee where emp_id= #{empId}
+    union
+    select auth_id from auth_department where dept_id = #{deptId}
+    union
+    select auth_id from auth_company where comp_id = #{compId})admin
+    on auth_menu.auth_id = admin.auth_id;
+  </select>
+</mapper>

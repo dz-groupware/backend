@@ -24,7 +24,7 @@
   </select>
 
   <!-- 사원 리스트 가져오기 -->
-  <select id="getEmpListByDeptId">
+  <select id="getEmpListByDeptId" resultType="com.example.backend.department.dto.EmpListDto">
     select department.name as deptName, employee.position as position,
     employee.name as empName, department.sort_order from employee_department
     inner join department on department.id = employee_department.dept_id
@@ -69,7 +69,24 @@
     select count(*) from department where id_tree like #{id} and id=#{parId};
   </select>
 
-  <select id="getOriginDept" resultType="com.example.backend.setting.dto.MenuTrans">
-    select id, par_id, name, name_tree, id_tree from menu where id = #{id} and id != par_id;
+  <select id="getOriginDept" resultType="com.example.backend.department.dto.DeptTrans">
+    select id, par_id, name, name_tree, id_tree from department where id = #{id} and id != par_id;
   </select>
+
+  <select id="getMoveDeptList" resultType="com.example.backend.department.dto.DeptTrans">
+    select id, par_id, name, id_tree, name_tree from department where id_tree like #{id}
+  </select>
+
+  <update id="modifyDeptTree" parameterType="com.example.backend.department.dto.DeptTrans">
+    update dept set id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} where id = #{id};
+  </update>
+
+  <select id="getParDept" resultType="com.example.backend.department.dto.DeptTrans">
+    select id, par_id, name, id_tree, name_tree from department where id = #{id};
+  </select>
+
+  <!-- 상위 메뉴 childNodeYn 변경 -->
+  <update id="modifyUpperDeptCNY" parameterType="java.lang.Long">
+    update department set child_node_yn = 0 where id = #{parId};
+  </update>
 </mapper>

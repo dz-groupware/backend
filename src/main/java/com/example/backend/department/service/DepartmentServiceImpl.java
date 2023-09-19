@@ -37,7 +37,12 @@ public class DepartmentServiceImpl implements DepartmentService {
       }
       if (dept.getStatus().equals("modify")){
         // 수정 로직 수행 (트리 수정)
-        modifyTree(dept);
+        DeptTrans updateDept = new DeptTrans(dept);
+        DeptTrans preUpdateDept = modifyTree(updateDept);
+        dept.setParId(preUpdateDept.getParId());
+        dept.setIdTree(preUpdateDept.getIdTree());
+        dept.setNameTree(preUpdateDept.getNameTree());
+        departmentMapper.modifyDepartment(dept);
       }
       return 1;
     } catch (Exception e) {
@@ -81,12 +86,16 @@ public class DepartmentServiceImpl implements DepartmentService {
     for (int i=0; i<dept.size(); i++) {
       if (dept.get(i).getStatus().equals("modify")) {
         // modify 로직 수행
-        //departmentMapper.modifyDepartment(dept.get(i));
+        DeptTrans updateDept = new DeptTrans(dept.get(i));
+        DeptTrans preUpdateDept = modifyTree(updateDept);
+        dept.get(i).setParId(preUpdateDept.getParId());
+        dept.get(i).setIdTree(preUpdateDept.getIdTree());
+        dept.get(i).setNameTree(preUpdateDept.getNameTree());
+        departmentMapper.modifyDepartment(dept.get(i));
       }
       if (dept.get(i).getStatus().equals("add")) {
         // add 로직 수행
-        // 현재 프론트 수정이 안된 상태여서 보류
-        //departmentMapper.addDepartment(dept.get(i));
+        departmentMapper.addDepartment(dept.get(i));
       }
     }
     return 1;
@@ -110,15 +119,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     return false;
   }
 
-  public int modifyTree(DeptDto dept) {
+  public DeptTrans modifyTree(DeptTrans dept) {
     //departmentMapper.modifyDepartment(dept);
     // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
     if (checkDeptInDept(dept.getId(), dept.getParId())) {
       DeptTrans originMenu = departmentMapper.getOriginDept(dept.getId());
       if(originMenu == null){
-        System.out.println("origin is gnb");
         // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu를 대메뉴 처럼 만든다.
-        List<DeptTrans> preMenuList = departmentMapper.getPreMoveMenuList("%" + dept.getParId().toString() + "%");
+        List<DeptTrans> preMenuList = departmentMapper.getMoveDeptList("%" + dept.getParId().toString() + "%");
 
         // preMenu 묶음 중 root 메뉴 (상위로 선택 된 메뉴를 깊은복사로 가져온다)
         Optional<DeptTrans> preMenuStream = preMenuList.stream()
@@ -133,7 +141,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         preMenu.setIdTree(preMenu.getId().toString());
         preMenu.setNameTree(preMenu.getName());
 
-        departmentMapper.modifyPreMoveMenu(preMenu);
+        departmentMapper.modifyDeptTree(preMenu);
 
         // preMenuList
         for (int i = 0; i < preMenuList.size(); i++) {
@@ -151,23 +159,23 @@ public class DepartmentServiceImpl implements DepartmentService {
             tmp = tmp.substring(1);
           }
           deptTrans.setNameTree(preMenu.getNameTree() +">"+ tmp);
-          departmentMapper.modifyPreMoveMenu(deptTrans);
+          departmentMapper.modifyDeptTree(deptTrans);
         }
 
         // menu 이동
-        List<DeptTrans> MenuList = departmentMapper.getPreMoveMenuList("%" + dept.getId().toString() + "%");
+        List<DeptTrans> MenuList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
         // MenuList
         for (int i = 0; i < MenuList.size(); i++) {
           DeptTrans deptTrans = MenuList.get(i);
 
           deptTrans.setIdTree(preMenu.getIdTree()+">"+deptTrans.getIdTree());
           deptTrans.setNameTree(preMenu.getNameTree()+">"+deptTrans.getNameTree());
-          departmentMapper.modifyPreMoveMenu(deptTrans);
+          departmentMapper.modifyDeptTree(deptTrans);
         }
       } else {
-        DeptTrans parMenu = departmentMapper.getParMenu(originMenu.getParId());
+        DeptTrans parMenu = departmentMapper.getParDept(originMenu.getParId());
 
-        List<DeptTrans> preMenuList = departmentMapper.getPreMoveMenuList("%" + dept.getParId().toString() + "%");
+        List<DeptTrans> preMenuList = departmentMapper.getMoveDeptList("%" + dept.getParId().toString() + "%");
         Optional<DeptTrans> preMenuStream = preMenuList.stream()
             .filter(pre -> pre.getId() == dept.getParId())
             .findFirst();
@@ -180,7 +188,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         preDept.setIdTree(parMenu.getIdTree()+">"+preDept.getId().toString());
         preDept.setNameTree(parMenu.getNameTree()+">"+preDept.getName());
 
-        departmentMapper.modifyPreMoveMenu(preDept);
+        departmentMapper.modifyDeptTree(preDept);
 
         for (int i = 0; i < preMenuList.size(); i++) {
           DeptTrans deptTrans = preMenuList.get(i);
@@ -198,11 +206,11 @@ public class DepartmentServiceImpl implements DepartmentService {
             tmp = tmp.substring(1);
           }
           deptTrans.setNameTree(preDept.getNameTree() + ">" + tmp);
-          departmentMapper.modifyPreMoveMenu(deptTrans);
+          departmentMapper.modifyDeptTree(deptTrans);
         }
 
         // menu 이동
-        List<DeptTrans> DeptList = departmentMapper.getPreMoveMenuList("%" + dept.getId().toString() + "%");
+        List<DeptTrans> DeptList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
 
         String originIdTree = originMenu.getIdTree();
         String originNameTree = originMenu.getNameTree();
@@ -211,11 +219,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         originMenu.setIdTree(preDept.getIdTree()+">"+originMenu.getId().toString());
         originMenu.setNameTree(preDept.getNameTree()+">"+originMenu.getName());
 
-        departmentMapper.modifyPreMoveMenu(originMenu);
-        departmentMapper.modifyUpperMenu(parMenu.getId());
-        departmentMapper.modifyUpperMenu(preDept.getId());
-        for (int i = 0; i < MenuList.size(); i++) {
-          DeptTrans deptTrans = MenuList.get(i);
+        departmentMapper.modifyDeptTree(originMenu);
+        departmentMapper.modifyUpperDeptCNY(parMenu.getId());
+        departmentMapper.modifyUpperDeptCNY(preDept.getId());
+        for (int i = 0; i < DeptList.size(); i++) {
+          DeptTrans deptTrans = DeptList.get(i);
           if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
             continue;
           }
@@ -229,16 +237,16 @@ public class DepartmentServiceImpl implements DepartmentService {
             tmp = tmp.substring(1);
           }
           deptTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
-          departmentMapper.modifyPreMoveMenu(deptTrans);
+          departmentMapper.modifyDeptTree(deptTrans);
         }
       }
       return originMenu;
     } else {
       // 일반적인 수정 로직
-      List<DeptTrans> DeptList = departmentMapper.getPreMoveMenuList("%" + dept.getId().toString() + "%");
+      List<DeptTrans> DeptList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
 
-      DeptTrans originMenu = departmentMapper.getParMenu(dept.getId());
-      DeptTrans preDept = departmentMapper.getParMenu(dept.getParId());
+      DeptTrans originMenu = departmentMapper.getParDept(dept.getId());
+      DeptTrans preDept = departmentMapper.getParDept(dept.getParId());
 
       String originIdTree = originMenu.getIdTree();
       String originNameTree = originMenu.getNameTree();
@@ -248,10 +256,10 @@ public class DepartmentServiceImpl implements DepartmentService {
       originMenu.setIdTree(preDept.getIdTree()+">"+originMenu.getId().toString());
       originMenu.setNameTree(preDept.getNameTree()+">"+originMenu.getName());
 
-      departmentMapper.modifyPreMoveMenu(originMenu);
-      departmentMapper.modifyUpperMenu(preDept.getId());
-      for (int i = 0; i < MenuList.size(); i++) {
-        DeptTrans deptTrans = MenuList.get(i);
+      departmentMapper.modifyDeptTree(originMenu);
+      departmentMapper.modifyUpperDeptCNY(preDept.getId());
+      for (int i = 0; i < DeptList.size(); i++) {
+        DeptTrans deptTrans = DeptList.get(i);
         if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
           continue;
         }
@@ -265,11 +273,9 @@ public class DepartmentServiceImpl implements DepartmentService {
           tmp = tmp.substring(1);
         }
         deptTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
-        departmentMapper.modifyPreMoveMenu(deptTrans);
+        departmentMapper.modifyDeptTree(deptTrans);
       }
       return originMenu;
     }
   }
-
-
 }
