@@ -100,8 +100,8 @@ public class AuthGroupServiceImpl implements AuthGroupService {
   public Long addAuth(AddAuthDto addAuthDto) {
     Long companyId = SecurityUtil.getCompanyId();
     authGroupMapper.addAuth(addAuthDto);
-    Long generatedAuthId = addAuthDto.getId();
-    authGroupMapper.insertIntoAuthDashboard(companyId, generatedAuthId);
-    return generatedAuthId;
+    authGroupMapper.insertIntoAuthDashboard(companyId, addAuthDto.getId());
+    return addAuthDto.getId();
   }
+
 }

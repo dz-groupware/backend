@@ -24,17 +24,21 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String token = jwtTokenProvider.getAccessTokenFromRequest(request);
-    try {
-      if (token != null && jwtTokenProvider.validateToken(token)) {
-        Authentication auth = jwtTokenProvider.getAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
+    String requestURI = request.getRequestURI();
+    if(!requestURI.startsWith("/api/v1/auth/login")){
+      try {
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+          Authentication auth = jwtTokenProvider.getAuthentication(token);
+          SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
+        }
+      } catch (RedisConnectionFailureException e) {
+        SecurityContextHolder.clearContext();
+        throw new Error("레디스 에러");
+      } catch (Exception e) {
+        throw new Error("유효하지않은 JWT");
       }
-    } catch (RedisConnectionFailureException e) {
-      SecurityContextHolder.clearContext();
-      throw new Error("레디스 에러");
-    } catch (Exception e) {
-      throw new Error("유효하지않은 JWT");
     }
+
 
     filterChain.doFilter(request, response);
   }

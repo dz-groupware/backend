@@ -1,6 +1,8 @@
 package com.example.backend.authgroup.controller;
 
 import com.example.backend.authgroup.dto.AddAuthDto;
+import com.example.backend.authgroup.dto.AuthResponseDto;
+import com.example.backend.authgroup.dto.MenuMappingRequestDto;
 import com.example.backend.common.MultiResponseDto;
 import com.example.backend.common.Page;
 import com.example.backend.common.SingleResponseDto;
@@ -77,12 +79,6 @@ public class AuthGroupController {
 
     @GetMapping("/companies/gnb-list")
   public ResponseEntity<?> getCompanyGnbList(@RequestParam(required = false) Boolean enabledYn) {
-      System.out.println("#############################");
-      System.out.println(SecurityUtil.getCompanyId());
-      System.out.println(SecurityUtil.getEmployeeId());
-      System.out.println(SecurityUtil.getUserId());
-      System.out.println(SecurityUtil.getDepartmentId());
-
     return new ResponseEntity<>(new SingleResponseDto<>(
         authGroupService.getCompanyGnbList(enabledYn)
     ), HttpStatus.OK);
@@ -130,7 +126,13 @@ public class AuthGroupController {
 
   @PostMapping("/auth")
   public ResponseEntity<?> addAuth(@RequestBody AddAuthDto addAuthDto) {
-    authGroupService.addAuth(addAuthDto);
-    return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    Long newAuthId = authGroupService.addAuth(addAuthDto);
+    AuthResponseDto responseDto = new AuthResponseDto(newAuthId);
+    return new ResponseEntity<>(new SingleResponseDto<>(responseDto),HttpStatus.ACCEPTED);
   }
+
+//  @PostMapping("/auth/{authId}/menu-mappings")
+//  public ResponseEntity<?> mapMenusToAuth(@RequestBody MenuMappingRequestDto menuMappingRequestDto) {
+//
+//  }
 }

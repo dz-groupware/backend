@@ -29,10 +29,7 @@ public class PrincipalDetailsService implements UserDetailsService {
   }
 
   public UserDetails loadUserByUserIdAndEmpId(Long userId, Long empId) throws UsernameNotFoundException {
-    System.out.println("!!!!!");
-    System.out.println(userId +":"+ empId);
     PrincipalUserDto principalUser = userMapper.getAnotherLogin(userId,empId);
-    System.out.println("나온거" + principalUser.toString());
     if (principalUser == null) {
       throw new UsernameNotFoundException("Employee not found");
     }

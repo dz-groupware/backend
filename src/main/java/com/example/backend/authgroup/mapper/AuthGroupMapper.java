@@ -25,6 +25,6 @@ public interface AuthGroupMapper {
 
   List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long companyId, Long lastId, String orderBy, String searchTerm, int pageSize);
   List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(Long companyId, String lastAuthName, String orderBy, String searchTerm, int pageSize);
-  Long addAuth(AddAuthDto addAuthDto);
+  void addAuth(AddAuthDto addAuthDto);
   void insertIntoAuthDashboard(Long compId, Long authId);
 }
