@@ -111,4 +111,18 @@
   <update id="updateChildNodeYnOfParMenu" parameterType="java.lang.Long">
     update menu set child_node_yn = 0 where id = #{id};
   </update>
+
+  <resultMap id="result" type="com.example.backend.setting.dto.Dto">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="age" property="age" />
+  </resultMap>
+
+  <insert id="testList" parameterType="java.util.List" useGeneratedKeys = "true" keyProperty = "id">
+    insert into test(name, age) values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.name}, #{item.age})
+    </foreach>
+  </insert>
+
 </mapper>

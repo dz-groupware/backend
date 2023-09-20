@@ -1,16 +1,22 @@
 package com.example.backend.setting.service;
 
-import com.example.backend.config.jwt.SecurityUtil;
-import com.example.backend.redis.JwtToServiceFilter;
 import com.example.backend.redis.RedisMapper;
 import com.example.backend.redis.RedisService;
+import com.example.backend.setting.dto.Dto;
+import com.example.backend.setting.dto.JwtDto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import com.example.backend.setting.mapper.SettingMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -19,31 +25,75 @@ public class SettingServiceImpl implements SettingService {
   private final SettingMapper settingMapper;
   private final RedisMapper redisMapper;
   private final RedisService redisService;
-  private final JwtToServiceFilter jwtToServiceFilter;
 
-  public SettingServiceImpl(SettingMapper settingMapper,  RedisMapper redisMapper, RedisService redisService, JwtToServiceFilter jwtToServiceFilter) {
+  public SettingServiceImpl(SettingMapper settingMapper,  RedisMapper redisMapper, RedisService redisService) {
     this.settingMapper = settingMapper;
     this.redisMapper = redisMapper;
     this.redisService = redisService;
-    this.jwtToServiceFilter = jwtToServiceFilter;
   }
 
-//  public String getToken(String jwt){
-//
-//    return jwt;
-//  }
-
   public void testRedisAndJwt(){
-    String jwt = jwtToServiceFilter.getJwtToken();
+    String jwt = redisService.getJwt();
 
-
-    System.out.println("in Service : "+jwt);
-    if (jwt == null) {
-      jwt = "null";
-    }
     redisService.saveDataToRedis(jwt, redisMapper.findMenuId(12L,6L,1L));
   }
 
+  @Transactional
+  public void testRedisModify(){
+    // 수정요청 : 수정 성공 시 레디스 데이터 삭제, 실행이 실패 되었을 시 그대로
+    settingMapper.deleteMenu(6L);
+    // 모든 캐시 삭제
+    redisService.flushDb(0);
+  }
+
+
+  @Override
+  public Map<String, Object> testGetInfo(){
+    String jwt = redisService.getJwt();
+    String[] arr = jwt.split("\\.");
+    String payload = arr[1];
+    List<String> resultRedis = redisService.getListFromRedis(jwt);
+    System.out.println("result : " + resultRedis);
+    Base64.Decoder decoder = Base64.getUrlDecoder();
+    String resultJWT = new String(decoder.decode(payload));
+    System.out.println(" jwt info : "+resultJWT);
+    Map<String, Object> result = new HashMap<>();
+    result.put("redis", resultRedis);
+    result.put("jwt", resultJWT);
+    return result;
+  }
+
+  @Override
+  public List<Dto> testList(){
+    List<Dto> dtoList = new ArrayList<>();
+    Dto dto1 = new Dto();
+    dto1.setName("name1");
+    dto1.setAge("age1");
+    Dto dto2 = new Dto();
+    dto2.setName("name2");
+    dto2.setAge("age2");
+    dtoList.add(dto1);
+    dtoList.add(dto2);
+
+    System.out.println("insert before ========================");
+    for (int i=0; i<dtoList.size(); i++){
+      System.out.println(i+" || "+dtoList.get(i).getName() + " || "+dtoList.get(i).getAge());
+    }
+    System.out.println("=================================");
+
+    settingMapper.testList(dtoList);
+
+    System.out.println("insert after ========================");
+    for (int i=0; i< dtoList.size(); i++){
+      System.out.println(i+" || "+ dtoList.get(i).getId()+" || "+ dtoList.get(i).getName() + " || "+ dtoList.get(i).getAge());
+    }
+    System.out.println("=================================");
+    return dtoList;
+  }
+  @Override
+  public JwtDto testJwtPayload() throws JsonProcessingException {
+    return redisService.getInfo();
+  }
   @Override
   public List<MenuRes> findGnbList() {
     return settingMapper.findGnbList();
@@ -59,7 +109,7 @@ public class SettingServiceImpl implements SettingService {
     // 대메뉴 추가
     if (type.equals("1")) {
       try {
-        menu.setCompId(SecurityUtil.getCompanyId());
+        menu.setCompId(redisService.getInfo().getCompId());
         menu.setNameTree(menu.getName());
         settingMapper.addMenu(menu);
         // 방금 추가 된 id 가져오기
@@ -75,7 +125,7 @@ public class SettingServiceImpl implements SettingService {
     if (type.equals("2")) {
       try {
         menu.setParId(menu.getId());
-        menu.setCompId(SecurityUtil.getCompanyId());
+        menu.setCompId(redisService.getInfo().getCompId());
         menu.setNameTree(menu.getName());
         menu.setIdTree(menu.getId().toString());
 
@@ -87,7 +137,7 @@ public class SettingServiceImpl implements SettingService {
     // 메뉴 추가
     if (type.equals("3")) {
       try{
-        menu.setCompId(SecurityUtil.getCompanyId());
+        menu.setCompId(redisService.getInfo().getCompId());
         Long id = menu.getId();
 
         Long parId = menu.getParId();
@@ -154,9 +204,8 @@ public class SettingServiceImpl implements SettingService {
 
   // 즐겨찾기
   @Override
-  public String findFavorById(Long menuId) {
-    Long empId = SecurityUtil.getEmployeeId();
-    int check = settingMapper.findFavorById(empId, menuId);
+  public String findFavorById(Long menuId) throws JsonProcessingException {
+    int check = settingMapper.findFavorById(redisService.getInfo().getEmpId(), menuId);
     if (check == 0) {
       return "false";
     }
@@ -169,15 +218,13 @@ public class SettingServiceImpl implements SettingService {
   }
 
   @Override
-  public int modifyFavorOn(Long menuId) {
-    Long empId = SecurityUtil.getEmployeeId();
-    return settingMapper.modifyFavorOn(empId, menuId);
+  public int modifyFavorOn(Long menuId) throws JsonProcessingException {
+    return settingMapper.modifyFavorOn(redisService.getInfo().getEmpId(), menuId);
   }
 
   @Override
-  public int modifyFavorOff(Long menuId) {
-    Long empId = SecurityUtil.getEmployeeId();
-    return settingMapper.modifyFavorOff(empId, menuId);
+  public int modifyFavorOff(Long menuId) throws JsonProcessingException {
+    return settingMapper.modifyFavorOff(redisService.getInfo().getEmpId(), menuId);
   }
 
   @Override

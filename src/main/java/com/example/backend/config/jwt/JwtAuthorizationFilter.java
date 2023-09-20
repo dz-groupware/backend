@@ -32,7 +32,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       FilterChain chain) throws IOException, ServletException {
 
     String accessToken = getAccessTokenFromCookie(request);
-    System.out.println("accessToken : "+accessToken);
     if (accessToken == null || "".equals(accessToken)) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
@@ -43,10 +42,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     if (username == null) {
       return;
     }
-
-    System.out.println("username : "+username);
-    System.out.println("response : " + response);
-    System.out.println("accessToken2 : "+accessToken);
 
     setSecurityContext(response, username);
 
@@ -64,7 +59,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     PrincipalDetails principalDetails = new PrincipalDetails(principalUser);
     Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null,
         principalDetails.getAuthorities());
-    System.out.println(authentication.getPrincipal());
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
@@ -73,7 +67,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if ("JWT".equals(cookie.getName())) {
-          System.out.println("cooke.getValue : "+cookie.getValue());
           return cookie.getValue();
         }
       }
@@ -97,7 +90,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     try {
       return JWT.require(Algorithm.HMAC512(jwtKey)).build().verify(accessToken).getClaim("sub").asString();
     } catch (Exception e) {
-      System.out.println(JWT.require(Algorithm.HMAC512(jwtKey)).build().verify(accessToken).getClaim("sub").asString());
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       chain.doFilter(request, response);  // 여기를 추가
       return null;

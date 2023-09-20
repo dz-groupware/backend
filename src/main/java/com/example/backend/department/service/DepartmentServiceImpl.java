@@ -1,29 +1,25 @@
 package com.example.backend.department.service;
 
-import com.example.backend.common.SingleResponseDto;
-import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.DeptTrans;
 import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
-import com.example.backend.setting.dto.MenuTrans;
-import java.util.ArrayList;
+import com.example.backend.redis.RedisService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
   private final DepartmentMapper departmentMapper;
+  private final RedisService redisService;
 
-  public DepartmentServiceImpl(DepartmentMapper departmentMapper) {
+  public DepartmentServiceImpl(DepartmentMapper departmentMapper, RedisService redisService) {
     this.departmentMapper = departmentMapper;
+    this.redisService = redisService;
   }
 
   @Override
@@ -31,10 +27,23 @@ public class DepartmentServiceImpl implements DepartmentService {
     System.out.println(dept.getStatus());
 
     try{
-      dept.setCompId(SecurityUtil.getCompanyId());
+      dept.setCompId(redisService.getInfo().getCompId());
+      // 메뉴 추가
       if (dept.getStatus().equals("add")){
+        if (dept.getParId().toString().equals("")){
+          // 상위부서 없음
+          dept.setParId(dept.getId());
+          dept.setIdTree(dept.getId().toString());
+          dept.setNameTree(dept.getName());
+        } else {
+          // 상위부서 찾기
+          DeptTrans parDept = departmentMapper.getParDept(dept.getParId());
+          dept.setIdTree(parDept.getIdTree()+">"+dept.getId().toString());
+          dept.setNameTree(parDept.getNameTree()+">"+dept.getName());
+        }
         departmentMapper.addDepartment(dept);
       }
+      // 메뉴 수정
       if (dept.getStatus().equals("modify")){
         // 수정 로직 수행 (트리 수정)
         DeptTrans updateDept = new DeptTrans(dept);
@@ -49,6 +58,24 @@ public class DepartmentServiceImpl implements DepartmentService {
       return -1;
     }
   }
+
+  @Override
+  public int addDeptest(DeptDto dept){
+    System.out.println(dept.getParId());
+    System.out.println(dept.getParName());
+    System.out.println(dept.getId());
+    System.out.println(dept.getName());
+    System.out.println(dept.getAbbr());
+    System.out.println(dept.getCode());
+    System.out.println(dept.getIdTree());
+    System.out.println(dept.getNameTree());
+    System.out.println(dept.getSortOrder());
+    System.out.println(dept.getCompId());
+    System.out.println(dept.getStatus());
+    return 1;
+  }
+
+
 
   @Override
   public List<DeptListDto> getDepartmentBasicList(Long compId) {
@@ -76,9 +103,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public int deleteDepartment(Long id) {
-    Long compId = SecurityUtil.getCompanyId();
-    departmentMapper.deleteDepartment(compId, id, "%"+id.toString()+"%");
+  public int deleteDepartment(Long id) throws JsonProcessingException {
+    departmentMapper.deleteDepartment(redisService.getInfo().getCompId(), id, "%"+id.toString()+"%");
     return 1;
   }
   @Override
@@ -102,9 +128,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public List<DeptListDto> getOptionCompList(){
-    Long compId = SecurityUtil.getCompanyId();
-    return departmentMapper.getOptionCompList(compId);
+  public List<DeptListDto> getOptionCompList() throws JsonProcessingException {
+    return departmentMapper.getOptionCompList(redisService.getInfo().getCompId());
   }
 
   @Override

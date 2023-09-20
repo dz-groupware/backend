@@ -22,7 +22,7 @@
   <select id="getGnbByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
     SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU
     INNER JOIN
-    (SELECT MENU_ID FROM AUTH_MENU INNER JOIN
+    (SELECT distinct MENU_ID FROM AUTH_MENU INNER JOIN
     (select auth_id from auth_employee where emp_id = #{empId} and deleted_yn = 0
     union
     SELECT AUTH_ID FROM AUTH_DEPARTMENT where dept_id = #{deptId} and deleted_yn = 0

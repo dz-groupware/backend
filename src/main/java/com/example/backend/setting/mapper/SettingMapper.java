@@ -1,10 +1,11 @@
 package com.example.backend.setting.mapper;
 
-import com.example.backend.setting.dto.Menu;
+import com.example.backend.setting.dto.Dto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 
 @Mapper
 public interface SettingMapper {
@@ -47,5 +48,11 @@ public interface SettingMapper {
   MenuTrans getParMenu(Long id);
   MenuTrans getPreParMenu(Long id);
   int updateChildNodeYnOfParMenu(Long id);
+
+//  void testList(DtoList list);
+
+
+  int testList(List<Dto> list);
+
 }
 

@@ -4,6 +4,7 @@ import com.example.backend.common.SingleResponseDto;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,38 +25,38 @@ public class MenuController {
   }
 
   @GetMapping("/gnb")
-  public ResponseEntity<?> getGnbById() {
+  public ResponseEntity<?> getGnbById() throws JsonProcessingException {
     return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getGnbById()), HttpStatus.OK);
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> getFavorByEmpId() {
+  public ResponseEntity<?> getFavorByEmpId() throws JsonProcessingException {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId()), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> removeFavor(@RequestParam Long menuId) {
+  public ResponseEntity<?> removeFavor(@RequestParam Long menuId) throws JsonProcessingException {
     return new ResponseEntity<>(
         new SingleResponseDto<Integer>(menuService.removeFavor(menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/lnb")
-  public ResponseEntity<?> getMenuById(@RequestParam Long menuId) {
+  public ResponseEntity<?> getMenuById(@RequestParam Long menuId) throws JsonProcessingException {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.getMenuById(menuId)),
         HttpStatus.OK);
   }
 
   @GetMapping("/gnb/admin")
-  public ResponseEntity<?> getGnbByAdmin() {
+  public ResponseEntity<?> getGnbByAdmin() throws JsonProcessingException {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuGnb()),
         HttpStatus.OK);
   }
 
   @GetMapping("/lnb/admin")
-  public ResponseEntity<?> getLnbByAdmin(@RequestParam Long menuId) {
+  public ResponseEntity<?> getLnbByAdmin(@RequestParam Long menuId) throws JsonProcessingException {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuLnb(menuId)),
         HttpStatus.OK);

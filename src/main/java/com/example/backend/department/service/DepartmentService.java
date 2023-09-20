@@ -4,6 +4,7 @@ import com.example.backend.common.SingleResponseDto;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.EmpListDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 
 public interface DepartmentService {
@@ -13,8 +14,10 @@ public interface DepartmentService {
   DeptDto getBasicDetailById(Long id);
   List<EmpListDto> getEmpListByDeptId(Long id);
   int modifyDepartment(DeptDto dept);
-  int deleteDepartment(Long id);
+  int deleteDepartment(Long id) throws JsonProcessingException;
   int modifyAllDepartment(List<DeptDto> dept);
-  List<DeptListDto> getOptionCompList();
+  List<DeptListDto> getOptionCompList() throws JsonProcessingException;
   List<DeptListDto> findDeptNameAndCode(Long compId, String text);
+
+  int addDeptest(DeptDto dept);
 }

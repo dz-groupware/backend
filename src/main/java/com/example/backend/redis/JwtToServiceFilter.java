@@ -27,7 +27,6 @@ public class JwtToServiceFilter extends OncePerRequestFilter {
       return;
     }
 
-    System.out.println("in JTS : " + accessToken);
     jwtThreadLocal.set(accessToken);
 
     chain.doFilter(request, response);
@@ -38,7 +37,6 @@ public class JwtToServiceFilter extends OncePerRequestFilter {
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if ("JWT".equals(cookie.getName())) {
-          System.out.println("cooke.getValue : "+cookie.getValue());
           return cookie.getValue();
         }
       }
@@ -47,7 +45,6 @@ public class JwtToServiceFilter extends OncePerRequestFilter {
   }
 
   public String getJwtToken(){
-    System.out.println("in getJwtToken : "+jwtThreadLocal.get());
     return jwtThreadLocal.get();
   }
 }

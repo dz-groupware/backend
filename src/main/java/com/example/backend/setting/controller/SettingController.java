@@ -2,10 +2,13 @@ package com.example.backend.setting.controller;
 
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.redis.RedisService;
+import com.example.backend.setting.dto.Dto;
+import com.example.backend.setting.dto.JwtDto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.service.SettingService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.ResponseEntity;
@@ -61,19 +64,20 @@ public class SettingController {
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> findFavorById(@RequestParam Long menuId) {
+  public ResponseEntity<?> findFavorById(@RequestParam Long menuId) throws JsonProcessingException {
     // 현재 즐겨찾기 상태를 가져오기
     return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(menuId)), HttpStatus.OK);
   }
 
   @PostMapping("/favor")
-  public ResponseEntity<?> modifyFavorOn(@RequestBody Long menuId) {
+  public ResponseEntity<?> modifyFavorOn(@RequestBody Long menuId) throws JsonProcessingException {
     // 즐겨찾기 저장 요청
     return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(menuId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> modifyFavorOff(@RequestParam Long menuId) {
+  public ResponseEntity<?> modifyFavorOff(@RequestParam Long menuId)
+      throws JsonProcessingException {
     // 즐겨찾기 삭제 요청
     return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(menuId)), HttpStatus.OK);
   }
@@ -84,9 +88,31 @@ public class SettingController {
         new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
   }
 
-  @GetMapping("/test/redis")
-  public String testRedis(){
+  @GetMapping("/test/redis-add")
+  public String testRedisAdd(){
     settingService.testRedisAndJwt();
     return "";
+  }
+
+
+  @GetMapping("/test/redis-modify")
+  public String testRedisModify(){
+    settingService.testRedisModify();
+    return "";
+  }
+
+  @GetMapping("/test/list")
+  public List<Dto> testList(){
+    return settingService.testList();
+  }
+
+  @GetMapping("/test/redis-get")
+  public Map<String, Object> testRead(){
+    return settingService.testGetInfo();
+  }
+
+  @GetMapping("/test/jwt-payload")
+  public ResponseEntity<?> testJwtPayload() throws JsonProcessingException {
+    return new ResponseEntity<> (new SingleResponseDto<JwtDto>(settingService.testJwtPayload()), HttpStatus.OK);
   }
 }

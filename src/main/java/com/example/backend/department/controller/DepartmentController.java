@@ -3,11 +3,9 @@ package com.example.backend.department.controller;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.department.dto.DeptDto;
-import com.example.backend.department.dto.DeptListDto;
-import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.service.DepartmentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -76,13 +74,13 @@ public class DepartmentController {
   }
 
   @DeleteMapping("dept")
-  public ResponseEntity<?> deleteDepartment(@RequestParam Long id) {
+  public ResponseEntity<?> deleteDepartment(@RequestParam Long id) throws JsonProcessingException {
     return new ResponseEntity(
         new SingleResponseDto<>(departmentService.deleteDepartment(id)), HttpStatus.OK);
   }
 
   @GetMapping("/option-comp")
-  public ResponseEntity<?>  getOptionCompList(){
+  public ResponseEntity<?>  getOptionCompList() throws JsonProcessingException {
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getOptionCompList()), HttpStatus.OK);
   }

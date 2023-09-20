@@ -1,113 +1,80 @@
 package com.example.backend.menu.service;
 
-import com.example.backend.common.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
-import com.example.backend.config.jwt.SecurityUtil;
-import com.example.backend.employee.mapper.EmployeeMapper;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
-import java.util.ArrayList;
+import com.example.backend.redis.RedisService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Service
 public class MenuServiceImpl implements MenuService {
 
   private final MenuMapper menuMapper;
   private final CheckMapper checkMapper;
+  private final RedisService redisService;
 
-  public MenuServiceImpl(MenuMapper menuMapper, CheckMapper checkMapper) {
+  public MenuServiceImpl(MenuMapper menuMapper, CheckMapper checkMapper, RedisService redisService) {
     this.menuMapper = menuMapper;
     this.checkMapper = checkMapper;
+    this.redisService = redisService;
   }
 
   @Override
-  public List<MenuDto> getGnbById() {
-    Long empId = SecurityUtil.getEmployeeId();
-    Long compId = SecurityUtil.getCompanyId();
+  public List<MenuDto> getGnbById() throws JsonProcessingException {
+
+    Long empId = redisService.getInfo().getEmpId();
+    Long compId = redisService.getInfo().getCompId();
 
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
-      System.out.println(SecurityUtil.getUserId());
-      System.out.println(SecurityUtil.getEmployeeId());
-      System.out.println(SecurityUtil.getCompanyId());
-
-      return menuMapper.getGnbForMaster(compId);
+      return menuMapper.getGnbForMaster(redisService.getInfo().getCompId());
+    } else {
+      return menuMapper.getGnbByEmpId(empId, compId, redisService.getInfo().getDeptId());
     }
-
-    Long userId = SecurityUtil.getUserId();
-    Long deptId = SecurityUtil.getDepartmentId();
-    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
-
-    if( result.size() == 1 && result.get(0) == 1L ){
-      return menuMapper.getGnbByEmpId(empId, compId, deptId);
-    }
-
-    return new ArrayList<>();
   }
 
   @Override
-  public List<MenuDto> getFavorByEmpId() {
+  public List<MenuDto> getFavorByEmpId() throws JsonProcessingException {
 
-    Long empId = SecurityUtil.getEmployeeId();
-    Long compId = SecurityUtil.getCompanyId();
+    Long empId = redisService.getInfo().getEmpId();
+    Long compId = redisService.getInfo().getCompId();
 
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
       return menuMapper.getFavorForMaster(compId);
+    } else {
+      return menuMapper.getFavorByEmpId(empId, compId, redisService.getInfo().getDeptId());
     }
-
-    Long userId = SecurityUtil.getUserId();
-    Long deptId = SecurityUtil.getDepartmentId();
-    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
-
-    if( result.size() == 1 && result.get(0) == 1L ){
-      return menuMapper.getFavorByEmpId(empId, compId, deptId);
-    }
-
-    return new ArrayList<>();
   }
 
   @Override
-  public int removeFavor(Long menuId) {
-    Long empId = SecurityUtil.getEmployeeId();
-    return menuMapper.removeFavor(empId, menuId);
+  public int removeFavor(Long menuId) throws JsonProcessingException {
+    return menuMapper.removeFavor(redisService.getInfo().getEmpId(), menuId);
   }
 
   @Override
-  public List<MenuDto> getMenuById(Long menuId) {
+  public List<MenuDto> getMenuById(Long menuId) throws JsonProcessingException {
 
-    Long empId = SecurityUtil.getEmployeeId();
-    Long compId = SecurityUtil.getCompanyId();
+    Long empId = redisService.getInfo().getEmpId();
+    Long compId = redisService.getInfo().getCompId();
 
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
       return menuMapper.getMenuForMaster(menuId, compId);
+    } else {
+      return menuMapper.getMenuById(menuId, empId, compId, redisService.getInfo().getDeptId());
     }
-
-    Long userId = SecurityUtil.getUserId();
-    Long deptId = SecurityUtil.getDepartmentId();
-    List<Long> result = checkMapper.checkExits(userId, empId, deptId, compId);
-
-    if( result.size() == 1 && result.get(0) == 1L ){
-      return menuMapper.getMenuById(menuId, empId, compId, deptId);
-    }
-
-    return new ArrayList<>();
   }
 
   @Override
-  public List<MenuDto> getUpperMenuGnb() {
-    Long compId = SecurityUtil.getCompanyId();
-    return menuMapper.getUpperMenuGnb(compId);
+  public List<MenuDto> getUpperMenuGnb() throws JsonProcessingException {
+    return menuMapper.getUpperMenuGnb(redisService.getInfo().getCompId());
   }
 
   @Override
-  public List<MenuDto> getUpperMenuLnb(Long menuId) {
-    Long compId = SecurityUtil.getCompanyId();
-    return menuMapper.getUpperMenuLnb(menuId, compId);
+  public List<MenuDto> getUpperMenuLnb(Long menuId) throws JsonProcessingException {
+    return menuMapper.getUpperMenuLnb(menuId, redisService.getInfo().getCompId());
   }
 }

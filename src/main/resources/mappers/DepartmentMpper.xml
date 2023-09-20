@@ -25,11 +25,16 @@
 
   <!-- 사원 리스트 가져오기 -->
   <select id="getEmpListByDeptId" resultType="com.example.backend.department.dto.EmpListDto">
-    select department.name as deptName, employee.position as position,
-    employee.name as empName, department.sort_order from employee_department
-    inner join department on department.id = employee_department.dept_id
+    select department.name as deptName, ed.position, employee.name as empName,
+    department.sort_order, ed.emp_id, ed.org, employee_department.emp_id from employee_department
+    inner join employee_department as ed on ed.emp_id = employee_department.emp_id
+    inner join department on department.id = ed.dept_id
     inner join employee on employee.id = employee_department.emp_id
-    where department.id = #{id};
+    where employee_department.dept_id = #{id} and ed.org = 1
+    and ed.transferred_yn = 0 and employee_department.transferred_yn = 0
+    and employee_department.deleted_yn = 0 and ed.deleted_yn = 0
+    and department.deleted_yn = 0 and employee.deleted_yn = 0
+    and department.enabled_yn = 1 ;
   </select>
 
   <!-- 추가 -->
@@ -81,11 +86,12 @@
     update dept set id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} where id = #{id};
   </update>
 
+  <!-- 상위 부서 가져오기 -->
   <select id="getParDept" resultType="com.example.backend.department.dto.DeptTrans">
     select id, par_id, name, id_tree, name_tree from department where id = #{id};
   </select>
 
-  <!-- 상위 메뉴 childNodeYn 변경 -->
+  <!-- 상위 부서 childNodeYn 변경 -->
   <update id="modifyUpperDeptCNY" parameterType="java.lang.Long">
     update department set child_node_yn = 0 where id = #{parId};
   </update>

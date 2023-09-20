@@ -1,10 +1,10 @@
 package com.example.backend.gnb.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.gnb.dto.BasicResponseDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ public class gnbController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getBasicInfoById() {
+  public ResponseEntity<?> getBasicInfoById() throws JsonProcessingException {
     return new ResponseEntity<>(new BasicResponseDto<>(
         menuService.getGnbById(),
         menuService.getFavorByEmpId(),
@@ -32,7 +32,8 @@ public class gnbController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity<?> getOtherEmpOfUser(@RequestParam Long empId) {
+  public ResponseEntity<?> getOtherEmpOfUser(@RequestParam Long empId)
+      throws JsonProcessingException {
     // 요청으로 받은 empId와 토큰 empId가 같은 유저인지 확인하는 과정 필요.
     if (modalService.checkEmpIds(empId)) {
       return new ResponseEntity<>(new BasicResponseDto<>(
