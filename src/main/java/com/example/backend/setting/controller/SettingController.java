@@ -88,11 +88,11 @@ public class SettingController {
         new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
   }
 
-  @GetMapping("/test/redis-add")
-  public String testRedisAdd(){
-    settingService.testRedisAndJwt();
-    return "";
-  }
+//  @GetMapping("/test/redis-add")
+//  public String testRedisAdd(){
+//    settingService.testRedisAndJwt();
+//    return "";
+//  }
 
 
   @GetMapping("/test/redis-modify")
@@ -106,13 +106,13 @@ public class SettingController {
     return settingService.testList();
   }
 
-  @GetMapping("/test/redis-get")
-  public Map<String, Object> testRead(){
-    return settingService.testGetInfo();
-  }
+//  @GetMapping("/test/redis-get")
+//  public Map<String, Object> testRead(){
+//    return settingService.testGetInfo();
+//  }
 
-  @GetMapping("/test/jwt-payload")
-  public ResponseEntity<?> testJwtPayload() throws JsonProcessingException {
-    return new ResponseEntity<> (new SingleResponseDto<JwtDto>(settingService.testJwtPayload()), HttpStatus.OK);
-  }
+//  @GetMapping("/test/jwt-payload")
+//  public ResponseEntity<?> testJwtPayload() throws JsonProcessingException {
+//    return new ResponseEntity<> (new SingleResponseDto<JwtDto>(settingService.testJwtPayload()), HttpStatus.OK);
+//  }
 }

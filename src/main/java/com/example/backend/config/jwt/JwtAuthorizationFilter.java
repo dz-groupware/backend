@@ -2,8 +2,6 @@ package com.example.backend.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.backend.setting.service.SettingService;
-import com.example.backend.setting.service.SettingServiceImpl;
 import com.example.backend.user.UserMapper;
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -20,7 +18,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
   private final String jwtKey;
   private final UserMapper userMapper;
-
 
   public JwtAuthorizationFilter(String jwt_key, UserMapper userMapper) {
     this.jwtKey = jwt_key;

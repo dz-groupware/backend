@@ -9,10 +9,7 @@ import com.example.backend.setting.dto.MenuTrans;
 import com.example.backend.setting.mapper.SettingMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -25,42 +22,12 @@ public class SettingServiceImpl implements SettingService {
   private final SettingMapper settingMapper;
   private final RedisMapper redisMapper;
   private final RedisService redisService;
+  private static ThreadLocal<JwtDto> jwtThreadLocal = ThreadLocal.withInitial(() -> new JwtDto());
 
   public SettingServiceImpl(SettingMapper settingMapper,  RedisMapper redisMapper, RedisService redisService) {
     this.settingMapper = settingMapper;
     this.redisMapper = redisMapper;
     this.redisService = redisService;
-  }
-
-  public void testRedisAndJwt(){
-    String jwt = redisService.getJwt();
-
-    redisService.saveDataToRedis(jwt, redisMapper.findMenuId(12L,6L,1L));
-  }
-
-  @Transactional
-  public void testRedisModify(){
-    // 수정요청 : 수정 성공 시 레디스 데이터 삭제, 실행이 실패 되었을 시 그대로
-    settingMapper.deleteMenu(6L);
-    // 모든 캐시 삭제
-    redisService.flushDb(0);
-  }
-
-
-  @Override
-  public Map<String, Object> testGetInfo(){
-    String jwt = redisService.getJwt();
-    String[] arr = jwt.split("\\.");
-    String payload = arr[1];
-    List<String> resultRedis = redisService.getListFromRedis(jwt);
-    System.out.println("result : " + resultRedis);
-    Base64.Decoder decoder = Base64.getUrlDecoder();
-    String resultJWT = new String(decoder.decode(payload));
-    System.out.println(" jwt info : "+resultJWT);
-    Map<String, Object> result = new HashMap<>();
-    result.put("redis", resultRedis);
-    result.put("jwt", resultJWT);
-    return result;
   }
 
   @Override
@@ -90,10 +57,7 @@ public class SettingServiceImpl implements SettingService {
     System.out.println("=================================");
     return dtoList;
   }
-  @Override
-  public JwtDto testJwtPayload() throws JsonProcessingException {
-    return redisService.getInfo();
-  }
+
   @Override
   public List<MenuRes> findGnbList() {
     return settingMapper.findGnbList();
@@ -109,7 +73,7 @@ public class SettingServiceImpl implements SettingService {
     // 대메뉴 추가
     if (type.equals("1")) {
       try {
-        menu.setCompId(redisService.getInfo().getCompId());
+        menu.setCompId(jwtThreadLocal.get().getCompId());
         menu.setNameTree(menu.getName());
         settingMapper.addMenu(menu);
         // 방금 추가 된 id 가져오기
@@ -125,7 +89,7 @@ public class SettingServiceImpl implements SettingService {
     if (type.equals("2")) {
       try {
         menu.setParId(menu.getId());
-        menu.setCompId(redisService.getInfo().getCompId());
+        menu.setCompId(jwtThreadLocal.get().getCompId());
         menu.setNameTree(menu.getName());
         menu.setIdTree(menu.getId().toString());
 
@@ -137,7 +101,7 @@ public class SettingServiceImpl implements SettingService {
     // 메뉴 추가
     if (type.equals("3")) {
       try{
-        menu.setCompId(redisService.getInfo().getCompId());
+        menu.setCompId(jwtThreadLocal.get().getCompId());
         Long id = menu.getId();
 
         Long parId = menu.getParId();
@@ -205,7 +169,7 @@ public class SettingServiceImpl implements SettingService {
   // 즐겨찾기
   @Override
   public String findFavorById(Long menuId) throws JsonProcessingException {
-    int check = settingMapper.findFavorById(redisService.getInfo().getEmpId(), menuId);
+    int check = settingMapper.findFavorById(jwtThreadLocal.get().getEmpId(), menuId);
     if (check == 0) {
       return "false";
     }
@@ -219,12 +183,12 @@ public class SettingServiceImpl implements SettingService {
 
   @Override
   public int modifyFavorOn(Long menuId) throws JsonProcessingException {
-    return settingMapper.modifyFavorOn(redisService.getInfo().getEmpId(), menuId);
+    return settingMapper.modifyFavorOn(jwtThreadLocal.get().getEmpId(), menuId);
   }
 
   @Override
   public int modifyFavorOff(Long menuId) throws JsonProcessingException {
-    return settingMapper.modifyFavorOff(redisService.getInfo().getEmpId(), menuId);
+    return settingMapper.modifyFavorOff(jwtThreadLocal.get().getEmpId(), menuId);
   }
 
   @Override
@@ -413,4 +377,40 @@ public class SettingServiceImpl implements SettingService {
       return originMenu;
     }
   }
+
+
+
+  @Transactional
+  public void testRedisModify(){
+    // 수정요청 : 수정 성공 시 레디스 데이터 삭제, 실행이 실패 되었을 시 그대로
+//    settingMapper.deleteMenu(6L);
+    // 모든 캐시 삭제
+    redisService.flushDb(0);
+  }
+//  public void testRedisAndJwt(){
+//    String jwt = redisService.getJwt();
+//
+//    redisService.saveDataToRedis(jwt, redisMapper.findMenuId(12L,6L,1L));
+//  }
+
+
+//  @Override
+//  public Map<String, Object> testGetInfo(){
+//    String jwt = redisService.getJwt();
+//    String[] arr = jwt.split("\\.");
+//    String payload = arr[1];
+//    List<String> resultRedis = redisService.getListFromRedis(jwt);
+//    System.out.println("result : " + resultRedis);
+//    Base64.Decoder decoder = Base64.getUrlDecoder();
+//    String resultJWT = new String(decoder.decode(payload));
+//    System.out.println(" jwt info : "+resultJWT);
+//    Map<String, Object> result = new HashMap<>();
+//    result.put("redis", resultRedis);
+//    result.put("jwt", resultJWT);
+//    return result;
+//  }
+  //  @Override
+//  public JwtDto testJwtPayload() throws JsonProcessingException {
+//    return redisService.getInfo();
+//  }
 }

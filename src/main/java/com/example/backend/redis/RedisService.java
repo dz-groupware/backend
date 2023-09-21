@@ -1,51 +1,30 @@
 package com.example.backend.redis;
 
+import com.example.backend.config.jwt.PrincipalDetails;
+import com.example.backend.config.jwt.PrincipalUserDto;
 import com.example.backend.setting.dto.JwtDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RedisService {
+public class RedisService implements UserDetailsService {
 
   private final RedisTemplate<String, String> redisTemplate;
   private final RedisMapper redisMapper;
-  private final JwtToServiceFilter jwtToServiceFilter;
 
-  public RedisService(RedisTemplate<String, String> redisTemplate, RedisMapper redisMapper, JwtToServiceFilter jwtToServiceFilter){
+  public RedisService(RedisTemplate<String, String> redisTemplate, RedisMapper redisMapper){
     this.redisTemplate = redisTemplate;
     this.redisMapper = redisMapper;
-    this.jwtToServiceFilter = jwtToServiceFilter;
+//    this.authorizationFilterWithJWT = authorizationFilterWithJWT;
   }
-
-  // jwt 토큰을 key로, 저장할 데이터를 value로 저장
-  public void saveDataToRedis(String key, List<Long> value) {
-    List<String> stringValueList = value.stream()
-        .map(String::valueOf)
-        .collect(Collectors.toList());
-    redisTemplate.opsForList().leftPushAll(key, stringValueList);
-  }
-  public String getDataFromRedis(String key){
-    return redisTemplate.opsForValue().get(key);
-  }
-
-  // key(jwt 토큰)로 데이터 조회
-  public List<String> getListFromRedis(String key){
-    return redisTemplate.opsForList().range(key, 0, -1);
-  }
-
-  // 레디스에 값이 없을 시, 필요한 데이터 조회
-  public List<Long> findMenuId(Long empId, Long deptId, Long compId){
-    return redisMapper.findMenuId(empId, deptId, compId);
-  }
-
-
-
   // 레디스 db 에 모든 데이터 삭제
   public void flushDb(int dbIndex) {
     // 특정 데이터베이스로 전환
@@ -54,15 +33,38 @@ public class RedisService {
     redisTemplate.getConnectionFactory().getConnection().flushDb();
   }
 
-  // 토큰 가져오기
-  public String getJwt() {
-    return jwtToServiceFilter.getJwtToken();
+//  // 토큰에서 값 가져오기
+//  public JwtDto getInfo() throws JsonProcessingException {
+//    String resultJWT = new String(
+//        Base64.getUrlDecoder().decode(((String)ThreadLocal.withInitial(() -> null).get()).split("\\.")[1]));
+//    JwtDto jwtDto = new ObjectMapper().readValue(resultJWT, JwtDto.class);
+//    return jwtDto;
+//  }
+@Override
+public UserDetails loadUserByUsername(String jwt) throws UsernameNotFoundException {
+    // 레디스 조회해서 있으면 그거 주고
+  Set<String> result = getMenuSetFromRedis(jwt);
+  Set<String> menuSet;
+  JwtDto info;
+  try {
+    info = getInfo(jwt);
+  } catch (JsonProcessingException e) {
+    throw new RuntimeException(e);
   }
 
-  // 토큰에서 값 가져오기
-  public JwtDto getInfo() throws JsonProcessingException {
-    String resultJWT = new String(Base64.getUrlDecoder().decode(jwtToServiceFilter.getJwtToken().split("\\.")[1]));
+  return new PrincipalJwtDetails(info); // PrincipalDetails should implement UserDetails
+}
+
+  private JwtDto getInfo(String accessToken) throws JsonProcessingException {
+    String resultJWT = new String(Base64.getUrlDecoder().decode(accessToken.split("\\.")[1]));
     JwtDto jwtDto = new ObjectMapper().readValue(resultJWT, JwtDto.class);
     return jwtDto;
+  }
+  private Set<String> getMenuSetFromRedis(String key){
+    return redisTemplate.opsForSet().members(key);
+//    return redisTemplate.opsForList().range(key, 0, -1);
+  }
+  private void saveDataToRedis(String key, String[] value) {
+    redisTemplate.opsForSet().add(key, value);
   }
 }
