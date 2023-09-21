@@ -10,7 +10,11 @@ public class JwtDto {
   private Long exp;
   private Long userId;
   private Long empId;
-  private Long compId;
   private Long deptId;
+  private Long compId;
+  private String jwt;
+  private boolean masterYn;
+  private String id = "";
+  private String password = "";
 
 }

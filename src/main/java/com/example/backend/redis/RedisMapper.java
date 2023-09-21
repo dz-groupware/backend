@@ -5,5 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface RedisMapper {
-  public List<Long> findMenuId(Long empId, Long deptId, Long compId);
+  List<Long> findMenuId(Long empId, Long deptId, Long compId);
+  boolean checkMaster(Long empId);
 }

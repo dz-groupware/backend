@@ -13,4 +13,9 @@
     select auth_id from auth_company where comp_id = #{compId})admin
     on auth_menu.auth_id = admin.auth_id;
   </select>
+
+  <!-- 마스터인지 확인 -->
+  <select id="checkMaster" resultType="boolean">
+    select master_yn from employee where id=#{empId};
+  </select>
 </mapper>

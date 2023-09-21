@@ -5,7 +5,8 @@ import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.DeptTrans;
 import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
-import com.example.backend.redis.RedisService;
+import com.example.backend.redis.JwtGetFilter;
+import com.example.backend.setting.dto.JwtDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Objects;
@@ -15,19 +16,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
   private final DepartmentMapper departmentMapper;
-  private final RedisService redisService;
+  private static ThreadLocal<JwtDto> jwtThreadLocal = ThreadLocal.withInitial(() -> new JwtDto());
 
-  public DepartmentServiceImpl(DepartmentMapper departmentMapper, RedisService redisService) {
+  public DepartmentServiceImpl(DepartmentMapper departmentMapper) {
     this.departmentMapper = departmentMapper;
-    this.redisService = redisService;
   }
 
   @Override
   public int addDepartment(DeptDto dept) {
-    System.out.println(dept.getStatus());
 
     try{
-      dept.setCompId(redisService.getInfo().getCompId());
+      dept.setCompId(jwtThreadLocal.get().getCompId());
       // 메뉴 추가
       if (dept.getStatus().equals("add")){
         if (dept.getParId().toString().equals("")){
@@ -104,7 +103,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Override
   public int deleteDepartment(Long id) throws JsonProcessingException {
-    departmentMapper.deleteDepartment(redisService.getInfo().getCompId(), id, "%"+id.toString()+"%");
+
+    departmentMapper.deleteDepartment(jwtThreadLocal.get().getCompId(), id, "%"+id.toString()+"%");
     return 1;
   }
   @Override
@@ -129,7 +129,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Override
   public List<DeptListDto> getOptionCompList() throws JsonProcessingException {
-    return departmentMapper.getOptionCompList(redisService.getInfo().getCompId());
+    return departmentMapper.getOptionCompList(jwtThreadLocal.get().getCompId());
   }
 
   @Override

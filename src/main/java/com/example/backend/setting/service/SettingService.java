@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface SettingService {
-  void testRedisAndJwt();
+//  void testRedisAndJwt();
 
   List<MenuRes> findGnbList();
 
@@ -35,7 +35,7 @@ public interface SettingService {
 
   void testRedisModify();
 
-  Map<String, Object> testGetInfo();
+//  Map<String, Object> testGetInfo();
 
-  JwtDto testJwtPayload() throws JsonProcessingException;
+//  JwtDto testJwtPayload() throws JsonProcessingException;
 }
