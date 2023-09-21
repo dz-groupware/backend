@@ -2,17 +2,17 @@ package com.example.backend.authgroup.controller;
 
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.AuthResponseDto;
-import com.example.backend.authgroup.dto.MenuMappingRequestDto;
 import com.example.backend.common.MultiResponseDto;
 import com.example.backend.common.Page;
 import com.example.backend.common.SingleResponseDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.authgroup.service.AuthGroupService;
-import com.example.backend.config.redis.SecurityUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -131,8 +131,15 @@ public class AuthGroupController {
     return new ResponseEntity<>(new SingleResponseDto<>(responseDto),HttpStatus.ACCEPTED);
   }
 
-//  @PostMapping("/auth/{authId}/menu-mappings")
-//  public ResponseEntity<?> mapMenusToAuth(@RequestBody MenuMappingRequestDto menuMappingRequestDto) {
-//
-//  }
+  @PostMapping("/auth/{auth-id}/menu-mappings")
+  public ResponseEntity<Void> modifyMappedMenuOfAuth(@PathVariable("auth-id") Long authId, @RequestBody Map<Long, Boolean> checkedMenuItems) {
+    //구현해야함
+    authGroupService.modifyMappedMenuOfAuth(authId, checkedMenuItems);
+    return ResponseEntity.accepted().build();
+  }
+  @DeleteMapping("/auth/{auth-id}")
+  public ResponseEntity<Void> deleteAuth(@PathVariable("auth-id")Long authId) {
+    authGroupService.deactivateAuthByAuthId(authId);
+    return ResponseEntity.accepted().build();
+  }
 }

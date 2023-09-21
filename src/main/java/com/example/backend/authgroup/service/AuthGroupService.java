@@ -8,6 +8,7 @@ import com.example.backend.authgroup.dto.CompanyAuthSummaryDto;
 import com.example.backend.authgroup.dto.CompanyMenuDto;
 import com.example.backend.authgroup.dto.MenuAuthStatusDto;
 import java.util.List;
+import java.util.Map;
 
 public interface AuthGroupService {
 
@@ -23,4 +24,8 @@ public interface AuthGroupService {
   List<MenuAuthStatusDto> getLnbListOfAuthWithAll(Long authId, Long parId);
   List<UserListOfAuthDto> getEmpListOfAuth(Long authId);
   Long addAuth(AddAuthDto addAuthDto);
+
+  void modifyMappedMenuOfAuth(Long authId, Map<Long, Boolean> checkedMenuItems);
+
+  void deactivateAuthByAuthId(Long authId);
 }

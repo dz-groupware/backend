@@ -11,11 +11,13 @@ import com.example.backend.authgroup.dto.MenuAuthStatusDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.config.redis.SecurityUtil;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AuthGroupServiceImpl implements AuthGroupService {
+public class AuthGroupServiceImpl implements AuthGroupService{
 
   private final AuthGroupMapper authGroupMapper;
 
@@ -104,4 +106,24 @@ public class AuthGroupServiceImpl implements AuthGroupService {
     return addAuthDto.getId();
   }
 
+  @Transactional
+  @Override
+  public void modifyMappedMenuOfAuth(Long authId, Map<Long, Boolean> checkedMenuItems) {
+    authGroupMapper.deleteAuthMenuByAuthId(authId);
+    //체크가 true인것만 가져오기
+    List<Long> checkedMenuIds = checkedMenuItems.entrySet().stream()
+        .filter(entry -> entry.getValue())
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toList());
+    // true로 마킹된 메뉴 아이템이 있을 경우에만 인서트를 수행
+    if(!checkedMenuIds.isEmpty()) {
+      authGroupMapper.modifyMappedMenuOfAuth(authId, checkedMenuIds);
+    }
+  }
+
+  @Transactional
+  @Override
+  public void deactivateAuthByAuthId(Long authId) {
+    authGroupMapper.deactivateAuthByAuthId(authId);
+  }
 }

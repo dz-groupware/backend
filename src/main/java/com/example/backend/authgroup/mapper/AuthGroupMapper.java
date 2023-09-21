@@ -27,4 +27,7 @@ public interface AuthGroupMapper {
   List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(Long companyId, String lastAuthName, String orderBy, String searchTerm, int pageSize);
   void addAuth(AddAuthDto addAuthDto);
   void insertIntoAuthDashboard(Long compId, Long authId);
+  void deleteAuthMenuByAuthId(Long authId);
+  void modifyMappedMenuOfAuth(Long authId, List<Long> checkedMenuIds);
+  void deactivateAuthByAuthId(Long authId);
 }

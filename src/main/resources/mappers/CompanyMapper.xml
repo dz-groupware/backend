@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.company.mapper.CompanyMapper">
+  
+  <select id="getParentCompanyWithEmployeeCount" resultType="com.example.backend.company.dto.CompanyWithEmployeeCountDto">
+    SELECT
+      c.id AS companyId,
+      c.enabled_yn AS enabledYn,
+      c.name AS companyName,
+      c.child_node_yn AS childNodeYn,
+      COUNT(ec.emp_id) AS employeeCount,
+    EXISTS (SELECT 1 FROM department d WHERE d.comp_id = c.id AND d.deleted_yn = 0) AS hasDepartment
+    FROM company c
+    LEFT JOIN employee_company ec
+      ON ec.comp_id = c.id
+      AND ec.resigned_yn=0
+      AND ec.deleted_yn=0
+    WHERE c.id = #{companyId}
+  </select>
+
+  <select id="getSubsidiaryCompaniesWithEmployeeCount" resultType="com.example.backend.company.dto.CompanyWithEmployeeCountDto">
+    SELECT
+      c.id AS companyId,
+      c.enabled_yn AS enabledYn,
+      c.name AS companyName,
+      c.child_node_yn AS childNodeYn,
+      COUNT(ec.emp_id) AS employeeCount,
+    EXISTS (SELECT 1 FROM department d WHERE d.comp_id = c.id AND d.deleted_yn = 0) AS hasDepartment
+    FROM company c
+    LEFT JOIN employee_company ec
+      ON ec.comp_id = c.id
+      AND ec.resigned_yn=0
+      AND ec.deleted_yn=0
+      AND c.deleted_yn=0
+    WHERE c.par_id = #{companyId}
+      AND c.id != #{companyId}
+
+    GROUP BY c.id
+  </select>
+
+  <select id="getParDepartmentsWithEmployeeCount" resultType="com.example.backend.company.dto.DepartmentWithEmployeeCountDto">
+    SELECT
+      d.id AS departmentId,
+      d.enabled_yn AS enabledYn,
+      d.name AS departmentName,
+      d.child_node_yn AS childNodeYn,
+      COUNT(ed.emp_id) AS employeeCount
+      FROM department d
+      LEFT JOIN employee_department ed
+      ON d.id = ed.dept_id
+      AND ed.deleted_yn = 0
+      AND ed.transferred_yn=0
+      AND d.deleted_yn=0
+    WHERE d.comp_id = #{companyId}
+      AND d.par_id = d.id
+    GROUP BY d.id;
+  </select>
+
+  <select id="getSubsidiaryDepartmentsWithEmployeeCount" resultType="com.example.backend.company.dto.DepartmentWithEmployeeCountDto">
+    SELECT
+      d.id AS departmentId,
+      d.enabled_yn AS enabledYn,
+      d.name AS departmentName,
+      d.child_node_yn AS childNodeYn,
+      COUNT(ed.emp_id) AS employeeCount
+      FROM department d
+      LEFT JOIN employee_department ed
+      ON d.id = ed.dept_id
+      AND ed.deleted_yn=0
+      AND ed.transferred_yn=0
+      AND d.deleted_yn=0
+    WHERE d.comp_id = #{companyId}
+      AND d.par_id != d.id
+      AND d.par_id = #{departmentId}
+    GROUP BY d.id;
+  </select>
+
+  <select id="getEmployeeByDepartmentId" resultType="com.example.backend.company.dto.DeptEmployeeDto">
+    SELECT
+      e.id as emp_id,
+      e.name as emp_name,
+      ed.dept_id as dept_id
+    FROM employee e
+    JOIN employee_department ed
+      ON e.id = ed.emp_id
+      AND e.deleted_yn = 0
+      AND ed.deleted_yn=0
+      AND ed.transferred_yn=0
+    where dept_id = #{departmentId}
+  </select>
+
+  <select id="getEmployeeNoDepartment" resultType="com.example.backend.company.dto.DeptEmployeeDto">
+    select
+      e.id as emp_id,
+      e.name as emp_name,
+      COALESCE(ed.dept_id, -1) as dept_id
+    FROM employee e
+    JOIN employee_company ec
+    ON ec.emp_id = e.id
+    LEFT JOIN employee_department ed
+    ON e.id = ed.emp_Id
+    WHERE ec.comp_id = #{companyId} AND ed.dept_id IS NULL;
+  </select>
+</mapper>

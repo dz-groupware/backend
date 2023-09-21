@@ -31,6 +31,7 @@
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
+    AND a.enabled_yn=1
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -94,22 +95,22 @@
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
-    WHERE c.id = #{companyId}
+    WHERE c.id = #{companyId} and a.enabled_yn=1
   </select>
 
   <select id="getCompanyGnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
     SELECT
-    m.id as menu_id,
-    m.par_id as menu_par_id,
-    m.comp_id as comp_id,
-    m.name as menu_name,
-    m.enabled_yn as enabled_yn,
-    m.sort_order as sort_order,
-    m.name_tree as name_tree,
-    m.id_tree as id_tree,
-    m.child_node_yn as child_node_yn,
-    m.admin_yn as admin_yn,
-    m.deleted_yn as deleted_yn
+      m.id as menu_id,
+      m.par_id as menu_par_id,
+      m.comp_id as comp_id,
+      m.name as menu_name,
+      m.enabled_yn as enabled_yn,
+      m.sort_order as sort_order,
+      m.name_tree as name_tree,
+      m.id_tree as id_tree,
+      m.child_node_yn as child_node_yn,
+      m.admin_yn as admin_yn,
+      m.deleted_yn as deleted_yn
     FROM menu m
     WHERE comp_id = #{companyId}
     AND id = par_id
@@ -153,7 +154,16 @@
     m.child_node_yn as child_node_yn,
     m.admin_yn as admin_yn,
     m.deleted_yn as deleted_yn,
-    a.id as auth_id
+    a.id as auth_id,
+    CASE
+      WHEN EXISTS (
+      SELECT 1
+      FROM auth_menu am2
+      JOIN menu m2 ON am2.menu_id = m2.id
+      WHERE am2.auth_id = #{authId} AND m2.par_id = m.id AND m2.id != m.id
+      ) THEN 1
+      ELSE 0
+    END AS has_mapped_child
     FROM auth a
     JOIN auth_menu am ON a.id = am.auth_id
     JOIN menu m ON am.menu_id = m.id
@@ -176,7 +186,16 @@
     m.child_node_yn as child_node_yn,
     m.admin_yn as admin_yn,
     m.deleted_yn as deleted_yn,
-    a.id as auth_id
+    a.id as auth_id,
+    CASE
+      WHEN EXISTS (
+      SELECT 1
+      FROM auth_menu am2
+      JOIN menu m2 ON am2.menu_id = m2.id
+      WHERE am2.auth_id = #{authId} AND m2.par_id = m.id AND m2.id != m.id
+      ) THEN 1
+      ELSE 0
+    END AS has_mapped_child
     FROM auth a
     JOIN auth_menu am ON a.id = am.auth_id
     JOIN menu m ON am.menu_id = m.id
@@ -224,15 +243,15 @@
   </select>
 
   <select id="getEmpListOfAuth" resultType="com.example.backend.authgroup.dto.UserListOfAuthDto">
-    select ed.id AS id, d.name AS dept_name, e.position as emp_position, e.name as emp_name
-    from auth_department ad
+    SELECT ed.id AS id, d.name AS dept_name, e.position as emp_position, e.name as emp_name
+    FROM auth_department ad
     JOIN department d ON d.id = ad.dept_id
     JOIN employee_department ed ON ad.dept_id = ed.dept_id
     JOIN employee e ON e.id = ed.emp_id
     WHERE ad.auth_id = #{authId} AND ad.deleted_yn != 1 AND ed.deleted_yn !=1
     UNION
-    select ed.id AS id, d.name AS dept_name, e.position as dept_position, e.name AS emp_name
-    from auth_employee ae
+    SELECT ed.id AS id, d.name AS dept_name, e.position AS dept_position, e.name AS emp_name
+    FROM auth_employee ae
     JOIN employee e ON e.id = ae.emp_id
     JOIN employee_department ed ON ae.emp_id = ed.emp_id
     JOIN department d ON d.id = ed.dept_id
@@ -247,4 +266,26 @@
     INSERT INTO auth_dashboard (comp_id, auth_id)
     VALUES (#{compId}, #{authId});
   </insert>
+
+  <delete id="deleteAuthMenuByAuthId">
+    DELETE
+    FROM auth_menu am
+    WHERE am.auth_id=#{authId}
+  </delete>
+
+  <insert id="modifyMappedMenuOfAuth">
+    INSERT INTO auth_menu (auth_id, menu_id)
+    VALUES
+    <foreach collection="checkedMenuIds" item="menuId" index="index" separator=",">
+      (#{authId}, #{menuId})
+    </foreach>
+  </insert>
+  
+  <update id="deactivateAuthByAuthId">
+    UPDATE auth
+    SET enabled_yn = 0
+    WHERE id = #{authId}
+  </update>
+  
+
 </mapper>
