@@ -4,17 +4,146 @@
 <mapper namespace="com.example.backend.employeemgmt.mapper.EmployeeMgmtMapper">
 
 
-
-
-
 <select id="getEmployeeMgmtList"
         resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
-    SELECT e.id, u.login_id, e.image_url, e.name, ec.join_date
-    FROM employee e
-    INNER JOIN user u ON e.user_id = u.id
+    SELECT
+    id, login_id, image_url, name, join_date
+    FROM (
+    SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+    ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+    FROM user u
+    INNER JOIN employee e ON u.id = e.user_id
     INNER JOIN employee_company ec ON e.id = ec.emp_id
-    WHERE e.deleted_yn = false AND ec.comp_id = #{companyId}
+    LEFT JOIN employee_department ed ON e.id = ed.emp_id
+    WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
+    ) AS RankedEmployees
+    WHERE rn = 1;
 </select>
+    <select id="getEmployeeMgmtDetailsById"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
+        SELECT u.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
+        u.login_id, u.login_pw, u.priv_email,
+        u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
+        ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
+       from employee e
+        INNER JOIN user u ON e.user_id=u.id
+        INNER JOIN employee_company ec ON e.id=ec.emp_id
+        LEFT JOIN employee_department ed ON e.id=ed.emp_id
+        WHERE u.id=#{id} and ec.comp_id=#{companyId}
+    </select>
+
+
+    <select id="getAllDepartmentMgmtList"  resultType="java.util.Map">
+        SELECT id,name from department where deleted_yn=false AND comp_id=#{companyId}
+    </select>
+
+
+    <!-- text 랑 id 둘다로 찾는거 -->
+    <select id="findEmployeeMgmtList" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL)
+        AND (
+        u.name LIKE CONCAT('%', #{text}, '%')
+        OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
+        OR u.login_id  LIKE CONCAT('%', #{text}, '%')
+        )
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+
+    <!-- text로만 찾는거 -->
+    <select id="findEmployeeMgmtListByText" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
+        AND (
+        u.name LIKE CONCAT('%', #{text}, '%')
+        OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
+        OR u.login_id  LIKE CONCAT('%', #{text}, '%')
+        )
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+    <!-- 회사 id 로만 찾는거 -->
+    <select id="findEmployeeMgmtListById" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL)
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+
+<!--    새로 사원 만들기-->
+
+    <insert id="addEmployeeMgmtUser" useGeneratedKeys="true" keyProperty="dto.id">
+        INSERT INTO `user` (`name`, `gender`, `priv_email`, `mobile_number`, `home_number`, `address`, `login_id`, `login_pw`, `user_id_num`,`deleted_yn`)
+        VALUES (#{dto.name}, #{dto.gender}, #{dto.privEmail}, #{dto.mobileNumber}, #{dto.homeNumber}, #{dto.address}, #{dto.loginId},
+        #{dto.loginPw}, #{dto.empIdNum},#{deletedYn})
+    </insert>
+
+    <insert id="addEmployeeMgmtEmployee" useGeneratedKeys="true" keyProperty="dto.id">
+        INSERT INTO `employee` (`user_id`, `name`, `gender`, `image_url`, `account_yn`,
+        `mobile_number`, `home_number`, `address`, `emp_id_num`, `last_access`, `position`,`master_yn`,`deleted_yn`)
+        VALUES (#{id}, #{dto.name}, #{dto.gender}, #{dto.imageUrl}, #{dto.accountYn}, #{dto.mobileNumber},
+        #{dto.homeNumber}, #{dto.address}, #{dto.empIdNum}, NOW(),#{dto.position},#{masterYn},#{deletedYn})
+    </insert>
+    <insert id="addEmployeeMgmtEmployeeCompany" >
+        INSERT INTO `employee_company` (`comp_id`, `emp_id`, `join_date`, `resignation_date`,`deleted_yn`,`resigned_yn`)
+        VALUES (#{dto.compId}, #{dto.id}, #{dto.joinDate}, #{dto.resignationDate},#{deletedYn},#{resignedYn})
+    </insert>
+
+    <insert id="addEmployeeMgmtEmployeeDepartment" >
+        INSERT INTO `employee_department` (`dept_id`, `emp_id`, `transferred_yn`,`join_date`, `left_date`, `org`,`position`,`deleted_yn`)
+        VALUES (#{dto.deptId}, #{dto.id},#{dto.transferredYn} ,#{dto.edjoinDate}, #{dto.leftDate},#{org},#{dto.position},#{deletedYn})
+    </insert>
+
+    <update id="removeEmployeeMgmtEmployee">
+        UPDATE user u
+        JOIN employee e ON e.user_id=u.id
+        JOIN employee_company ec ON e.id=ec.emp_id
+        LEFT JOIN employee_department ed ON e.id=ed.emp_id
+        SET
+        e.image_url= #{imageUrl},u.name=#{name},e.name=#{name}
+        u.user_id_num=#{userIdNum}, e.emp_id_num=#{empIdNum},u.gender=#{gender}, e.gender=#{gender},
+        e.account_yn=#{accountYn},u.login_id=#{loginId}, u.login_pw=#{loginPw}, u.priv_email=#{privEmail},
+        u.mobile_number=#{mobileNumber},  e.mobile_number=#{mobileNumber},
+        e.home_number=#{homeNumber},  u.home_number=#{homeNumber}, e.address=#{address},u.address=#{address},
+        ec.join_date AS ec_join_date=#{joinDate},
+        ec.resignation_date=#{resignationDate},ec.comp_id=#{compId},e.position=#{position},ed.position=#{position}
+        ed.dept_id=#{deptId}, ed.transferred_yn=#{transferredYn},ed.join_date AS ed_join_date=#{edjoinDate},
+        ed.left_date=#{leftDate},ed.org=#{org},
+        ec.resignedYn=#{resignedYn},
+        u.deleted_yn=#{deletedYn},
+        e.deleted_yn=#{deletedYn},
+        ed.deleted_yn=#{deletedYn}
+        ,ec.deleted_yn=#{deletedYn}
+        WHERE u.id=#{id}
+    </update>
 
 
 </mapper>

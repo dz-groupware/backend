@@ -238,7 +238,7 @@
     JOIN department d ON d.id = ed.dept_id
     WHERE ae.auth_id = #{authId} AND ae.deleted_yn != 1 AND ed.deleted_yn !=1
   </select>
-  
+
   <insert id="addAuth" parameterType="com.example.backend.authgroup.dto.AddAuthDto" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     INSERT INTO auth(name, enabled_yn) values(#{authName}, #{enabledYn});
   </insert>

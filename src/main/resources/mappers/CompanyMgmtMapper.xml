@@ -145,6 +145,18 @@
   </update>
 
 
+  <update id="modifyCompanyMgmtWithClosingDate">
+    UPDATE company SET
+    par_id=#{parId}, enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr},
+    business_type=#{businessType},
+    rep_name=#{repName}, rep_id_num=#{repIdNum},
+    rep_tel=#{repTel}, business_num=#{businessNum}, corp_type=#{corpType}, corp_num=#{corpNum},
+    establishment_date= #{establishmentDate},
+    opening_date=#{openingDate}, closing_date=#{closingDate},address=#{address},deleted_yn=1
+    WHERE id=#{id}
+  </update>
+
+
 
 <!--delete-->
 
