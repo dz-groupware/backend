@@ -5,7 +5,6 @@ import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
 
 @Mapper
 public interface SettingMapper {
@@ -14,13 +13,13 @@ public interface SettingMapper {
 
   List<MenuRes> findMenuDetailById(Long menuId);
 
-  int addMenu(MenuRes menu);
+  void addMenu(MenuRes menu);
 
-  int modifyParId(Long id, String idTree);
-  int modifyMenuParId(Long parId, Long id, String idTree);
+  void modifyParId(Long id, String idTree);
+  void modifyMenuParId(Long parId, Long id, String idTree);
   int modifyGnbById();
 
-  int modifyMenuById(MenuRes menu);
+  void modifyMenuById(MenuRes menu);
 
   List<MenuRes> findMenuByName(String gnbName, String name);
 
@@ -35,8 +34,8 @@ public interface SettingMapper {
   List<MenuRes> findAllMenu(Long compId);
 
   MenuRes getUpperMenuById(Long parId);
-  int modifyUpperMenu(Long parId);
-  int deleteMenu(Long menuId);
+  void modifyUpperMenu(Long parId);
+  void deleteMenu(Long menuId);
   List<Long> getMenuIdByIdTree(String menuId);
 
   int checkMenuInMenu(String id, Long parId);
@@ -52,7 +51,7 @@ public interface SettingMapper {
 //  void testList(DtoList list);
 
 
-  int testList(List<Dto> list);
+  void testList(List<Dto> list);
 
 }
 

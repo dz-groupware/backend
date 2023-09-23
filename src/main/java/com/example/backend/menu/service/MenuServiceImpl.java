@@ -4,8 +4,9 @@ import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import com.example.backend.setting.dto.JwtDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,6 @@ public class MenuServiceImpl implements MenuService {
 
   private final MenuMapper menuMapper;
   private final CheckMapper checkMapper;
-  private static ThreadLocal<JwtDto> jwtThreadLocal = new ThreadLocal<>();
 
   public MenuServiceImpl(MenuMapper menuMapper, CheckMapper checkMapper) {
     this.menuMapper = menuMapper;
@@ -21,9 +21,7 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public List<MenuDto> getGnbById() {
-    JwtDto jwtDto = jwtThreadLocal.get();
-
+  public List<MenuDto> getGnbById(JwtDto jwtDto) {
     if(checkMapper.checkMaster(jwtDto.getEmpId())) {
       // 마스터인 경우
       return menuMapper.getGnbForMaster(jwtDto.getCompId());
@@ -33,45 +31,41 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public List<MenuDto> getFavorByEmpId() throws JsonProcessingException {
-
-    Long empId = jwtThreadLocal.get().getEmpId();
-    Long compId = jwtThreadLocal.get().getCompId();
-
+  public List<MenuDto> getFavorByEmpId(JwtDto jwtDto) {
+    Long empId = jwtDto.getEmpId();
+    Long compId = jwtDto.getCompId();
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
       return menuMapper.getFavorForMaster(compId);
     } else {
-      return menuMapper.getFavorByEmpId(empId, compId, jwtThreadLocal.get().getDeptId());
+      return menuMapper.getFavorByEmpId(empId, compId, jwtDto.getDeptId());
     }
   }
 
   @Override
-  public int removeFavor(Long menuId) throws JsonProcessingException {
-    return menuMapper.removeFavor(jwtThreadLocal.get().getEmpId(), menuId);
+  public int removeFavor(JwtDto jwtDto, Long menuId) {
+    return menuMapper.removeFavor(jwtDto.getEmpId(), menuId);
   }
 
   @Override
-  public List<MenuDto> getMenuById(Long menuId) throws JsonProcessingException {
-
-    Long empId = jwtThreadLocal.get().getEmpId();
-    Long compId = jwtThreadLocal.get().getCompId();
-
+  public List<MenuDto> getMenuById(JwtDto jwtDto, Long menuId) {
+    Long empId = jwtDto.getEmpId();
+    Long compId = jwtDto.getCompId();
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
-      return menuMapper.getMenuById(menuId, empId, compId, jwtThreadLocal.get().getDeptId());
+      return menuMapper.getMenuById(menuId, empId, compId, jwtDto.getDeptId());
     }
   }
 
   @Override
-  public List<MenuDto> getUpperMenuGnb() throws JsonProcessingException {
-    return menuMapper.getUpperMenuGnb(jwtThreadLocal.get().getCompId());
+  public List<MenuDto> getUpperMenuGnb(JwtDto jwtDto) {
+    return menuMapper.getUpperMenuGnb(jwtDto.getCompId());
   }
 
   @Override
-  public List<MenuDto> getUpperMenuLnb(Long menuId) throws JsonProcessingException {
-    return menuMapper.getUpperMenuLnb(menuId, jwtThreadLocal.get().getCompId());
+  public List<MenuDto> getUpperMenuLnb(JwtDto jwtDto, Long menuId) {
+    return menuMapper.getUpperMenuLnb(menuId, jwtDto.getCompId());
   }
 }

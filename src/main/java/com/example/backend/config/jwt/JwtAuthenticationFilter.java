@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       // principalDetailsService 의 loadUserByUsername() 가 실행된 후 정상이면 authentication 이 리텀됨
       Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
+      System.out.println("로그인 완료");
       return authentication;
     } catch (IOException e) {
       e.printStackTrace();
