@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,8 +48,8 @@ public class SettingController {
   }
 
   @PostMapping("/menu")
-  public ResponseEntity<?> saveMenu(@RequestBody MenuRes menu, @RequestParam String type) {
-    return new ResponseEntity<>(settingService.saveMenu(menu, type), HttpStatus.OK);
+  public ResponseEntity<?> saveMenu(@CookieValue("JWT") String jwt, @RequestBody MenuRes menu, @RequestParam String type) {
+    return new ResponseEntity<>(settingService.saveMenu(new JwtDto(jwt), menu, type), HttpStatus.OK);
   }
 
   @DeleteMapping("/menu")
@@ -64,22 +65,22 @@ public class SettingController {
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> findFavorById(@RequestParam Long menuId) throws JsonProcessingException {
+  public ResponseEntity<?> findFavorById(@CookieValue("JWT") String jwt, @RequestParam Long menuId){
     // 현재 즐겨찾기 상태를 가져오기
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(new JwtDto(jwt), menuId)), HttpStatus.OK);
   }
 
   @PostMapping("/favor")
-  public ResponseEntity<?> modifyFavorOn(@RequestBody Long menuId) throws JsonProcessingException {
+  public ResponseEntity<?> modifyFavorOn(@CookieValue("JWT") String jwt, @RequestBody Long menuId) {
     // 즐겨찾기 저장 요청
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(new JwtDto(jwt), menuId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> modifyFavorOff(@RequestParam Long menuId)
+  public ResponseEntity<?> modifyFavorOff(@CookieValue("JWT") String jwt, @RequestParam Long menuId)
       throws JsonProcessingException {
     // 즐겨찾기 삭제 요청
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(new JwtDto(jwt), menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/menu/all")

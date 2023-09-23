@@ -15,17 +15,17 @@ public interface SettingService {
 
   List<MenuRes> findMenuDetailById(Long menuId);
 
-  int saveMenu(MenuRes menu, String type);
+  int saveMenu(JwtDto jwtDto, MenuRes menu, String type);
 
   List<MenuRes> findMenuByName(String gnbName, String name);
 
   List<String> findAllIcon();
 
-  String findFavorById(Long menuId) throws JsonProcessingException;
+  String findFavorById(JwtDto jwtDto, Long menuId);
 
-  int modifyFavorOn(Long menuId) throws JsonProcessingException;
+  int modifyFavorOn(JwtDto jwtDto, Long menuId);
 
-  int modifyFavorOff(Long menuId) throws JsonProcessingException;
+  int modifyFavorOff(JwtDto jwtDto, Long menuId);
 
   List<MenuRes> findAllMenu(Long compId);
   int deleteMenu(Long menuId);

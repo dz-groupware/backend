@@ -5,9 +5,7 @@ import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.DeptTrans;
 import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
-import com.example.backend.redis.JwtGetFilter;
 import com.example.backend.setting.dto.JwtDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,17 +14,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
   private final DepartmentMapper departmentMapper;
-  private static ThreadLocal<JwtDto> jwtThreadLocal = ThreadLocal.withInitial(() -> new JwtDto());
 
   public DepartmentServiceImpl(DepartmentMapper departmentMapper) {
     this.departmentMapper = departmentMapper;
   }
 
   @Override
-  public int addDepartment(DeptDto dept) {
-
+  public int addDepartment(JwtDto jwtDto, DeptDto dept) {
+    Long compId = jwtDto.getCompId();
     try{
-      dept.setCompId(jwtThreadLocal.get().getCompId());
+      dept.setCompId(compId);
       // 메뉴 추가
       if (dept.getStatus().equals("add")){
         if (dept.getParId().toString().equals("")){
@@ -59,7 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public int addDeptest(DeptDto dept){
+  public int addDeptTest(DeptDto dept){
     System.out.println(dept.getParId());
     System.out.println(dept.getParName());
     System.out.println(dept.getId());
@@ -77,12 +74,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 
   @Override
-  public List<DeptListDto> getDepartmentBasicList(Long compId) {
-    return departmentMapper.getDepartmentBasicList(compId);
+  public List<DeptListDto> getDepartmentBasicList(JwtDto jwtDto) {
+    return departmentMapper.getDepartmentBasicList(jwtDto.getCompId());
   }
 
   @Override
-  public List<DeptListDto> getDepartmentById(Long compId, Long parId) {
+  public List<DeptListDto> getDepartmentById(JwtDto jwtDto, Long parId) {
+    Long compId = jwtDto.getCompId();
     return departmentMapper.getDepartmentById(compId, parId);
   }
 
@@ -102,34 +100,34 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public int deleteDepartment(Long id) throws JsonProcessingException {
-
-    departmentMapper.deleteDepartment(jwtThreadLocal.get().getCompId(), id, "%"+id.toString()+"%");
+  public int deleteDepartment(JwtDto jwtDto, Long id) {
+    Long compId = jwtDto.getCompId();
+    departmentMapper.deleteDepartment(compId, id, "%"+id.toString()+"%");
     return 1;
   }
   @Override
-  public int modifyAllDepartment( List<DeptDto> dept) {
-    for (int i=0; i<dept.size(); i++) {
-      if (dept.get(i).getStatus().equals("modify")) {
+  public int modifyAllDepartment(List<DeptDto> dept) {
+    for (DeptDto deptDto : dept) {
+      if (deptDto.getStatus().equals("modify")) {
         // modify 로직 수행
-        DeptTrans updateDept = new DeptTrans(dept.get(i));
+        DeptTrans updateDept = new DeptTrans(deptDto);
         DeptTrans preUpdateDept = modifyTree(updateDept);
-        dept.get(i).setParId(preUpdateDept.getParId());
-        dept.get(i).setIdTree(preUpdateDept.getIdTree());
-        dept.get(i).setNameTree(preUpdateDept.getNameTree());
-        departmentMapper.modifyDepartment(dept.get(i));
+        deptDto.setParId(preUpdateDept.getParId());
+        deptDto.setIdTree(preUpdateDept.getIdTree());
+        deptDto.setNameTree(preUpdateDept.getNameTree());
+        departmentMapper.modifyDepartment(deptDto);
       }
-      if (dept.get(i).getStatus().equals("add")) {
+      if (deptDto.getStatus().equals("add")) {
         // add 로직 수행
-        departmentMapper.addDepartment(dept.get(i));
+        departmentMapper.addDepartment(deptDto);
       }
     }
     return 1;
   }
 
   @Override
-  public List<DeptListDto> getOptionCompList() throws JsonProcessingException {
-    return departmentMapper.getOptionCompList(jwtThreadLocal.get().getCompId());
+  public List<DeptListDto> getOptionCompList(JwtDto jwtDto) {
+    return departmentMapper.getOptionCompList(jwtDto.getCompId());
   }
 
   @Override
@@ -138,10 +136,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   public boolean checkDeptInDept(Long id, Long parId){
-    if(departmentMapper.checkDeptInDept("%"+id.toString()+"%", parId) != 0) {
-      return true;
-    }
-    return false;
+    return departmentMapper.checkDeptInDept("%" + id.toString() + "%", parId) != 0;
   }
 
   public DeptTrans modifyTree(DeptTrans dept) {
@@ -150,12 +145,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (checkDeptInDept(dept.getId(), dept.getParId())) {
       DeptTrans originMenu = departmentMapper.getOriginDept(dept.getId());
       if(originMenu == null){
-        // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu를 대메뉴 처럼 만든다.
+        // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu 를 대메뉴 처럼 만든다.
         List<DeptTrans> preMenuList = departmentMapper.getMoveDeptList("%" + dept.getParId().toString() + "%");
 
         // preMenu 묶음 중 root 메뉴 (상위로 선택 된 메뉴를 깊은복사로 가져온다)
         Optional<DeptTrans> preMenuStream = preMenuList.stream()
-            .filter(pre -> pre.getId() == dept.getParId())
+            .filter(pre -> Objects.equals(pre.getId(), dept.getParId()))
             .findFirst();
 
         DeptTrans preMenu = new DeptTrans(preMenuStream.get());
@@ -169,32 +164,29 @@ public class DepartmentServiceImpl implements DepartmentService {
         departmentMapper.modifyDeptTree(preMenu);
 
         // preMenuList
-        for (int i = 0; i < preMenuList.size(); i++) {
-          DeptTrans deptTrans = preMenuList.get(i);
+        for (DeptTrans deptTrans : preMenuList) {
           if (Objects.equals(deptTrans.getId(), preMenu.getId())) {
             continue;
           }
           String tmp = deptTrans.getIdTree().substring(originPreIdTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          deptTrans.setIdTree(preMenu.getIdTree() +">"+ tmp);
+          deptTrans.setIdTree(preMenu.getIdTree() + ">" + tmp);
           tmp = deptTrans.getNameTree().substring(originPreNameTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          deptTrans.setNameTree(preMenu.getNameTree() +">"+ tmp);
+          deptTrans.setNameTree(preMenu.getNameTree() + ">" + tmp);
           departmentMapper.modifyDeptTree(deptTrans);
         }
 
         // menu 이동
         List<DeptTrans> MenuList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
         // MenuList
-        for (int i = 0; i < MenuList.size(); i++) {
-          DeptTrans deptTrans = MenuList.get(i);
-
-          deptTrans.setIdTree(preMenu.getIdTree()+">"+deptTrans.getIdTree());
-          deptTrans.setNameTree(preMenu.getNameTree()+">"+deptTrans.getNameTree());
+        for (DeptTrans deptTrans : MenuList) {
+          deptTrans.setIdTree(preMenu.getIdTree() + ">" + deptTrans.getIdTree());
+          deptTrans.setNameTree(preMenu.getNameTree() + ">" + deptTrans.getNameTree());
           departmentMapper.modifyDeptTree(deptTrans);
         }
       } else {
@@ -202,7 +194,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         List<DeptTrans> preMenuList = departmentMapper.getMoveDeptList("%" + dept.getParId().toString() + "%");
         Optional<DeptTrans> preMenuStream = preMenuList.stream()
-            .filter(pre -> pre.getId() == dept.getParId())
+            .filter(pre -> Objects.equals(pre.getId(), dept.getParId()))
             .findFirst();
 
         DeptTrans preDept = new DeptTrans(preMenuStream.get());
@@ -215,9 +207,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         departmentMapper.modifyDeptTree(preDept);
 
-        for (int i = 0; i < preMenuList.size(); i++) {
-          DeptTrans deptTrans = preMenuList.get(i);
-
+        for (DeptTrans deptTrans : preMenuList) {
           if (Objects.equals(deptTrans.getId(), preDept.getId())) {
             continue;
           }
@@ -247,21 +237,20 @@ public class DepartmentServiceImpl implements DepartmentService {
         departmentMapper.modifyDeptTree(originMenu);
         departmentMapper.modifyUpperDeptCNY(parMenu.getId());
         departmentMapper.modifyUpperDeptCNY(preDept.getId());
-        for (int i = 0; i < DeptList.size(); i++) {
-          DeptTrans deptTrans = DeptList.get(i);
+        for (DeptTrans deptTrans : DeptList) {
           if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
             continue;
           }
           String tmp = deptTrans.getIdTree().substring(originIdTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          deptTrans.setIdTree(originMenu.getIdTree() +">"+ tmp);
+          deptTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
           tmp = deptTrans.getNameTree().substring(originNameTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          deptTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
+          deptTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
           departmentMapper.modifyDeptTree(deptTrans);
         }
       }
@@ -283,21 +272,20 @@ public class DepartmentServiceImpl implements DepartmentService {
 
       departmentMapper.modifyDeptTree(originMenu);
       departmentMapper.modifyUpperDeptCNY(preDept.getId());
-      for (int i = 0; i < DeptList.size(); i++) {
-        DeptTrans deptTrans = DeptList.get(i);
+      for (DeptTrans deptTrans : DeptList) {
         if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
           continue;
         }
         String tmp = deptTrans.getIdTree().substring(originIdTree.length());
-        if (tmp.startsWith(">")){
+        if (tmp.startsWith(">")) {
           tmp = tmp.substring(1);
         }
-        deptTrans.setIdTree(originMenu.getIdTree() +">"+ tmp);
+        deptTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
         tmp = deptTrans.getNameTree().substring(originNameTree.length());
-        if (tmp.startsWith(">")){
+        if (tmp.startsWith(">")) {
           tmp = tmp.substring(1);
         }
-        deptTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
+        deptTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
         departmentMapper.modifyDeptTree(deptTrans);
       }
       return originMenu;

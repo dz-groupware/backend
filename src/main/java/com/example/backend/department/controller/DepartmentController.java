@@ -1,13 +1,13 @@
 package com.example.backend.department.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.service.DepartmentService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.backend.setting.dto.JwtDto;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,40 +26,38 @@ public class DepartmentController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getDepartment() {
-    Long compId = SecurityUtil.getCompanyId();
-    return new ResponseEntity(
-        new SingleResponseDto<>(departmentService.getDepartmentBasicList(compId)), HttpStatus.OK);
+  public ResponseEntity<?> getDepartment(@CookieValue("JWT") String jwt) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.getDepartmentBasicList(new JwtDto(jwt))), HttpStatus.OK);
   }
 
   @PostMapping("/dept")
-  public ResponseEntity<?> addDepartment(@RequestBody DeptDto dept) {
-    return new ResponseEntity(
-        new SingleResponseDto<>(departmentService.addDepartment(dept)), HttpStatus.OK);
+  public ResponseEntity<?> addDepartment(@CookieValue("JWT") String jwt, @RequestBody DeptDto dept) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.addDepartment(new JwtDto(jwt), dept)), HttpStatus.OK);
   }
 
   @GetMapping("dept-list")
-  public ResponseEntity<?> getDepartmentList(@RequestParam Long parId) {
-    Long compId = SecurityUtil.getCompanyId();
-    return new ResponseEntity(
-        new SingleResponseDto<>(departmentService.getDepartmentById(compId, parId)), HttpStatus.OK);
+  public ResponseEntity<?> getDepartmentList(@CookieValue("JWT") String jwt, @RequestParam Long parId) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.getDepartmentById(new JwtDto(jwt), parId)), HttpStatus.OK);
   }
 
   @GetMapping("detail-basic")
   public ResponseEntity<?> getBasicDetailById(@RequestParam Long id) {
-    return new ResponseEntity(
+    return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getBasicDetailById(id)), HttpStatus.OK);
   }
 
   @GetMapping("detail-emp")
   public ResponseEntity<?> getEmpListByDeptId(@RequestParam Long id){
-    return new ResponseEntity(
+    return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getEmpListByDeptId(id)), HttpStatus.OK);
   }
 
   @PostMapping("/dept-modify")
   public ResponseEntity<?> modifyDepartment(@RequestBody DeptDto dept) {
-    return new ResponseEntity(
+    return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.modifyDepartment(dept)), HttpStatus.OK);
   }
 
@@ -68,21 +66,21 @@ public class DepartmentController {
 
 
     System.out.println(dept);
-    return new ResponseEntity(
+    return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.modifyAllDepartment(dept)), HttpStatus.OK);
 
   }
 
   @DeleteMapping("dept")
-  public ResponseEntity<?> deleteDepartment(@RequestParam Long id) throws JsonProcessingException {
-    return new ResponseEntity(
-        new SingleResponseDto<>(departmentService.deleteDepartment(id)), HttpStatus.OK);
+  public ResponseEntity<?> deleteDepartment(@CookieValue("JWT") String jwt, @RequestParam Long id) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.deleteDepartment(new JwtDto(jwt), id)), HttpStatus.OK);
   }
 
   @GetMapping("/option-comp")
-  public ResponseEntity<?>  getOptionCompList() throws JsonProcessingException {
+  public ResponseEntity<?>  getOptionCompList(@CookieValue("JWT") String jwt) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getOptionCompList()), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getOptionCompList(new JwtDto(jwt))), HttpStatus.OK);
   }
 
   @GetMapping("/dept")
