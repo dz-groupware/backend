@@ -1,5 +1,6 @@
 package com.example.backend.config;
 
+import com.example.backend.redis.PkDto;
 import com.example.backend.setting.dto.JwtDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,11 +44,11 @@ public class RedisConfig {
   }
 
   @Bean(name = "redisForPayload")
-  public RedisTemplate<String, JwtDto> redisForPayload(@Qualifier("factoryForPayload")RedisConnectionFactory redisConnectionFactory) {
-    RedisTemplate<String, JwtDto> template = new RedisTemplate<>();
+  public RedisTemplate<String, PkDto> redisForPayload(@Qualifier("factoryForPayload")RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, PkDto> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());
-    Jackson2JsonRedisSerializer<JwtDto> jsonSerializer = new Jackson2JsonRedisSerializer<>(JwtDto.class);
+    Jackson2JsonRedisSerializer<PkDto> jsonSerializer = new Jackson2JsonRedisSerializer<>(PkDto.class);
     template.setValueSerializer(jsonSerializer);
     template.setHashValueSerializer(jsonSerializer);
     return template;

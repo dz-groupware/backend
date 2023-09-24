@@ -3,6 +3,7 @@ package com.example.backend.menu.service;
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
+import com.example.backend.redis.PkDto;
 import com.example.backend.setting.dto.JwtDto;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -19,52 +20,52 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public List<MenuDto> getGnbById(JwtDto jwtDto) {
-    if(checkMapper.checkMaster(jwtDto.getEmpId())) {
+  public List<MenuDto> getGnbById(PkDto pkDto) {
+    if(checkMapper.checkMaster(pkDto.getEmpId())) {
       // 마스터인 경우
-      return menuMapper.getGnbForMaster(jwtDto.getCompId());
+      return menuMapper.getGnbForMaster(pkDto.getCompId());
     } else {
-      return menuMapper.getGnbByEmpId(jwtDto.getEmpId(), jwtDto.getCompId(), jwtDto.getDeptId());
+      return menuMapper.getGnbByEmpId(pkDto.getEmpId(), pkDto.getCompId(), pkDto.getDeptId());
     }
   }
 
   @Override
-  public List<MenuDto> getFavorByEmpId(JwtDto jwtDto) {
-    Long empId = jwtDto.getEmpId();
-    Long compId = jwtDto.getCompId();
+  public List<MenuDto> getFavorByEmpId(PkDto pkDto) {
+    Long empId = pkDto.getEmpId();
+    Long compId = pkDto.getCompId();
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
       return menuMapper.getFavorForMaster(compId);
     } else {
-      return menuMapper.getFavorByEmpId(empId, compId, jwtDto.getDeptId());
+      return menuMapper.getFavorByEmpId(empId, compId, pkDto.getDeptId());
     }
   }
 
   @Override
-  public int removeFavor(JwtDto jwtDto, Long menuId) {
-    return menuMapper.removeFavor(jwtDto.getEmpId(), menuId);
+  public int removeFavor(PkDto pkDto, Long menuId) {
+    return menuMapper.removeFavor(pkDto.getEmpId(), menuId);
   }
 
   @Override
-  public List<MenuDto> getMenuById(JwtDto jwtDto, Long menuId) {
-    Long empId = jwtDto.getEmpId();
-    Long compId = jwtDto.getCompId();
+  public List<MenuDto> getMenuById(PkDto pkDto, Long menuId) {
+    Long empId = pkDto.getEmpId();
+    Long compId = pkDto.getCompId();
 
     if(checkMapper.checkMaster(empId)) {
       // 마스터인 경우
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
-      return menuMapper.getMenuById(menuId, empId, compId, jwtDto.getDeptId());
+      return menuMapper.getMenuById(menuId, empId, compId, pkDto.getDeptId());
     }
   }
 
   @Override
-  public List<MenuDto> getUpperMenuGnb(JwtDto jwtDto) {
-    return menuMapper.getUpperMenuGnb(jwtDto.getCompId());
+  public List<MenuDto> getUpperMenuGnb(PkDto pkDto) {
+    return menuMapper.getUpperMenuGnb(pkDto.getCompId());
   }
 
   @Override
-  public List<MenuDto> getUpperMenuLnb(JwtDto jwtDto, Long menuId) {
-    return menuMapper.getUpperMenuLnb(menuId, jwtDto.getCompId());
+  public List<MenuDto> getUpperMenuLnb(PkDto pkDto, Long menuId) {
+    return menuMapper.getUpperMenuLnb(menuId, pkDto.getCompId());
   }
 }

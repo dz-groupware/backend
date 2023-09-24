@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +19,10 @@ public class testRedisController {
   }
 
   @GetMapping("header")
-  public ResponseEntity<?> getFormHeader(@CookieValue("JWT") String jwt){
-    return new ResponseEntity<>(redisService.testRedis(new JwtDto(jwt)), HttpStatus.OK);
+  public ResponseEntity<?> getFormHeader(@RequestAttribute PkDto pkDto){
+    return new ResponseEntity<>(redisService.testRedis(pkDto), HttpStatus.OK);
   }
+
   @GetMapping("flush")
   public String flushDB(@CookieValue("JWT") String jwt, @RequestParam int idx){
     return redisService.flushDb(new JwtDto(jwt), idx);

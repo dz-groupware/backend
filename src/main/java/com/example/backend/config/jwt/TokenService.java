@@ -17,10 +17,12 @@ public class TokenService {
     return JWT.create()
         .withSubject(principalDetails.getUsername()) // 토큰 이름 설정
         .withExpiresAt(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
-        .withClaim("userId", principalDetails.getUserId())
-        .withClaim("empId", principalDetails.getEmployeeId())
-        .withClaim("compId", principalDetails.getCompanyId())
-        .withClaim("deptId", principalDetails.getDepartmentId())
+                .withClaim("empId", principalDetails.getEmployeeId().toString())
+
+//        .withClaim("userId", principalDetails.getUserId())
+//        .withClaim("empId", principalDetails.getEmployeeId())
+//        .withClaim("compId", principalDetails.getCompanyId())
+//        .withClaim("deptId", principalDetails.getDepartmentId())
         .sign(Algorithm.HMAC512(jwtKey)); // 고유한 시크릿 값 적용
   }
   public Cookie createJwtCookie(String token) {

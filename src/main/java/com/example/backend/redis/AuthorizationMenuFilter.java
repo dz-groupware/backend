@@ -1,11 +1,8 @@
 package com.example.backend.redis;
 
-
-import com.example.backend.setting.dto.JwtDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,68 +17,76 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class AuthorizationMenuFilter extends OncePerRequestFilter {
 
-
+  private final String jwtKey;
   private final RedisMapper redisMapper;
   private final RedisTemplate<String, String> redisForMenu;
-  public AuthorizationMenuFilter(RedisTemplate<String, String> redisForMenu,
-      RedisMapper redisMapper) {
+  private final RedisTemplate<String, PkDto> redisForPayload;
+  public AuthorizationMenuFilter(String jwtKey, RedisTemplate<String, String> redisForMenu,
+      RedisMapper redisMapper, RedisTemplate<String, PkDto> redisForPayload) {
+    this.jwtKey = jwtKey;
     this.redisMapper = redisMapper;
     this.redisForMenu = redisForMenu;
-
+    this.redisForPayload = redisForPayload;
   }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
 
-
-    // 토큰 받아와서
+    logger.info("#### AuthorizationMenuFilter ###");
+    // 토큰 받아옴
     String accessToken = getAccessTokenFromCookie(request);
+
+    // 유효한 토큰인지 확인 - 토큰 없음
     if (accessToken == null || "".equals(accessToken)) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
 
+    // 유효한 토큰인지 확인 - 유효하지 않음
+    String empId = Jwts.parserBuilder()
+        .setSigningKey(Keys.hmacShaKeyFor(jwtKey.getBytes()))
+        .build()
+        .parseClaimsJws(accessToken)
+        .getBody()
+        .get("empId", String.class);
 
-    // 레디스 조회
-    Set<String> result = getListFromRedis(accessToken);
-    Set<String> menuSet;
+    // 레디스 조회 - 사용자 정보
+    PkDto pkDto = redisForPayload.opsForValue().get(empId);
 
-    if (result.isEmpty()) {
-      // 레디스에 값이 없었다면 db에서 확인 후 저장
-      System.out.println("jwt is not in redis");
+    // redis 에 값이 없으면 SQL 조회 후 redis 에 저장
+    if (pkDto == null) {
+      logger.info("pk is not in redis");
+      pkDto = redisMapper.getAllKeys(Long.parseLong(empId));
+      // 레디스에 저장
+      redisForPayload.opsForValue().set(empId, pkDto);
+    }
 
-      JwtDto jwtDto = getInfo(accessToken);
+    // 레디스 조회 - 메뉴 리스트
+    Set<String> menuSet = redisForMenu.opsForSet().members(accessToken);
 
-      List<Long> menuList = redisMapper.findMenuId(jwtDto.getEmpId(), jwtDto.getDeptId(), jwtDto.getCompId());
-
+    if (menuSet == null || menuSet.isEmpty()) {
+      // 레디스에 값이 없었다면 db 에서 확인 후 저장
+      logger.info("jwt is not in redis");
+      List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
       // 메뉴 리스트
       menuSet = menuList.stream().map(String::valueOf).collect(Collectors.toSet());
-
       // 레디스에 저장
-      saveDataToRedis(accessToken, menuList.stream().map(String::valueOf).toArray(String[]::new));
-
-    } else {
-      System.out.println("jwt is in redis");
-      // 레디스에 값이 있었다면 그 값으로 권한이 있는지 확인
-      menuSet = result;
+      redisForMenu.opsForSet().add(accessToken, menuList.stream().map(String::valueOf).toArray(String[]::new));
     }
 
     // 헤더에서 가져온 접근할 페이지
     String menuId = request.getHeader("menuId");
-
-    System.out.println("in menuFilter : "+menuId);
-
-    System.out.println("menuId : "+menuId+" || menuSet : "+menuSet);
+    logger.info("in menuFilter : "+menuId);
+    logger.info("menuId : "+menuId+" || menuSet : "+menuSet);
     // 사용자가 메뉴에 접근할 수 있는지 확인
     if (menuId == null || menuSet.contains(menuId) || menuId.equals("0")) {
-
+      request.setAttribute("pkDto", pkDto);
       chain.doFilter(request, response);
     } else {
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
   }
-
 
   private String getAccessTokenFromCookie(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
@@ -93,22 +98,5 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       }
     }
     return null;
-  }
-
-  private Set<String> getListFromRedis(String key){
-    return redisForMenu.opsForSet().members(key);
-//    return redisTemplate.opsForList().range(key, 0, -1);
-  }
-
-  public void saveDataToRedis(String key, String[] value) {
-    redisForMenu.opsForSet().add(key, value);
-  }
-
-
-
-  public JwtDto getInfo(String accessToken) throws JsonProcessingException {
-    String resultJWT = new String(Base64.getUrlDecoder().decode(accessToken.split("\\.")[1]));
-    return new ObjectMapper().readValue(resultJWT, JwtDto.class);
-
   }
 }

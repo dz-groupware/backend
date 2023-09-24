@@ -14,6 +14,14 @@
     on auth_menu.auth_id = admin.auth_id;
   </select>
 
+  <select id="getAllKeys" resultType="com.example.backend.redis.PkDto">
+    select e.id as emp_id, e.user_id, e.master_yn, ed.dept_id, ec.comp_id  from employee as e
+    left join employee_department as ed on ed.emp_id=e.id and e.id = #{empId} and org = 1
+    left join employee_company as ec on ec.emp_id = e.id
+    where ed.transferred_yn = 0 and ed.deleted_yn = 0
+    and ec.resigned_yn = 0 and ec.deleted_yn = 0 and e.account_yn = 1 and e.deleted_yn = 0;
+  </select>
+
   <!-- 마스터인지 확인 -->
   <select id="checkMaster" resultType="boolean">
     select master_yn from employee where id=#{empId};

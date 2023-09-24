@@ -4,12 +4,12 @@ import com.example.backend.common.SingleResponseDto;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.service.ModalService;
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.redis.PkDto;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,28 +25,28 @@ public class ModalController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity<?> getAllProfile(@CookieValue("JWT") String jwt) {
+  public ResponseEntity<?> getAllProfile(@RequestAttribute PkDto pkDto) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<ProfileRes>>(modalService.getAllProfile(new JwtDto(jwt))),
+        new SingleResponseDto<List<ProfileRes>>(modalService.getAllProfile(pkDto)),
         HttpStatus.OK);
   }
 
   @GetMapping("/org/tree")
-  public ResponseEntity<?> getOrgTree(@CookieValue("JWT") String jwt, @RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
+  public ResponseEntity<?> getOrgTree(@RequestAttribute PkDto pkDto, @RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
     return new ResponseEntity<>(new SingleResponseDto<List<TreeItemRes>>(
-        modalService.getOrgTree(new JwtDto(jwt), type, deptId)), HttpStatus.OK);
+        modalService.getOrgTree(pkDto, type, deptId)), HttpStatus.OK);
   }
 
   @GetMapping("/org/empList")
-  public ResponseEntity<?> findEmpList(@CookieValue("JWT") String jwt, String type, Long compId, Long deptId) {
+  public ResponseEntity<?> findEmpList(@RequestAttribute PkDto pkDto, String type, Long compId, Long deptId) {
     return new ResponseEntity<>(
         new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type, compId, deptId)),
         HttpStatus.OK);
   }
 
   @GetMapping("/org/search")
-  public ResponseEntity<?> findOrgSearchResult(@CookieValue("JWT") String jwt, @RequestParam String type, @RequestParam String text) {
-    return new ResponseEntity<>(modalService.findOrgResult(new JwtDto(jwt), type, text), HttpStatus.OK);
+  public ResponseEntity<?> findOrgSearchResult(@RequestAttribute PkDto pkDto, @RequestParam String type, @RequestParam String text) {
+    return new ResponseEntity<>(modalService.findOrgResult(pkDto, type, text), HttpStatus.OK);
 
   }
 }
