@@ -1,5 +1,6 @@
 package com.example.backend.employee.mapper;
 
+import com.example.backend.employee.dto.EmployeeCompanyDto;
 import com.example.backend.employee.dto.EmployeeReqDto;
 import com.example.backend.config.redis.PrincipalUserDto;
 import java.util.List;
@@ -16,4 +17,5 @@ public interface EmployeeMapper {
   void removeEmployee(Long id);
   long getTotalElements();
   Boolean checkMaster(Long empId);
+  EmployeeCompanyDto findCompEmpByEmpId(Long employeeId);
 }

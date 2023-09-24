@@ -1,6 +1,8 @@
 package com.example.backend.authgroup.service;
 
 import com.example.backend.authgroup.dto.AddAuthDto;
+import com.example.backend.authgroup.dto.AddEmpAuthDto;
+import com.example.backend.authgroup.dto.EmployeeAuthStatusDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import com.example.backend.common.Page;
 import com.example.backend.authgroup.dto.AuthMenuDto;
@@ -26,6 +28,14 @@ public interface AuthGroupService {
   Long addAuth(AddAuthDto addAuthDto);
 
   void modifyMappedMenuOfAuth(Long authId, Map<Long, Boolean> checkedMenuItems);
-
   void deactivateAuthByAuthId(Long authId);
+
+
+  List<CompanyAuthSummaryDto> findEmployeeAuthListOrderById(Long lastId, String orderBy, String searchTerm, Long employeeId, int pageSize);
+  List<CompanyAuthSummaryDto> findEmployeeAuthListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long employeeId, int pageSize);
+  Long getEmployeeAuthCount(Long employeeId);
+
+  List<EmployeeAuthStatusDto> findEmployeeAuthStatusListOrderById(Long lastId, String orderBy, String searchTerm, Long employeeId, int pageSize);
+  List<EmployeeAuthStatusDto> findEmployeeAuthStatusListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long employeeId, int pageSize);
+  void addAuthEmployee(AddEmpAuthDto addEmpAuthDto);
 }

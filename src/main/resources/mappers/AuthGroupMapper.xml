@@ -286,6 +286,176 @@
     SET enabled_yn = 0
     WHERE id = #{authId}
   </update>
-  
 
+  <select id="findEmployeeAuthListOrderById"
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
+    SELECT
+    adb.id as id,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
+    WHERE ae.emp_id IS NOT NULL AND a.enabled_yn = 1
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
+    </if>
+    <choose>
+      <when test="orderBy == 'authDashboardIdDesc'">
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
+      </when>
+      <when test="orderBy == 'authDashboardIdAsc'">
+        AND adb.id &gt; #{lastId}
+        ORDER BY adb.id ASC
+      </when>
+      <otherwise>
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+  <select id="findEmployeeAuthListOrderByAuthName"
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
+    SELECT
+    adb.id as id,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
+    WHERE ae.emp_id IS NOT NULL AND a.enabled_yn = 1
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
+    </if>
+    <choose>
+      <when test="orderBy == 'authNameAsc'">
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc'">
+        AND a.name &lt; #{lastAuthName}
+        ORDER BY a.name DESC
+      </when>
+      <when test="orderBy == 'authNameAsc' and lastAuthName == null">
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc' and lastAuthName == null">
+        ORDER BY a.name DESC
+      </when>
+      <otherwise>
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+  <select id="getEmployeeAuthCount" resultType="long">
+    SELECT COUNT(*)
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = ${employeeId}
+    WHERE ae.emp_id IS NOT NULL AND a.enabled_yn = 1;
+  </select>
+
+
+  <select id="findEmployeeAuthStatusListOrderById"
+    resultType="com.example.backend.authgroup.dto.EmployeeAuthStatusDto">
+    SELECT
+    adb.id as id,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn,
+    CASE WHEN ae.emp_id IS NOT NULL THEN 1 ELSE 0 END AS has_auth
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
+    WHERE adb.comp_id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
+    </if>
+    <choose>
+      <when test="orderBy == 'authDashboardIdDesc'">
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
+      </when>
+      <when test="orderBy == 'authDashboardIdAsc'">
+        AND adb.id &gt; #{lastId}
+        ORDER BY adb.id ASC
+      </when>
+      <otherwise>
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+  <select id="findEmployeeAuthStatusListOrderByAuthName"
+    resultType="com.example.backend.authgroup.dto.EmployeeAuthStatusDto">
+    SELECT
+    adb.id as id,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn,
+    CASE WHEN ae.emp_id IS NOT NULL THEN 1 ELSE 0 END AS has_auth
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
+    WHERE adb.comp_id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
+    </if>
+    <choose>
+      <when test="orderBy == 'authNameAsc'">
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc'">
+        AND a.name &lt; #{lastAuthName}
+        ORDER BY a.name DESC
+      </when>
+      <when test="orderBy == 'authNameAsc' and lastAuthName == null">
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc' and lastAuthName == null">
+        ORDER BY a.name DESC
+      </when>
+      <otherwise>
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+  <insert id="addAuthEmployee">
+    INSERT INTO auth_employee (emp_id, auth_id) VALUES
+      <foreach collection="checkedAuthIds" item="authId" index="index" separator=",">
+      (#{employeeId}, #{authId})
+      </foreach>
+  </insert>
+
+  <delete id="deleteAuthEmployeeByEmpId">
+    DELETE
+    FROM auth_employee ae
+    WHERE ae.emp_id = #{employee_Id}
+  </delete>
 </mapper>

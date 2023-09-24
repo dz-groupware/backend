@@ -80,6 +80,8 @@
     SELECT
       e.id as emp_id,
       e.name as emp_name,
+      e.position as emp_position,
+      e.master_yn as emp_master_yn,
       ed.dept_id as dept_id
     FROM employee e
     JOIN employee_department ed
@@ -94,6 +96,8 @@
     select
       e.id as emp_id,
       e.name as emp_name,
+      e.position as emp_position,
+      e.master_yn as emp_master_yn,
       COALESCE(ed.dept_id, -1) as dept_id
     FROM employee e
     JOIN employee_company ec

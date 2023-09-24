@@ -8,5 +8,7 @@ import lombok.Getter;
 public class DeptEmployeeDto {
   private Long empId;
   private String empName;
+  private String empPosition;
+  private Boolean empMasterYn;
   private Long deptId;
 }
