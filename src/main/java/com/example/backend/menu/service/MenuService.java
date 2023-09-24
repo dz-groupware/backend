@@ -1,9 +1,7 @@
 package com.example.backend.menu.service;
 
 import com.example.backend.menu.dto.MenuDto;
-import com.example.backend.redis.PkDto;
-import com.example.backend.setting.dto.JwtDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.backend.common.dto.PkDto;
 import java.util.List;
 
 public interface MenuService {

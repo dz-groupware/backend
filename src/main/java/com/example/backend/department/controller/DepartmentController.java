@@ -1,16 +1,16 @@
 package com.example.backend.department.controller;
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.service.DepartmentService;
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.common.dto.PkDto;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,21 +26,21 @@ public class DepartmentController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getDepartment(@CookieValue("JWT") String jwt) {
+  public ResponseEntity<?> getDepartment(@RequestAttribute PkDto pkDto) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getDepartmentBasicList(new JwtDto(jwt))), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getDepartmentBasicList(pkDto)), HttpStatus.OK);
   }
 
   @PostMapping("/dept")
-  public ResponseEntity<?> addDepartment(@CookieValue("JWT") String jwt, @RequestBody DeptDto dept) {
+  public ResponseEntity<?> addDepartment(@RequestAttribute PkDto pkDto, @RequestBody DeptDto dept) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.addDepartment(new JwtDto(jwt), dept)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.addDepartment(pkDto, dept)), HttpStatus.OK);
   }
 
   @GetMapping("dept-list")
-  public ResponseEntity<?> getDepartmentList(@CookieValue("JWT") String jwt, @RequestParam Long parId) {
+  public ResponseEntity<?> getDepartmentList(@RequestAttribute PkDto pkDto, @RequestParam Long parId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getDepartmentById(new JwtDto(jwt), parId)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getDepartmentById(pkDto, parId)), HttpStatus.OK);
   }
 
   @GetMapping("detail-basic")
@@ -72,15 +72,15 @@ public class DepartmentController {
   }
 
   @DeleteMapping("dept")
-  public ResponseEntity<?> deleteDepartment(@CookieValue("JWT") String jwt, @RequestParam Long id) {
+  public ResponseEntity<?> deleteDepartment(@RequestAttribute PkDto pkDto, @RequestParam Long id) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.deleteDepartment(new JwtDto(jwt), id)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.deleteDepartment(pkDto, id)), HttpStatus.OK);
   }
 
   @GetMapping("/option-comp")
-  public ResponseEntity<?>  getOptionCompList(@CookieValue("JWT") String jwt) {
+  public ResponseEntity<?>  getOptionCompList(@RequestAttribute PkDto pkDto) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getOptionCompList(new JwtDto(jwt))), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getOptionCompList(pkDto)), HttpStatus.OK);
   }
 
   @GetMapping("/dept")

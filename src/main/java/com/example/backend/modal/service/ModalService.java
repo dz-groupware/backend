@@ -1,10 +1,9 @@
 package com.example.backend.modal.service;
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
-import com.example.backend.redis.PkDto;
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.common.dto.PkDto;
 import java.util.List;
 
 public interface ModalService {

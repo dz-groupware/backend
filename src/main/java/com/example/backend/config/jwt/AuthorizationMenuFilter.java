@@ -1,5 +1,7 @@
-package com.example.backend.redis;
+package com.example.backend.config.jwt;
 
+import com.example.backend.common.dto.PkDto;
+import com.example.backend.redis.RedisMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.io.IOException;

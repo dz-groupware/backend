@@ -1,4 +1,4 @@
-package com.example.backend.redis;
+package com.example.backend.common.dto;
 
 import lombok.Getter;
 import lombok.Setter;

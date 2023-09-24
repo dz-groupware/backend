@@ -1,19 +1,15 @@
 package com.example.backend.modal.service;
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
-import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
 
-import com.example.backend.redis.PkDto;
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.common.dto.PkDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

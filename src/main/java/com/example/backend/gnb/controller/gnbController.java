@@ -1,10 +1,10 @@
 package com.example.backend.gnb.controller;
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.gnb.dto.BasicResponseDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
-import com.example.backend.redis.PkDto;
+import com.example.backend.common.dto.PkDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

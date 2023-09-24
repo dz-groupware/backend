@@ -1,8 +1,8 @@
 package com.example.backend.setting.service;
 
+import com.example.backend.common.dto.PkDto;
 import com.example.backend.redis.RedisService;
 import com.example.backend.setting.dto.Dto;
-import com.example.backend.setting.dto.JwtDto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import com.example.backend.setting.mapper.SettingMapper;
@@ -64,11 +64,11 @@ public class SettingServiceImpl implements SettingService {
   }
 
   @Override
-  public int saveMenu(JwtDto jwtDto, MenuRes menu, String type) {
+  public int saveMenu(PkDto pkDto, MenuRes menu, String type) {
     // 대메뉴 추가
     if (type.equals("1")) {
       try {
-        menu.setCompId(jwtDto.getCompId());
+        menu.setCompId(pkDto.getCompId());
         menu.setNameTree(menu.getName());
         settingMapper.addMenu(menu);
         // 방금 추가 된 id 가져오기
@@ -84,7 +84,7 @@ public class SettingServiceImpl implements SettingService {
     if (type.equals("2")) {
       try {
         menu.setParId(menu.getId());
-        menu.setCompId(jwtDto.getCompId());
+        menu.setCompId(pkDto.getCompId());
         menu.setNameTree(menu.getName());
         menu.setIdTree(menu.getId().toString());
 
@@ -96,7 +96,7 @@ public class SettingServiceImpl implements SettingService {
     // 메뉴 추가
     if (type.equals("3")) {
       try{
-        menu.setCompId(jwtDto.getCompId());
+        menu.setCompId(pkDto.getCompId());
         Long id = menu.getId();
 
         Long parId = menu.getParId();
@@ -137,10 +137,7 @@ public class SettingServiceImpl implements SettingService {
 
   public boolean checkMenuInMenu(Long id, Long parId){
     System.out.println(settingMapper.checkMenuInMenu("%"+id.toString()+"%", parId) != 0);
-    if(settingMapper.checkMenuInMenu("%"+id.toString()+"%", parId) != 0) {
-      return true;
-    }
-    return false;
+    return settingMapper.checkMenuInMenu("%" + id.toString() + "%", parId) != 0;
   }
 
   public MenuTrans getParIdOfUpperMenu(Long id){
@@ -163,8 +160,8 @@ public class SettingServiceImpl implements SettingService {
 
   // 즐겨찾기
   @Override
-  public String findFavorById(JwtDto jwtDto, Long menuId) {
-    int check = settingMapper.findFavorById(jwtDto.getEmpId(), menuId);
+  public String findFavorById(PkDto pkDto, Long menuId) {
+    int check = settingMapper.findFavorById(pkDto.getEmpId(), menuId);
     if (check == 0) {
       return "false";
     }
@@ -172,18 +169,18 @@ public class SettingServiceImpl implements SettingService {
       return "true";
     }
     // 의도하지 않은 상황이므로 관련 모든 데이터를 지우고 false 전달
-    modifyFavorOff(jwtDto, menuId);
+    modifyFavorOff(pkDto, menuId);
     return "false";
   }
 
   @Override
-  public int modifyFavorOn(JwtDto jwtDto, Long menuId) {
-    return settingMapper.modifyFavorOn(jwtDto.getEmpId(), menuId);
+  public int modifyFavorOn(PkDto pkDto, Long menuId) {
+    return settingMapper.modifyFavorOn(pkDto.getEmpId(), menuId);
   }
 
   @Override
-  public int modifyFavorOff(JwtDto jwtDto, Long menuId) {
-    return settingMapper.modifyFavorOff(jwtDto.getEmpId(), menuId);
+  public int modifyFavorOff(PkDto pkDto, Long menuId) {
+    return settingMapper.modifyFavorOff(pkDto.getEmpId(), menuId);
   }
 
   @Override
@@ -196,8 +193,8 @@ public class SettingServiceImpl implements SettingService {
   public int deleteMenu(Long menuId) {
     List<Long> menuIdList = settingMapper.getMenuIdByIdTree("%"+menuId.toString()+"%");
 
-    for (int i=0; i<menuIdList.size(); i++){
-      settingMapper.deleteMenu(menuIdList.get(i));
+    for (Long aLong : menuIdList) {
+      settingMapper.deleteMenu(aLong);
     }
     return 1;
   }
@@ -224,7 +221,7 @@ public class SettingServiceImpl implements SettingService {
 
         // preMenu 묶음 중 root 메뉴 (상위로 선택 된 메뉴를 깊은복사로 가져온다)
         Optional<MenuTrans> preMenuStream = preMenuList.stream()
-            .filter(pre -> pre.getId() == menu.getParId())
+            .filter(pre -> Objects.equals(pre.getId(), menu.getParId()))
             .findFirst();
 
         MenuTrans preMenu = new MenuTrans(preMenuStream.get());
@@ -238,32 +235,29 @@ public class SettingServiceImpl implements SettingService {
         settingMapper.modifyPreMoveMenu(preMenu);
 
         // preMenuList
-        for (int i = 0; i < preMenuList.size(); i++) {
-          MenuTrans menuTrans = preMenuList.get(i);
+        for (MenuTrans menuTrans : preMenuList) {
           if (Objects.equals(menuTrans.getId(), preMenu.getId())) {
             continue;
           }
           String tmp = menuTrans.getIdTree().substring(originPreIdTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          menuTrans.setIdTree(preMenu.getIdTree() +">"+ tmp);
+          menuTrans.setIdTree(preMenu.getIdTree() + ">" + tmp);
           tmp = menuTrans.getNameTree().substring(originPreNameTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          menuTrans.setNameTree(preMenu.getNameTree() +">"+ tmp);
+          menuTrans.setNameTree(preMenu.getNameTree() + ">" + tmp);
           settingMapper.modifyPreMoveMenu(menuTrans);
         }
 
         // menu 이동
         List<MenuTrans> MenuList = settingMapper.getPreMoveMenuList("%" + menu.getId().toString() + "%");
         // MenuList
-        for (int i = 0; i < MenuList.size(); i++) {
-          MenuTrans menuTrans = MenuList.get(i);
-
-          menuTrans.setIdTree(preMenu.getIdTree()+">"+menuTrans.getIdTree());
-          menuTrans.setNameTree(preMenu.getNameTree()+">"+menuTrans.getNameTree());
+        for (MenuTrans menuTrans : MenuList) {
+          menuTrans.setIdTree(preMenu.getIdTree() + ">" + menuTrans.getIdTree());
+          menuTrans.setNameTree(preMenu.getNameTree() + ">" + menuTrans.getNameTree());
           settingMapper.modifyPreMoveMenu(menuTrans);
         }
       } else {
@@ -271,7 +265,7 @@ public class SettingServiceImpl implements SettingService {
 
         List<MenuTrans> preMenuList = settingMapper.getPreMoveMenuList("%" + menu.getParId().toString() + "%");
         Optional<MenuTrans> preMenuStream = preMenuList.stream()
-            .filter(pre -> pre.getId() == menu.getParId())
+            .filter(pre -> Objects.equals(pre.getId(), menu.getParId()))
             .findFirst();
 
         MenuTrans preMenu = new MenuTrans(preMenuStream.get());
@@ -284,9 +278,7 @@ public class SettingServiceImpl implements SettingService {
 
         settingMapper.modifyPreMoveMenu(preMenu);
 
-        for (int i = 0; i < preMenuList.size(); i++) {
-          MenuTrans menuTrans = preMenuList.get(i);
-
+        for (MenuTrans menuTrans : preMenuList) {
           if (Objects.equals(menuTrans.getId(), preMenu.getId())) {
             continue;
           }
@@ -316,21 +308,20 @@ public class SettingServiceImpl implements SettingService {
         settingMapper.modifyPreMoveMenu(originMenu);
         settingMapper.modifyUpperMenu(parMenu.getId());
         settingMapper.modifyUpperMenu(preMenu.getId());
-        for (int i = 0; i < MenuList.size(); i++) {
-          MenuTrans menuTrans = MenuList.get(i);
+        for (MenuTrans menuTrans : MenuList) {
           if (Objects.equals(menuTrans.getId(), originMenu.getId())) {
             continue;
           }
           String tmp = menuTrans.getIdTree().substring(originIdTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          menuTrans.setIdTree(originMenu.getIdTree() +">"+ tmp);
+          menuTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
           tmp = menuTrans.getNameTree().substring(originNameTree.length());
-          if (tmp.startsWith(">")){
+          if (tmp.startsWith(">")) {
             tmp = tmp.substring(1);
           }
-          menuTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
+          menuTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
           settingMapper.modifyPreMoveMenu(menuTrans);
         }
       }
@@ -352,21 +343,20 @@ public class SettingServiceImpl implements SettingService {
 
       settingMapper.modifyPreMoveMenu(originMenu);
       settingMapper.modifyUpperMenu(preMenu.getId());
-      for (int i = 0; i < MenuList.size(); i++) {
-        MenuTrans menuTrans = MenuList.get(i);
+      for (MenuTrans menuTrans : MenuList) {
         if (Objects.equals(menuTrans.getId(), originMenu.getId())) {
           continue;
         }
         String tmp = menuTrans.getIdTree().substring(originIdTree.length());
-        if (tmp.startsWith(">")){
+        if (tmp.startsWith(">")) {
           tmp = tmp.substring(1);
         }
-        menuTrans.setIdTree(originMenu.getIdTree() +">"+ tmp);
+        menuTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
         tmp = menuTrans.getNameTree().substring(originNameTree.length());
-        if (tmp.startsWith(">")){
+        if (tmp.startsWith(">")) {
           tmp = tmp.substring(1);
         }
-        menuTrans.setNameTree(originMenu.getNameTree() +">"+ tmp);
+        menuTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
         settingMapper.modifyPreMoveMenu(menuTrans);
       }
       return originMenu;
@@ -375,6 +365,6 @@ public class SettingServiceImpl implements SettingService {
 
   @Transactional
   public void testRedisModify(){
-    redisService.flushDb(new JwtDto(""),0);
+    redisService.flushDb(0);
   }
 }

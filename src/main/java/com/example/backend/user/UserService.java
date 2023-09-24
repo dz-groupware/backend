@@ -1,9 +1,9 @@
 package com.example.backend.user;
 
+import com.example.backend.common.dto.PkDto;
 import com.example.backend.config.jwt.PrincipalUserDto;
-import com.example.backend.config.jwt.SecurityUtil;
 import javax.servlet.http.HttpServletResponse;
 
 public interface UserService {
-  public PrincipalUserDto getAnotherLogin( HttpServletResponse response,Long empId);
+  public PrincipalUserDto getAnotherLogin(PkDto pkdto, HttpServletResponse response,Long empId);
 }

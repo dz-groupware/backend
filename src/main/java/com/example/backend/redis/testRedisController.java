@@ -1,9 +1,8 @@
 package com.example.backend.redis;
 
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.common.dto.PkDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +23,8 @@ public class testRedisController {
   }
 
   @GetMapping("flush")
-  public String flushDB(@CookieValue("JWT") String jwt, @RequestParam int idx){
-    return redisService.flushDb(new JwtDto(jwt), idx);
+  public String flushDB(@RequestParam int idx){
+    return redisService.flushDb(idx);
   }
 
 }

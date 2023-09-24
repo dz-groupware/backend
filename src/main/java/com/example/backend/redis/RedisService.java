@@ -1,10 +1,7 @@
 package com.example.backend.redis;
 
-import com.example.backend.setting.dto.JwtDto;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.backend.common.dto.PkDto;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,7 +23,7 @@ public class RedisService {
   }
 
   // 레디스 db 에 모든 데이터 삭제
-  public String flushDb(JwtDto jwtDto, int idx) {
+  public String flushDb(int idx) {
     if (idx == 1) {
       redisForMenu.getConnectionFactory().getConnection().flushDb();
       return "flushDB : idx 1";

@@ -1,21 +1,20 @@
 package com.example.backend.setting.controller;
 
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
+import com.example.backend.common.dto.PkDto;
 import com.example.backend.setting.dto.Dto;
-import com.example.backend.setting.dto.JwtDto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.service.SettingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +32,7 @@ public class SettingController {
   @GetMapping("/menu/gnb")
   public ResponseEntity<?> findGnbList() {
     try{
-      return new ResponseEntity<>(new SingleResponseDto<List<MenuRes>>(settingService.findGnbList()),
+      return new ResponseEntity<>(new SingleResponseDto<>(settingService.findGnbList()),
           HttpStatus.OK);
     } catch (InvalidMediaTypeException e) {
       return new ResponseEntity<>("유효하지 않은 요청입니다.", HttpStatus.BAD_REQUEST);
@@ -48,8 +47,8 @@ public class SettingController {
   }
 
   @PostMapping("/menu")
-  public ResponseEntity<?> saveMenu(@CookieValue("JWT") String jwt, @RequestBody MenuRes menu, @RequestParam String type) {
-    return new ResponseEntity<>(settingService.saveMenu(new JwtDto(jwt), menu, type), HttpStatus.OK);
+  public ResponseEntity<?> saveMenu(@RequestAttribute PkDto pkDto, @RequestBody MenuRes menu, @RequestParam String type) {
+    return new ResponseEntity<>(settingService.saveMenu(pkDto, menu, type), HttpStatus.OK);
   }
 
   @DeleteMapping("/menu")
@@ -65,28 +64,28 @@ public class SettingController {
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> findFavorById(@CookieValue("JWT") String jwt, @RequestParam Long menuId){
+  public ResponseEntity<?> findFavorById(@RequestAttribute PkDto pkDto, @RequestParam Long menuId){
     // 현재 즐겨찾기 상태를 가져오기
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(new JwtDto(jwt), menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(pkDto, menuId)), HttpStatus.OK);
   }
 
   @PostMapping("/favor")
-  public ResponseEntity<?> modifyFavorOn(@CookieValue("JWT") String jwt, @RequestBody Long menuId) {
+  public ResponseEntity<?> modifyFavorOn(@RequestAttribute PkDto pkDto, @RequestBody Long menuId) {
     // 즐겨찾기 저장 요청
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(new JwtDto(jwt), menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(pkDto, menuId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> modifyFavorOff(@CookieValue("JWT") String jwt, @RequestParam Long menuId)
+  public ResponseEntity<?> modifyFavorOff(@RequestAttribute PkDto pkDto, @RequestParam Long menuId)
       throws JsonProcessingException {
     // 즐겨찾기 삭제 요청
-    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(new JwtDto(jwt), menuId)), HttpStatus.OK);
+    return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(pkDto, menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/menu/all")
   public ResponseEntity<?> findAllMenu(@RequestParam Long compId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuRes>>(settingService.findAllMenu(compId)), HttpStatus.OK);
+        new SingleResponseDto<>(settingService.findAllMenu(compId)), HttpStatus.OK);
   }
 
 //  @GetMapping("/test/redis-add")

@@ -5,7 +5,7 @@ import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.DeptTrans;
 import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.common.dto.PkDto;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,8 +20,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public int addDepartment(JwtDto jwtDto, DeptDto dept) {
-    Long compId = jwtDto.getCompId();
+  public int addDepartment(PkDto pkDto, DeptDto dept) {
+    Long compId = pkDto.getCompId();
     try{
       dept.setCompId(compId);
       // 메뉴 추가
@@ -74,13 +74,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 
   @Override
-  public List<DeptListDto> getDepartmentBasicList(JwtDto jwtDto) {
-    return departmentMapper.getDepartmentBasicList(jwtDto.getCompId());
+  public List<DeptListDto> getDepartmentBasicList(PkDto pkDto) {
+    return departmentMapper.getDepartmentBasicList(pkDto.getCompId());
   }
 
   @Override
-  public List<DeptListDto> getDepartmentById(JwtDto jwtDto, Long parId) {
-    Long compId = jwtDto.getCompId();
+  public List<DeptListDto> getDepartmentById(PkDto pkDto, Long parId) {
+    Long compId = pkDto.getCompId();
     return departmentMapper.getDepartmentById(compId, parId);
   }
 
@@ -100,8 +100,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public int deleteDepartment(JwtDto jwtDto, Long id) {
-    Long compId = jwtDto.getCompId();
+  public int deleteDepartment(PkDto pkDto, Long id) {
+    Long compId = pkDto.getCompId();
     departmentMapper.deleteDepartment(compId, id, "%"+id.toString()+"%");
     return 1;
   }
@@ -126,8 +126,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public List<DeptListDto> getOptionCompList(JwtDto jwtDto) {
-    return departmentMapper.getOptionCompList(jwtDto.getCompId());
+  public List<DeptListDto> getOptionCompList(PkDto pkDto) {
+    return departmentMapper.getOptionCompList(pkDto.getCompId());
   }
 
   @Override

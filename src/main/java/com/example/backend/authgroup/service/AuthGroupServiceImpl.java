@@ -2,8 +2,8 @@ package com.example.backend.authgroup.service;
 
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
-import com.example.backend.common.Page;
-import com.example.backend.common.PageDto;
+import com.example.backend.common.dto.Page;
+import com.example.backend.common.dto.PageDto;
 import com.example.backend.authgroup.dto.AuthMenuDto;
 import com.example.backend.authgroup.dto.CompanyAuthSummaryDto;
 import com.example.backend.authgroup.dto.CompanyMenuDto;

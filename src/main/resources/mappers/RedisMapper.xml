@@ -14,7 +14,7 @@
     on auth_menu.auth_id = admin.auth_id;
   </select>
 
-  <select id="getAllKeys" resultType="com.example.backend.redis.PkDto">
+  <select id="getAllKeys" resultType="com.example.backend.common.dto.PkDto">
     select e.id as emp_id, e.user_id, e.master_yn, ed.dept_id, ec.comp_id  from employee as e
     left join employee_department as ed on ed.emp_id=e.id and e.id = #{empId} and org = 1
     left join employee_company as ec on ec.emp_id = e.id

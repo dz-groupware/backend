@@ -3,8 +3,7 @@ package com.example.backend.menu.service;
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
-import com.example.backend.redis.PkDto;
-import com.example.backend.setting.dto.JwtDto;
+import com.example.backend.common.dto.PkDto;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
