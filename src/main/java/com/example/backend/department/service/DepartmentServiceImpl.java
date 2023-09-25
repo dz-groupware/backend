@@ -5,7 +5,7 @@ import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.DeptTrans;
 import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

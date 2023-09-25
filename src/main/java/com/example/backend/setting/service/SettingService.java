@@ -1,6 +1,6 @@
 package com.example.backend.setting.service;
 
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import com.example.backend.setting.dto.Dto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;

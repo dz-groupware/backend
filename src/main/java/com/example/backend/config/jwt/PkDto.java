@@ -1,4 +1,4 @@
-package com.example.backend.common.dto;
+package com.example.backend.config.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -4,11 +4,13 @@ import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
+import java.util.List;
+
 import com.example.backend.config.jwt.SecurityUtil;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -75,6 +77,11 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         //원래의 부모값을 저장
         Long originalParId = companyMgmtMapper.getParIdFromDB(companyMgmt.getId());
         System.out.println(originalParId);
+
+        if (companyMgmt.getClosingDate() != null) {
+            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
+            return; // exit the method since we have removed the company
+        }
 
         int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
         if (circularCount > 0) {

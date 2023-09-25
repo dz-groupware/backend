@@ -3,7 +3,7 @@ package com.example.backend.department.controller;
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.service.DepartmentService;
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

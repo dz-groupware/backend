@@ -2,7 +2,7 @@ package com.example.backend.setting.controller;
 
 
 import com.example.backend.common.dto.SingleResponseDto;
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import com.example.backend.setting.dto.Dto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.service.SettingService;
