@@ -49,6 +49,5 @@ public interface CompanyMgmtMapper {
   void removeCompanyMgmt(Long id);
 
 
-
-
+  void modifyCompanyMgmtWithClosingDate(CompanyMgmtReqDto companyMgmt);
 }

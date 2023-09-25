@@ -17,7 +17,6 @@ public class EmployeeMgmtResDto {
     private Boolean accountYn;
     private String loginId;
     private String loginPw;
-    private String email;
     private String privEmail;
     private String mobileNumber;
     private String homeNumber;
@@ -26,5 +25,15 @@ public class EmployeeMgmtResDto {
     private Date joinDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date resignationDate;
+    private Long departmentId;
+    private Long compId;
+    private String position;
+    private Long deptId;
+    private Boolean transferredYn;
+   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date edjoinDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date leftDate;
+    private Boolean deletedYn;
 
 }

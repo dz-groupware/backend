@@ -3,6 +3,8 @@ package com.example.backend.companymgmt.service;
 import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
+
+
 import java.util.List;
 
 public interface CompanyMgmtService {
