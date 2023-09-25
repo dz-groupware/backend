@@ -3,7 +3,7 @@ import com.example.backend.config.jwt.JwtAccessDeniedHandler;
 import com.example.backend.config.jwt.JwtAuthenticationEntryPoint;
 import com.example.backend.config.jwt.JwtFilter;
 import com.example.backend.config.jwt.JwtTokenProvider;
-import com.example.backend.user.UserMapper;
+import com.example.backend.config.jwt.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

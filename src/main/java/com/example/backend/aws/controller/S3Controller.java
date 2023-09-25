@@ -1,7 +1,7 @@
-package com.example.backend.AWS.controller;
+package com.example.backend.aws.controller;
 
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.example.backend.AWS.service.S3;
+import com.example.backend.aws.service.S3;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

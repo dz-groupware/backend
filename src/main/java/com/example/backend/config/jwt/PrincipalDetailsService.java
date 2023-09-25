@@ -1,6 +1,5 @@
 package com.example.backend.config.jwt;
 
-import com.example.backend.user.UserMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,16 +18,18 @@ public class PrincipalDetailsService implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String username) {
+    System.out.println("여기는 불려?"+ username);
+    System.out.println();
     PrincipalUserDto principalUser = userMapper.findByLoginId(username);
-    System.out.println("이거호출되나");
+    System.out.println("출력되고 있나"+ principalUser.toString());
     if (principalUser == null) {
       throw new UsernameNotFoundException("Employee not found");
     }
     return new PrincipalDetails(principalUser);
   }
 
-  public UserDetails loadUserByUserIdAndEmpId(Long userId, Long empId) throws UsernameNotFoundException {
+  public UserDetails loadUserByUserIdAndEmpId(Long userId, Long empId)  {
     PrincipalUserDto principalUser = userMapper.getAnotherLogin(userId,empId);
     if (principalUser == null) {
       throw new UsernameNotFoundException("Employee not found");

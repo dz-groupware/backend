@@ -20,4 +20,12 @@ public class MenuTrans {
     this.idTree = new String(stream.idTree);
     this.nameTree = new String(stream.nameTree);
   }
+
+  public MenuTrans(MenuRes menu){
+    this.id = menu.getId();
+    this.parId = menu.getParId();
+    this.name = menu.getName();
+    this.idTree = menu.getIdTree();
+    this.nameTree = menu.getNameTree();
+  }
 }

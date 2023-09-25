@@ -7,6 +7,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class JwtTokenProvider {
     PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
     Date now = new Date();
     Date expirationDate = new Date(now.getTime() + accessExpirationTime);
+    claims.put("empId", principalDetails.getEmployeeId());
 
     String clientIp = request.getRemoteAddr();
     String userAgent = request.getHeader("User-Agent");
@@ -66,10 +68,10 @@ public class JwtTokenProvider {
     }
 
     String accessToken = Jwts.builder()
+        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
         .setClaims(claims)
         .setIssuedAt(now)
         .setExpiration(expirationDate)
-        .signWith(SignatureAlgorithm.HS256, secretKey)
         .compact();
 
     redisTemplate.opsForValue().set(
@@ -94,7 +96,7 @@ public class JwtTokenProvider {
         .setClaims(claims)
         .setIssuedAt(now)
         .setExpiration(expireDate)
-        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
         .compact();
 
     redisTemplate.opsForValue().set(
@@ -108,10 +110,12 @@ public class JwtTokenProvider {
   }
 
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
-    Claims claims = Jwts.parser()
-        .setSigningKey(secretKey)
+    Claims claims = Jwts.parserBuilder()
+        .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+        .build()
         .parseClaimsJws(token)
         .getBody();
+
     // 요청에서 오는 IP와 User-Agent 정보
     String incomingIp = request.getRemoteAddr();
     String incomingUserAgent = request.getHeader("User-Agent");
@@ -129,6 +133,10 @@ public class JwtTokenProvider {
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
     String storedIp = (String) userInfoMap.get("clientIp");
     String storedUserAgent = (String) userInfoMap.get("userAgent");
+    System.out.println("들어온거 +" + incomingIp);
+    System.out.println("들어온거 +" + incomingUserAgent);
+    System.out.println("저장된거 +" + storedIp);
+    System.out.println("저장된거 +" + storedUserAgent);
     if(!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
       throw new RuntimeException("인증 정보가 일치하지 않습니다.");
     }
@@ -144,6 +152,7 @@ public class JwtTokenProvider {
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {
+        System.out.println(cookie.getName());
         if ("accessToken".equals(cookie.getName())) {
           System.out.println("cooke.getValue : " + cookie.getValue());
           return cookie.getValue();
@@ -167,7 +176,12 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token){
     try{
-      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      System.out.println("validation");
+      Jwts.parserBuilder()
+          .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+          .build()
+          .parseClaimsJws(token);
+      System.out.println("에러뜨기전");
       return true;
     } catch(ExpiredJwtException e) {
       throw new Error("만료된토큰");
@@ -197,7 +211,6 @@ public class JwtTokenProvider {
       }
     }
 
-    // 여기에 클라이언트 측 토큰 삭제 로직을 추가할 수 있습니다.
   }
 
 }

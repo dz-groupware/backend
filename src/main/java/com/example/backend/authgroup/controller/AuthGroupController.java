@@ -3,11 +3,9 @@ package com.example.backend.authgroup.controller;
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.AddEmpAuthDto;
 import com.example.backend.authgroup.dto.AuthResponseDto;
-import com.example.backend.common.MultiResponseDto;
-import com.example.backend.common.Page;
-import com.example.backend.common.SingleResponseDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.authgroup.service.AuthGroupService;
+import com.example.backend.common.dto.SingleResponseDto;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
@@ -30,18 +28,6 @@ public class AuthGroupController {
   public AuthGroupController(AuthGroupService authGroupService,
       AuthGroupMapper companyMapper) {
     this.authGroupService = authGroupService;
-  }
-
-  /**
-   * @deprecated 페이지네이션 사용x
-   * */
-  @GetMapping("/companies/auth/page")
-  public ResponseEntity<?> getCompanyAuthSummaryPage(int pageNumber, int pageSize) {
-    Page<?> page = authGroupService.getCompanyAuthSummaryPage(pageNumber, pageSize);
-    return ResponseEntity.ok(new MultiResponseDto<>(
-        page.getData(),
-        page.getPageInfo()
-    ));
   }
 
   @GetMapping("/companies/auth/list")
@@ -142,7 +128,6 @@ public class AuthGroupController {
     if (lastId != null) {
       return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.findEmployeeAuthListOrderById(lastId, orderBy, decodeSearchTerm, employeeId,pageSize)));
     }
-
     return ResponseEntity.badRequest().build();
   }
 
@@ -164,7 +149,6 @@ public class AuthGroupController {
     }
     return ResponseEntity.badRequest().build();
   }
-
 
   @PostMapping("/employee/auth")
   public ResponseEntity<Void> addAuthEmployee(@RequestBody AddEmpAuthDto addEmpAuthDto) {

@@ -78,6 +78,11 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Long originalParId = companyMgmtMapper.getParIdFromDB(companyMgmt.getId());
         System.out.println(originalParId);
 
+        if (companyMgmt.getClosingDate() != null) {
+            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
+            return; // exit the method since we have removed the company
+        }
+
         int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
         if (circularCount > 0) {
             throw new IllegalArgumentException("Circular reference detected! Cannot move company under its own subtree.");

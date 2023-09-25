@@ -1,8 +1,6 @@
 package com.example.backend.config.jwt;
 
-import com.example.backend.common.SingleResponseDto;
-import com.example.backend.user.EmpIdRequestDto;
-import com.example.backend.user.UserMapper;
+import com.example.backend.common.dto.SingleResponseDto;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class JwtController {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
-  private final UserMapper userMapper;
   private final PrincipalDetailsService principalDetailsService;
 
   @PostMapping("/login")
@@ -40,11 +37,12 @@ public class JwtController {
               loginReqDto.getLoginPw()
           )
       );
-
+      System.out.println("asdfadf"+ authentication.toString());
       tokenDto = new TokenDto(
           jwtTokenProvider.createAccessToken(authentication, request),
           jwtTokenProvider.createRefreshToken(authentication)
       );
+      System.out.println(tokenDto.toString());
 
     }catch(BadCredentialsException e){
       log.error("유효하지않은 로그인아디와 패스워드입니다.");
@@ -54,6 +52,8 @@ public class JwtController {
     //리프레쉬만 httpOnly 로넘기기
     Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
     Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
+    accessTokenCookie.setHttpOnly(true);
+    accessTokenCookie.setPath("/");
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setPath("/");
 
@@ -76,6 +76,8 @@ public class JwtController {
 
     Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
     Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
+    accessTokenCookie.setHttpOnly(true);
+    accessTokenCookie.setPath("/");
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setPath("/");
     response.addCookie(accessTokenCookie);
@@ -106,6 +108,8 @@ public class JwtController {
 
     Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
     Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
+    accessTokenCookie.setHttpOnly(true);
+    accessTokenCookie.setPath("/");
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setPath("/");
     response.addCookie(accessTokenCookie);
@@ -125,7 +129,8 @@ public class JwtController {
 
     accessTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
     refreshTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
-
+    accessTokenCookie.setHttpOnly(true);
+    accessTokenCookie.setPath("/");
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setPath("/");
 

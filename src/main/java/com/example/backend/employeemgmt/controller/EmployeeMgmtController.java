@@ -1,9 +1,9 @@
 package com.example.backend.employeemgmt.controller;
 
-import com.example.backend.common.SingleResponseDto;
-import com.example.backend.employee.service.EmployeeService;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.employeemgmt.dto.EmployeeMgmtReqDto;
 import com.example.backend.employeemgmt.service.EmployeeMgmtService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,42 +20,48 @@ public class EmployeeMgmtController {
         return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getEmployeeMgmtList()),
                 HttpStatus.OK);
     }
-//
-//
-//    @PostMapping
-//    public ResponseEntity addEmployeeMgmt(@RequestBody EmployeeMgmtReqDto employee) {
-//        employeeMgmtService.addEmployeeMgmt(employee);
-//        return new ResponseEntity<>(new SingleResponseDto("성공"),
-//                HttpStatus.CREATED);
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity getEmployeeDetailsById(@PathVariable Long id) {
-//        return new ResponseEntity<>(
-//                new SingleResponseDto<>(employeeMgmtService.getEmployeeDetailsById(id)),
-//                HttpStatus.OK);
-//    }
-//
-//
-//    @GetMapping("/company-list")
-//    public ResponseEntity findEmployeeMgmtList(@RequestParam String compId, String searchType) {
-//        return new ResponseEntity<>(
-//                new SingleResponseDto<>(employeeMgmtService.findEmployeeMgmtList(compId, searchType)),
-//                HttpStatus.OK);
-//    }
-//
-//    @PutMapping
-//    public ResponseEntity modifyEmployeeMgmt(@RequestBody EmployeeMgmtReqDto company) {
-//        employeeMgmtService.modifyEmployeeMgmt(company);
-//        return new ResponseEntity<>(new SingleResponseDto("성공"),
-//                HttpStatus.OK);
-//    }
-//
-//    @DeleteMapping("/del/{id}")
-//    public ResponseEntity removeEmployeeMgmt(@PathVariable Long id) {
-//        employeeMgmtService.removeEmployeeMgmt(id);
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+
+    @GetMapping("/dep")
+    public ResponseEntity getAllDepartmentMgmtList() {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.getAllDepartmentMgmtList()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getEmployeeDetailsById(@PathVariable Long id) {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.getEmployeeDetailsById(id)),
+                HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity addEmployeeMgmt(@RequestBody EmployeeMgmtReqDto employeeMgmt) {
+
+        employeeMgmtService.addEmployeeMgmt(employeeMgmt);
+        return new ResponseEntity<>(new SingleResponseDto("성공"),
+                HttpStatus.CREATED);
+    }
+    @GetMapping("/employee-list")
+    public ResponseEntity findEmployeeMgmtList(@RequestParam Long compId, String text) {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.findEmployeeMgmtList(compId, text)),
+                HttpStatus.OK);
+    }
+
+
+    @PutMapping
+   public ResponseEntity modifyEmployeeMgmt(@RequestBody EmployeeMgmtReqDto employeeMgmt) {
+        employeeMgmtService.modifyEmployeeMgmt(employeeMgmt);
+        return new ResponseEntity<>(new SingleResponseDto("성공"),
+                HttpStatus.OK);
+    }
+
+    @PutMapping("/del/{id}")
+    public ResponseEntity removeEmployeeMgmt(@PathVariable Long id ,@RequestBody EmployeeMgmtReqDto employeeMgmt) {
+        employeeMgmtService.removeEmployeeMgmt(id,employeeMgmt);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }
 

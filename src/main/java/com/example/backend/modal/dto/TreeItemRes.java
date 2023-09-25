@@ -11,4 +11,6 @@ public class TreeItemRes {
   private Long parId;
   private String name;
   private int sortOrder;
+  private String type;
+  private Long compId;
 }

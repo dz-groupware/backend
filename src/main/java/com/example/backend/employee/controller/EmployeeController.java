@@ -1,8 +1,8 @@
 package com.example.backend.employee.controller;
 
-import com.example.backend.common.MultiResponseDto;
-import com.example.backend.common.PageDto;
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.MultiResponseDto;
+import com.example.backend.common.dto.PageDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.employee.dto.EmployeeReqDto;
 import com.example.backend.employee.service.EmployeeService;
 import org.springframework.http.HttpStatus;
