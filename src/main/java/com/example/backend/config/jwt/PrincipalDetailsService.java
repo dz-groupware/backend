@@ -19,7 +19,7 @@ public class PrincipalDetailsService implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String username){
     PrincipalUserDto principalUser = userMapper.findByLoginId(username);
     if (principalUser == null) {
       throw new UsernameNotFoundException("Employee not found");

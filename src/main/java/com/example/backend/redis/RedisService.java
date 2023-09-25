@@ -34,4 +34,13 @@ public class RedisService {
       return "There is no database";
     }
   }
+
+  // 특정 key로 찾아서 삭제
+  public void deletePk(String key){
+    redisForPayload.delete(key);
+  }
+
+  // 수정 없음.
+
+
 }
