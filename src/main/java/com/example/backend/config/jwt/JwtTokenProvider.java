@@ -153,8 +153,11 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
+    log.info("token get 1");
     if (cookies != null) {
+      log.info("token get 2");
       for (Cookie cookie : cookies) {
+        log.info("token get 3");
         System.out.println(cookie.getName());
         if ("accessToken".equals(cookie.getName())) {
           System.out.println("cooke.getValue : " + cookie.getValue());
