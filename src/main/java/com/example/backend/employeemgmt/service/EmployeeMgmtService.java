@@ -21,5 +21,6 @@ public interface EmployeeMgmtService {
     @Transactional
     void addEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt);
 
+    void modifyEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt);
     void removeEmployeeMgmt(Long id, EmployeeMgmtReqDto employeeMgmt);
 }

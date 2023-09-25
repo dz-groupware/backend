@@ -9,10 +9,10 @@
     SELECT
     id, login_id, image_url, name, join_date
     FROM (
-    SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
-    ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
-    FROM user u
-    INNER JOIN employee e ON u.id = e.user_id
+    SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+    ROW_NUMBER() OVER(PARTITION BY e.id ORDER BY ed.id DESC) AS rn
+    FROM employee e
+    INNER JOIN user u ON e.user_id = u.id
     INNER JOIN employee_company ec ON e.id = ec.emp_id
     LEFT JOIN employee_department ed ON e.id = ed.emp_id
     WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
@@ -21,15 +21,16 @@
 </select>
     <select id="getEmployeeMgmtDetailsById"
             resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
-        SELECT u.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
+        SELECT e.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
         u.login_id, u.login_pw, u.priv_email,
         u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
-        ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
+        ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
+        ,e.deleted_yn
        from employee e
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE u.id=#{id} and ec.comp_id=#{companyId}
+        WHERE e.id=#{empId} and ec.comp_id=#{companyId}
     </select>
 
 
@@ -122,28 +123,144 @@
         VALUES (#{dto.deptId}, #{dto.id},#{dto.transferredYn} ,#{dto.edjoinDate}, #{dto.leftDate},#{org},#{dto.position},#{deletedYn})
     </insert>
 
-    <update id="removeEmployeeMgmtEmployee">
-        UPDATE user u
-        JOIN employee e ON e.user_id=u.id
-        JOIN employee_company ec ON e.id=ec.emp_id
-        LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        SET
-        e.image_url= #{imageUrl},u.name=#{name},e.name=#{name}
-        u.user_id_num=#{userIdNum}, e.emp_id_num=#{empIdNum},u.gender=#{gender}, e.gender=#{gender},
-        e.account_yn=#{accountYn},u.login_id=#{loginId}, u.login_pw=#{loginPw}, u.priv_email=#{privEmail},
-        u.mobile_number=#{mobileNumber},  e.mobile_number=#{mobileNumber},
-        e.home_number=#{homeNumber},  u.home_number=#{homeNumber}, e.address=#{address},u.address=#{address},
-        ec.join_date AS ec_join_date=#{joinDate},
-        ec.resignation_date=#{resignationDate},ec.comp_id=#{compId},e.position=#{position},ed.position=#{position}
-        ed.dept_id=#{deptId}, ed.transferred_yn=#{transferredYn},ed.join_date AS ed_join_date=#{edjoinDate},
-        ed.left_date=#{leftDate},ed.org=#{org},
-        ec.resignedYn=#{resignedYn},
-        u.deleted_yn=#{deletedYn},
-        e.deleted_yn=#{deletedYn},
-        ed.deleted_yn=#{deletedYn}
-        ,ec.deleted_yn=#{deletedYn}
-        WHERE u.id=#{id}
+
+
+
+<!--    delete-->
+    <select id="getUserIdById" resultType="Long">
+        select user_id from employee where id=#{id}
+    </select>
+
+
+    <select id="getEmployeeIdsByUserId" resultType="Long">
+        select id from employee where user_id=#{userId}
+    </select>
+
+
+    <update id="removeEmployeeMgmtUser">
+    UPDATE user u
+    JOIN employee e ON e.user_id = u.id
+    SET
+    u.name = #{dto.name},
+    u.user_id_num = #{dto.empIdNum},
+    u.gender = #{dto.gender},
+    u.login_id = #{dto.loginId},
+    u.login_pw = #{dto.loginPw},
+    u.priv_email = #{dto.privEmail},
+    u.mobile_number = #{dto.mobileNumber},
+    u.home_number = #{dto.homeNumber},
+    u.address = #{dto.address},
+    u.deleted_yn = #{dto.deletedYn}
+    WHERE e.id = #{empId}
     </update>
+    <update id="removeEmployeeMgmtEmployee">
+        UPDATE employee e
+        SET
+        e.image_url = #{dto.imageUrl},
+        e.name = #{dto.name},
+        e.emp_id_num = #{dto.empIdNum},
+        e.gender = #{dto.gender},
+        e.account_yn = #{dto.accountYn},
+        e.mobile_number = #{dto.mobileNumber},
+        e.home_number = #{dto.homeNumber},
+        e.address = #{dto.address},
+        e.position = #{dto.position},
+        e.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId}
+
+    </update>
+    <update id="removeEmployeeMgmtEmployeeCompany">
+        UPDATE employee_company ec
+        JOIN employee e ON e.id = ec.emp_id
+        SET
+        ec.join_date = #{dto.joinDate},
+        ec.resignation_date = #{dto.resignationDate},
+        ec.comp_id = #{dto.compId},
+        ec.resigned_yn = #{resignedYn},
+        ec.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId}
+
+    </update>
+
+    <update id="removeEmployeeMgmtEmployeeDepartment">
+        UPDATE employee_department ed
+        JOIN employee e ON e.id = ed.emp_id
+        SET
+        ed.position = #{dto.position},
+        ed.dept_id = #{dto.deptId},
+        ed.transferred_yn = #{dto.transferredYn},
+        ed.join_date = #{dto.edjoinDate},
+        ed.left_date = #{dto.leftDate},
+        ed.org = #{org},
+        ed.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId} AND ed.id=#{dto.departmentId}
+
+    </update>
+
+<!--    수정-->
+
+    <update id="modifyEmployeeMgmtUser">
+        UPDATE user u
+        JOIN employee e ON e.user_id = u.id
+        SET
+        u.name = #{dto.name},
+        u.user_id_num = #{dto.empIdNum},
+        u.gender = #{dto.gender},
+        u.login_id = #{dto.loginId},
+        u.login_pw = #{dto.loginPw},
+        u.priv_email = #{dto.privEmail},
+        u.mobile_number = #{dto.mobileNumber},
+        u.home_number = #{dto.homeNumber},
+        u.address = #{dto.address},
+        u.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId}
+    </update>
+    <update id="modifyEmployeeMgmtEmployee">
+        UPDATE employee e
+        SET
+        e.image_url = #{dto.imageUrl},
+        e.name = #{dto.name},
+        e.emp_id_num = #{dto.empIdNum},
+        e.gender = #{dto.gender},
+        e.account_yn = #{dto.accountYn},
+        e.mobile_number = #{dto.mobileNumber},
+        e.home_number = #{dto.homeNumber},
+        e.address = #{dto.address},
+        e.position = #{dto.position},
+        e.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId}
+
+    </update>
+    <update id="modifyEmployeeMgmtEmployeeCompany">
+        UPDATE employee_company ec
+        JOIN employee e ON e.id = ec.emp_id
+        SET
+        ec.join_date = #{dto.joinDate},
+        ec.resignation_date = #{dto.resignationDate},
+        ec.comp_id = #{dto.compId},
+        ec.resigned_yn = #{resignedYn},
+        ec.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId}
+
+    </update>
+
+    <update id="modifyEmployeeMgmtEmployeeDepartment">
+        UPDATE employee_department ed
+        JOIN employee e ON e.id = ed.emp_id
+        SET
+        ed.position = #{dto.position},
+        ed.dept_id = #{dto.deptId},
+        ed.transferred_yn = #{dto.transferredYn},
+        ed.join_date = #{dto.edjoinDate},
+        ed.left_date = #{dto.leftDate},
+        ed.org = #{org},
+        ed.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId} AND ed.id=#{dto.departmentId}
+
+    </update>
+
+
+
 
 
 </mapper>

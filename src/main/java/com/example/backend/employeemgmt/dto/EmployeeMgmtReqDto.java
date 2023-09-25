@@ -30,6 +30,7 @@ public class EmployeeMgmtReqDto {
     private Date joinDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date resignationDate;
+    private Long departmentId;
     private Long compId;
     private String position;
     private Long deptId;
@@ -38,7 +39,7 @@ public class EmployeeMgmtReqDto {
     private Date edjoinDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date leftDate;
-
     private Boolean deletedYn;
+
 }
 
