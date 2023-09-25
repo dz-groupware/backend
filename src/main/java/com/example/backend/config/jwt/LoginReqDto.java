@@ -1,4 +1,4 @@
-package com.example.backend.config.redis;
+package com.example.backend.config.jwt;
 
 
 import javax.validation.constraints.NotNull;

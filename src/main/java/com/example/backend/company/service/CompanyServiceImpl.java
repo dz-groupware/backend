@@ -4,7 +4,7 @@ import com.example.backend.company.dto.CompanyWithEmployeeCountDto;
 import com.example.backend.company.dto.DepartmentWithEmployeeCountDto;
 import com.example.backend.company.dto.DeptEmployeeDto;
 import com.example.backend.company.mapper.CompanyMapper;
-import com.example.backend.config.redis.SecurityUtil;
+import com.example.backend.config.jwt.SecurityUtil;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

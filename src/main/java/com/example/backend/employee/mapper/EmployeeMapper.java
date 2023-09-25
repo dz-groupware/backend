@@ -2,7 +2,7 @@ package com.example.backend.employee.mapper;
 
 import com.example.backend.employee.dto.EmployeeCompanyDto;
 import com.example.backend.employee.dto.EmployeeReqDto;
-import com.example.backend.config.redis.PrincipalUserDto;
+import com.example.backend.config.jwt.PrincipalUserDto;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 

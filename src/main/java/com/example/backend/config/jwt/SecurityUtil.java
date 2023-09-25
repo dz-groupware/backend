@@ -1,6 +1,5 @@
-package com.example.backend.config.redis;
+package com.example.backend.config.jwt;
 
-import com.example.backend.config.redis.PrincipalDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

@@ -1,4 +1,4 @@
-package com.example.backend.config.redis;
+package com.example.backend.config.jwt;
 
 import com.example.backend.user.UserMapper;
 import org.springframework.security.core.userdetails.UserDetails;

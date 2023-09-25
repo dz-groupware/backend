@@ -1,8 +1,8 @@
 //package com.example.backend.user;
 //
-//import com.example.backend.config.redis.PrincipalDetails;
-//import com.example.backend.config.redis.PrincipalUserDto;
-//import com.example.backend.config.redis.SecurityUtil;
+//import com.example.backend.config.jwt.PrincipalDetails;
+//import com.example.backend.config.jwt.PrincipalUserDto;
+//import com.example.backend.config.jwt.SecurityUtil;
 //import javax.servlet.http.Cookie;
 //import javax.servlet.http.HttpServletResponse;
 //import org.springframework.stereotype.Service;

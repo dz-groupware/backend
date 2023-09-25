@@ -1,8 +1,8 @@
 package com.example.backend.config;
-import com.example.backend.config.redis.JwtAccessDeniedHandler;
-import com.example.backend.config.redis.JwtAuthenticationEntryPoint;
-import com.example.backend.config.redis.JwtFilter;
-import com.example.backend.config.redis.JwtTokenProvider;
+import com.example.backend.config.jwt.JwtAccessDeniedHandler;
+import com.example.backend.config.jwt.JwtAuthenticationEntryPoint;
+import com.example.backend.config.jwt.JwtFilter;
+import com.example.backend.config.jwt.JwtTokenProvider;
 import com.example.backend.user.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.example.backend.menu.service;
 
 import com.example.backend.common.mapper.CheckMapper;
-import com.example.backend.config.redis.SecurityUtil;
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.backend.config.redis;
+package com.example.backend.config.jwt;
 
 import java.util.ArrayList;
 import java.util.Collection;

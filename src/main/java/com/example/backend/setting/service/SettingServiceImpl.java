@@ -1,6 +1,6 @@
 package com.example.backend.setting.service;
 
-import com.example.backend.config.redis.SecurityUtil;
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import com.example.backend.setting.mapper.SettingMapper;
