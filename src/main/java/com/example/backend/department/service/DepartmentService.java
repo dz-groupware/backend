@@ -3,7 +3,7 @@ package com.example.backend.department.service;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.dto.DeptListDto;
 import com.example.backend.department.dto.EmpListDto;
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import java.util.List;
 
 public interface DepartmentService {

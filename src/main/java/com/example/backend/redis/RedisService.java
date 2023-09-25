@@ -1,6 +1,6 @@
 package com.example.backend.redis;
 
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 

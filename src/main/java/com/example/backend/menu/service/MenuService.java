@@ -1,7 +1,7 @@
 package com.example.backend.menu.service;
 
 import com.example.backend.menu.dto.MenuDto;
-import com.example.backend.common.dto.PkDto;
+import com.example.backend.config.jwt.PkDto;
 import java.util.List;
 
 public interface MenuService {

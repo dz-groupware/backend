@@ -1,4 +1,4 @@
-package com.example.backend.user;
+package com.example.backend.config.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

@@ -4,6 +4,7 @@ import com.example.backend.authgroup.dto.AuthMenuDto;
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.CompanyAuthSummaryDto;
 import com.example.backend.authgroup.dto.CompanyMenuDto;
+import com.example.backend.authgroup.dto.EmployeeAuthStatusDto;
 import com.example.backend.authgroup.dto.MenuAuthStatusDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import java.util.List;
@@ -25,6 +26,19 @@ public interface AuthGroupMapper {
 
   List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long companyId, Long lastId, String orderBy, String searchTerm, int pageSize);
   List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(Long companyId, String lastAuthName, String orderBy, String searchTerm, int pageSize);
-  Long addAuth(AddAuthDto addAuthDto);
+  void addAuth(AddAuthDto addAuthDto);
   void insertIntoAuthDashboard(Long compId, Long authId);
+  void deleteAuthMenuByAuthId(Long authId);
+  void modifyMappedMenuOfAuth(Long authId, List<Long> checkedMenuIds);
+  void deactivateAuthByAuthId(Long authId);
+
+  List<CompanyAuthSummaryDto> findEmployeeAuthListOrderById(Long lastId, String orderBy, String searchTerm,Long employeeId, int pageSize);
+  List<CompanyAuthSummaryDto> findEmployeeAuthListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long employeeId, int pageSize);
+  long getEmployeeAuthCount( Long employeeId);
+
+  List<EmployeeAuthStatusDto> findEmployeeAuthStatusListOrderById(Long lastId, String orderBy, String searchTerm, Long companyId, Long employeeId, int pageSize);
+  List<EmployeeAuthStatusDto> findEmployeeAuthStatusListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long companyId, Long employeeId, int pageSize);
+  void deleteAuthEmployeeByEmpId(Long employeeId);
+  void addAuthEmployee(Long employeeId, List<Long> checkedAuthIds);
+
 }
