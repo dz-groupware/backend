@@ -1,13 +1,14 @@
 package com.example.backend.menu.service;
 
 import com.example.backend.menu.dto.MenuDto;
+import com.example.backend.common.dto.PkDto;
 import java.util.List;
 
 public interface MenuService {
-  List<MenuDto> getGnbById();
-  List<MenuDto> getFavorByEmpId();
-  int removeFavor(Long menuId);
-  List<MenuDto> getMenuById(Long menuId);
-  List<MenuDto> getGnbByAdmin();
-  List<MenuDto> getLnbByAdmin(Long menuId);
+  List<MenuDto> getGnbById(PkDto pkDto) ;
+  List<MenuDto> getFavorByEmpId(PkDto pkDto) ;
+  int removeFavor(PkDto pkDto, Long menuId) ;
+  List<MenuDto> getMenuById(PkDto pkDto, Long menuId) ;
+  List<MenuDto> getUpperMenuGnb(PkDto pkDto) ;
+  List<MenuDto> getUpperMenuLnb(PkDto pkDto, Long menuId) ;
 }

@@ -1,7 +1,6 @@
-package com.example.backend.AWS.service;
+package com.example.backend.aws.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import java.io.IOException;

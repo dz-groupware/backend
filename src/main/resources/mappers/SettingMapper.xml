@@ -36,18 +36,10 @@
     select * from menu where id=1;
   </select>
 
-  <!-- 메뉴 수정 -->
   <select id="findMenuByName" resultType="com.example.backend.setting.dto.MenuRes">
-    select coalesce(searchTree.sub, 0) as sub, subTree.id, searchTree.par_id, name, sort_order,
-    par_id, enabled_yn
-    from (select id, name, sort_order, name_tree
-    from menu where name_tree like #{gnbName})subTree left join
-    (select 1 as sub, id, par_id, enabled_yn from menu where name like #{name})searchTree on
-    subTree.id=searchTree.id where sub=1;
-  </select>
-
-  <select id="findAllIcon" resultType="String">
-    select icon_url from menu;
+    select menu.id, menu.name, menu.par_id, m.name as par_name, menu.name_tree, menu.enabled_yn from menu
+    inner join menu as m
+    where menu.name_tree like #{gnbName} and menu.name like #{name} and m.id=menu.par_id order by menu.sort_order desc;
   </select>
 
   <!-- 즐겨찾기 확인 -->
@@ -115,5 +107,22 @@
     (SELECT PAR_ID FROM MENU WHERE ID=#{id})ORIGIN WHERE ORIGIN.PAR_ID = MENU.ID;
   </select>
 
+
+  <update id="updateChildNodeYnOfParMenu" parameterType="java.lang.Long">
+    update menu set child_node_yn = 0 where id = #{id};
+  </update>
+
+  <resultMap id="result" type="com.example.backend.setting.dto.Dto">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="age" property="age" />
+  </resultMap>
+
+  <insert id="testList" parameterType="java.util.List" useGeneratedKeys = "true" keyProperty = "id">
+    insert into test(name, age) values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.name}, #{item.age})
+    </foreach>
+  </insert>
 
 </mapper>

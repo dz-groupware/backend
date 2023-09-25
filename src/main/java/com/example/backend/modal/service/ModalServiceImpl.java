@@ -1,12 +1,12 @@
 package com.example.backend.modal.service;
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
-import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
 
+import com.example.backend.common.dto.PkDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -29,22 +29,21 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<ProfileRes> getAllProfile() {
-    Long userId = SecurityUtil.getUserId();
-    return modalMapper.getProfileByUserId(userId);
+  public List<ProfileRes> getAllProfile(PkDto pkDto) {
+    return modalMapper.getProfileByUserId(pkDto.getUserId());
   }
 
   @Override
-  public List<TreeItemRes> getOrgTree(String type, Long compId, Long deptId) {
+  public List<TreeItemRes> getOrgTree(PkDto pkDto, String type, Long deptId) {
     if(type.equals("basic")) {
-      compId = SecurityUtil.getCompanyId();
-      return modalMapper.getCompToGnb(compId);
+
+      return modalMapper.getCompToGnb(pkDto.getCompId());
     }
     if (type.equals("comp")) {
-      return modalMapper.getGnbToLnb(compId);
+      return modalMapper.getGnbToLnb(pkDto.getCompId());
     }
     if (type.equals("dept")) {
-      return modalMapper.getLnbToLnb(compId, deptId);
+      return modalMapper.getLnbToLnb(pkDto.getCompId(), deptId);
     }
     return new ArrayList<TreeItemRes>();
   }
@@ -62,13 +61,11 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public SingleResponseDto<?> findOrgResult(String type, String text) {
-    log.info(type + text);
+  public SingleResponseDto<?> findOrgResult(PkDto pkDto, String type, String text) {
     if (type.equals("all")) {
       Map<String, List<?>> result = new HashMap<>();
-      Long compId = SecurityUtil.getCompanyId();
-      result.put("Tree", modalMapper.findDeptAllByText(compId, text));
-      result.put("List", modalMapper.findEmpAllByText(compId, text, text, text, text, text, text, text));
+      result.put("Tree", modalMapper.findDeptAllByText(pkDto.getCompId(), text, pkDto.getCompId(), text));
+      result.put("List", modalMapper.findEmpAllByText(pkDto.getCompId(), text, text, text, text, text, text, text));
       return new SingleResponseDto<Map>(result);
     }
 
@@ -83,9 +80,8 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public boolean checkEmpIds(Long empId){
-    Long userId = SecurityUtil.getUserId();
-    List<Long> result = modalMapper.checkEmpIds(userId);
+  public boolean checkEmpIds(PkDto pkDto, Long empId){
+    List<Long> result = modalMapper.checkEmpIds(pkDto.getUserId());
     for (int i=0; i<result.size(); i++){
       if (result.get(i) == empId) {
         return true;

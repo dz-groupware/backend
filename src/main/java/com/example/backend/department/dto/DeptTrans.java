@@ -1,19 +1,19 @@
-package com.example.backend.setting.dto;
+package com.example.backend.department.dto;
+
 
 import lombok.Getter;
 import lombok.Setter;
-
 @Getter
 @Setter
-public class MenuTrans {
+public class DeptTrans {
   private Long id = 0L;
   private Long parId = 0L;
   private String name = "";
   private String idTree = "";
   private String nameTree = "";
 
-  public MenuTrans(){}
-  public MenuTrans(MenuTrans stream) {
+  public DeptTrans(){}
+  public DeptTrans(DeptTrans stream) {
     this.id = stream.id;
     this.parId = stream.parId;
     this.name = new String(stream.name);
@@ -21,7 +21,7 @@ public class MenuTrans {
     this.nameTree = new String(stream.nameTree);
   }
 
-  public MenuTrans(MenuRes menu){
+  public DeptTrans(DeptDto menu){
     this.id = menu.getId();
     this.parId = menu.getParId();
     this.name = menu.getName();

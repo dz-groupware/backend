@@ -1,9 +1,9 @@
 package com.example.backend.authgroup.controller;
 
 import com.example.backend.authgroup.dto.AddAuthDto;
-import com.example.backend.common.MultiResponseDto;
-import com.example.backend.common.Page;
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.MultiResponseDto;
+import com.example.backend.common.dto.Page;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.authgroup.service.AuthGroupService;
 import java.io.UnsupportedEncodingException;

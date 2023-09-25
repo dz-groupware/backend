@@ -13,7 +13,7 @@ public interface ModalMapper {
   List<TreeItemRes> getLnbToLnb(Long compId, Long deptId);
   List<ProfileRes> getEmpListByCompId(Long compId);
   List<ProfileRes> getEmpListByDeptId(Long compId, Long deptId);
-  List<TreeItemRes> findDeptAllByText(Long compId, String text);
+  List<TreeItemRes> findDeptAllByText(Long compId1, String text1, Long compId2, String text2);
   List<ProfileRes> findEmpAllByText(Long compId, String text1, String text2, String text3, String text4, String text5, String text6, String text7);
 
 

@@ -1,8 +1,6 @@
 package com.example.backend.employeemgmt.controller;
 
-import com.example.backend.common.SingleResponseDto;
-import com.example.backend.employee.service.EmployeeService;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtReqDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.employeemgmt.service.EmployeeMgmtService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.http.HttpStatus;
