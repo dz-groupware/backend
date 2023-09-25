@@ -4,4 +4,4 @@
 pkill -f 'java -jar backend-0.0.1-SNAPSHOT.jar'
 
 # 새로운 JAR 파일로 Java 애플리케이션 실행
-nohup java -jar ~/backend-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+nohup java -jar ~/home/ubuntu/backend-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
