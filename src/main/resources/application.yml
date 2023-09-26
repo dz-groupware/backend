@@ -14,7 +14,7 @@ spring:
       write-dates-as-timestamps: false
   redis:
     host: ${SPRING_REDIS_HOST}
-    port: ${SPRING_REDIS_PORT}
+    port: ${SPRING_REDIS_PORT:6379}
   jwt:
     secret:
       key: ${SPRING_JWT_SECRET_KEY}
