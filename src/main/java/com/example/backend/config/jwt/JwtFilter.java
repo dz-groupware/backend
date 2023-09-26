@@ -25,7 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
     String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
     String requestURI = request.getRequestURI();
-    System.out.println("여기1" + accessToken);
+    System.out.println("in jwt :: " + accessToken);
 
 
     if(!requestURI.startsWith("/api/v1/auth/login")){
@@ -33,10 +33,10 @@ public class JwtFilter extends OncePerRequestFilter {
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
           Authentication auth = jwtTokenProvider.getAuthentication(accessToken, request);
           SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
-          System.out.println("여기뜨나"+ auth);
+          System.out.println("accetoken :: "+ auth);
         }
       } catch (ExpiredJwtException e) {
-        System.out.println("캐치1");
+        System.out.println("catch1");
         // 여기서 리프레쉬 토큰 사용하여 새로운 액세스 토큰 발급
         String refreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
         if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
@@ -55,14 +55,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
       } catch (RedisConnectionFailureException e) {
         SecurityContextHolder.clearContext();
-        System.out.println("캐치2");
+        System.out.println("catch2");
         throw new Error("레디스 에러");
       } catch (JwtException e) {
-        System.out.println("캐치3");
+        System.out.println("catch3");
         throw new Error("유효하지 않은 JWT");
       }
     }
-    System.out.println("정상");
+    System.out.println("good");
     filterChain.doFilter(request, response);
   }
 }

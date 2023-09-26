@@ -6,7 +6,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.HashMap;
@@ -110,22 +109,26 @@ public class JwtTokenProvider {
   }
 
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
+    System.out.println("in getAuthentication");
     Claims claims = Jwts.parserBuilder()
         .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
         .build()
         .parseClaimsJws(token)
         .getBody();
+    System.out.println("done Claims");
 
     // 요청에서 오는 IP와 User-Agent 정보
     String incomingIp = request.getRemoteAddr();
     String incomingUserAgent = request.getHeader("User-Agent");
 
     String userInfoJson = redisTemplate.opsForValue().get(token);
+    System.out.println("userInfoJson : "+ userInfoJson);
     // JSON 문자열을 Map으로 변환
     Map<String, Object> userInfoMap = null;
     try {
       userInfoMap = objectMapper.readValue(userInfoJson, Map.class);
     } catch (JsonProcessingException e) {
+      System.out.println("JsonProcessingException");
       e.printStackTrace();
     }
     // 토큰에 저장된 IP와 User-Agent 정보
@@ -150,8 +153,11 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
+    log.info("token get 1");
     if (cookies != null) {
+      log.info("token get 2");
       for (Cookie cookie : cookies) {
+        log.info("token get 3");
         System.out.println(cookie.getName());
         if ("accessToken".equals(cookie.getName())) {
           System.out.println("cooke.getValue : " + cookie.getValue());

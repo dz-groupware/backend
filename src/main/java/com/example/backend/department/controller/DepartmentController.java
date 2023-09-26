@@ -49,6 +49,7 @@ public class DepartmentController {
         new SingleResponseDto<>(departmentService.getBasicDetailById(id)), HttpStatus.OK);
   }
 
+
   @GetMapping("detail-emp")
   public ResponseEntity<?> getEmpListByDeptId(@RequestParam Long id){
     return new ResponseEntity<>(

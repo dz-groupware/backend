@@ -30,6 +30,7 @@ public class JwtController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginReqDto loginReqDto,HttpServletRequest request, HttpServletResponse response){
     TokenDto tokenDto = null;
+    System.out.println("in controller ");
     try {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(
