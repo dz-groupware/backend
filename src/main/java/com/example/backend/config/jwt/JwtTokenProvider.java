@@ -41,7 +41,7 @@ public class JwtTokenProvider {
   private final PrincipalDetailsService userDetailsService;
   private final ObjectMapper objectMapper;
 
-  public String createAccessToken(Authentication authentication, HttpServletRequest request)  {
+  public String[] createAccessToken(Authentication authentication, HttpServletRequest request)  {
     Claims claims = Jwts.claims().setSubject(authentication.getName());
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
@@ -80,7 +80,7 @@ public class JwtTokenProvider {
         TimeUnit.MILLISECONDS
     );
 
-    return accessToken;
+    return new String[]{accessToken, principalDetails.getEmployeeId().toString(), principalDetails.getCompanyId().toString()};
   }
 
   public String createRefreshToken(Authentication authentication){
@@ -109,26 +109,22 @@ public class JwtTokenProvider {
   }
 
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
-    System.out.println("in getAuthentication");
     Claims claims = Jwts.parserBuilder()
         .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
         .build()
         .parseClaimsJws(token)
         .getBody();
-    System.out.println("done Claims");
 
     // 요청에서 오는 IP와 User-Agent 정보
     String incomingIp = request.getRemoteAddr();
     String incomingUserAgent = request.getHeader("User-Agent");
 
     String userInfoJson = redisTemplate.opsForValue().get(token);
-    System.out.println("userInfoJson : "+ userInfoJson);
     // JSON 문자열을 Map으로 변환
     Map<String, Object> userInfoMap = null;
     try {
       userInfoMap = objectMapper.readValue(userInfoJson, Map.class);
     } catch (JsonProcessingException e) {
-      System.out.println("JsonProcessingException");
       e.printStackTrace();
     }
     // 토큰에 저장된 IP와 User-Agent 정보
@@ -153,11 +149,8 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
-    log.info("token get 1");
     if (cookies != null) {
-      log.info("token get 2");
       for (Cookie cookie : cookies) {
-        log.info("token get 3");
         System.out.println(cookie.getName());
         if ("accessToken".equals(cookie.getName())) {
           System.out.println("cooke.getValue : " + cookie.getValue());

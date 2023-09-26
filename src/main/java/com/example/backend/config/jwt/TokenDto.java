@@ -11,9 +11,13 @@ import lombok.ToString;
 public class TokenDto {
   private String accessToken;
   private String refreshToken;
+  private String empId;
+  private String compId;
 
-  public TokenDto(String accessToken, String refreshToken) {
+  public TokenDto(String accessToken, String refreshToken, String empId, String compId) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
+    this.empId = empId;
+    this.compId = compId;
   }
 }

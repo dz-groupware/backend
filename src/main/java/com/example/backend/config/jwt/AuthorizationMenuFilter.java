@@ -33,14 +33,15 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
 
-    String uri = request.getRequestURI();
-    if ("/api/v1/auth/login".equals(uri)) {
+    logger.info("### AuthorizationMenuFilter ###");
+
+    if ("/api/v1/auth/login".equals(request.getRequestURI())) {
       chain.doFilter(request, response);
       return;
     }
 
-
     String accessToken = tokenProvider.getAccessTokenFromRequest(request);
+
     if (accessToken == null || "".equals(accessToken)) {
       response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
       return;
@@ -60,11 +61,14 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       pkDto = redisMapper.getAllKeys(empId);
       redisForPayload.opsForValue().set("empId", pkDto);
     }
-    logger.info("jwt is not in redis");
+
     List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
 
     String menuId = request.getHeader("menuId");
+
     logger.info("in menuFilter : "+menuId);
+
+    // menuId == null 지울예정
     if (menuId == null || menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
       request.setAttribute("pkDto", pkDto);
       chain.doFilter(request, response);
@@ -72,5 +76,4 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
   }
-
 }

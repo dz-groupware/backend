@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
           Authentication auth = jwtTokenProvider.getAuthentication(refreshToken, request);
           SecurityContextHolder.getContext().setAuthentication(auth);
-          String newAccessToken = jwtTokenProvider.createAccessToken(auth, request);
+          String newAccessToken = jwtTokenProvider.createAccessToken(auth, request)[0];
           String newRefreshToken = jwtTokenProvider.createRefreshToken(auth);
           // 새 액세스 토큰을 응답 헤더나 쿠키 등에 추가
           Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
