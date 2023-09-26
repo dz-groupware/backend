@@ -1,0 +1,39 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api/v1
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  redis:
+    host: ${SPRING_REDIS_HOST:localhost}
+    port: ${SPRING_REDIS_PORT:6379}
+  jwt:
+    secret:
+      key: ${SPRING_JWT_SECRET_KEY}
+    token:
+      access-expiration-time: 43200000
+      refresh-expiration-time: 604800000
+cloud:
+  aws:
+    credentials:
+      accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
+      secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCEKT}
+      dir: ${CLOUD_AWS_S3_DIR}
+    region:
+      static: ${CLOUD_AWS_REGION_STATIC}
+    stack:
+      auto: ${CLOUD_AWS_STACK_AUTO}
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:/mappers/*.xml
