@@ -2,6 +2,7 @@ package com.example.backend.menu.service;
 
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.menu.dto.MenuDto;
+import com.example.backend.menu.dto.RouteDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import com.example.backend.config.jwt.PkDto;
 import java.util.List;
@@ -66,5 +67,10 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public List<MenuDto> getUpperMenuLnb(PkDto pkDto, Long menuId) {
     return menuMapper.getUpperMenuLnb(menuId, pkDto.getCompId());
+  }
+
+  @Override
+  public List<RouteDto> getMenuList(PkDto pkDto) {
+    return menuMapper.getMenuList(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
   }
 }
