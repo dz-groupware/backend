@@ -58,51 +58,39 @@ public class JwtTokenProvider {
   }
 
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
-    Claims claims = Jwts.parserBuilder()
-        .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
-        .build()
-        .parseClaimsJws(token)
-        .getBody();
-
-    // 요청에서 오는 IP와 User-Agent 정보
-    String incomingIp = request.getRemoteAddr();
-    String incomingUserAgent = request.getHeader("User-Agent");
-
-    String userInfoJson = redisTemplate.opsForValue().get(token);
-    // JSON 문자열을 Map으로 변환
-    Map<String, Object> userInfoMap = null;
-    try {
-      userInfoMap = objectMapper.readValue(userInfoJson, Map.class);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    // 토큰에 저장된 IP와 User-Agent 정보
+    Claims claims = parseToken(token);
+    Map<String, Object> userInfoMap = getUserInfoFromRedis(token);
+    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
+    UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
+    return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+  }
+
+  private Map<String, Object> getUserInfoFromRedis(String token) {
+    String userInfoJson = redisTemplate.opsForValue().get(token);
+    try {
+      return objectMapper.readValue(userInfoJson, Map.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("JSON 변환 중 에러 발생", e);
+    }
+  }
+
+  private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
+    String incomingIp = request.getRemoteAddr();
+    String incomingUserAgent = request.getHeader("User-Agent");
     String storedIp = (String) userInfoMap.get("clientIp");
     String storedUserAgent = (String) userInfoMap.get("userAgent");
-    System.out.println("들어온거 +" + incomingIp);
-    System.out.println("들어온거 +" + incomingUserAgent);
-    System.out.println("저장된거 +" + storedIp);
-    System.out.println("저장된거 +" + storedUserAgent);
-    if(!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
+    if (!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
       throw new RuntimeException("인증 정보가 일치하지 않습니다.");
     }
-
-    UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
-
-    System.out.println("##############");
-    System.out.println("userInfoMap: " + userInfoMap);
-    return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {
-        System.out.println(cookie.getName());
         if ("accessToken".equals(cookie.getName())) {
-          System.out.println("cooke.getValue : " + cookie.getValue());
           return cookie.getValue();
         }
       }
@@ -177,9 +165,18 @@ public class JwtTokenProvider {
     claims.put("empId", ((PrincipalDetails) authentication.getPrincipal()).getEmployeeId());
     return claims;
   }
+
   private Claims generateRefreshClaims(Authentication authentication) {
     Claims claims = Jwts.claims().setSubject(authentication.getName());
     return claims;
+  }
+
+  private Claims parseToken(String token) {
+    return Jwts.parserBuilder()
+        .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+        .build()
+        .parseClaimsJws(token)
+        .getBody();
   }
 
   private String generateUserInfoJson(Authentication authentication, HttpServletRequest request) {
