@@ -155,4 +155,9 @@ public class AuthGroupController {
     authGroupService.addAuthEmployee(addEmpAuthDto);
     return ResponseEntity.ok().build();
   }
+
+  @GetMapping("/hello")
+  public String hello(){
+    return "hello";
+  }
 }
