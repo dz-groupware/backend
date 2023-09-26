@@ -1,5 +1,7 @@
 package com.example.backend.config.jwt;
 
+import com.example.backend.common.error.BusinessLogicException;
+import com.example.backend.common.error.JwtExceptionCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -7,6 +9,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.lettuce.core.RedisException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,46 +71,53 @@ public class JwtTokenProvider {
   }
 
   private Map<String, Object> getUserInfoFromRedis(String token) {
-    String userInfoJson = redisTemplate.opsForValue().get(token);
+    String userInfoJson = null;
     try {
+      userInfoJson = redisTemplate.opsForValue().get(token);
+      if (userInfoJson == null) { // 4. Null Check
+        throw new BusinessLogicException(JwtExceptionCode.INVALID_REDIS_TOKEN);
+      }
       return objectMapper.readValue(userInfoJson, Map.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("JSON 변환 중 에러 발생", e);
+    } catch (RedisException e) { // 1. Redis Connection Error
+      throw new BusinessLogicException(JwtExceptionCode.NO_REDIS_CONNECTION);
+    } catch (JsonProcessingException | ClassCastException e) {
+      throw new BusinessLogicException(JwtExceptionCode.TYPE_MISMATCH);
     }
   }
 
   private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
     String incomingIp = request.getRemoteAddr();
     String incomingUserAgent = request.getHeader("User-Agent");
+    if (incomingIp == null ||incomingUserAgent == null) {
+      throw new BusinessLogicException(JwtExceptionCode.MISSING_USER_AGENT);
+    }
     String storedIp = (String) userInfoMap.get("clientIp");
     String storedUserAgent = (String) userInfoMap.get("userAgent");
     if (!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
-      throw new RuntimeException("인증 정보가 일치하지 않습니다.");
+      throw new BusinessLogicException(JwtExceptionCode.MISMATCHED_USER_AGENT);
     }
   }
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if ("accessToken".equals(cookie.getName())) {
-          return cookie.getValue();
-        }
-      }
+    if (cookies == null) {
+      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
-    return null;
+    for (Cookie cookie : cookies)
+      if ("accessToken".equals(cookie.getName()))
+        return cookie.getValue();
+    throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
   public String getRefreshTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if ("refreshToken".equals(cookie.getName())) {
-          return cookie.getValue();
-        }
-      }
+    if (cookies == null) {
+      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
-    return null;
+    for (Cookie cookie : cookies)
+      if ("refreshToken".equals(cookie.getName()))
+        return cookie.getValue();
+    throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
   public boolean validateToken(String token){
@@ -117,12 +127,11 @@ public class JwtTokenProvider {
           .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
           .build()
           .parseClaimsJws(token);
-      System.out.println("에러뜨기전");
       return true;
     } catch(ExpiredJwtException e) {
-      throw new Error("만료된토큰");
+      throw new BusinessLogicException(JwtExceptionCode.EXPIRED_JWT_TOKEN);
     } catch(JwtException e) {
-      throw new Error("유효하지않은 토큰");
+      throw new BusinessLogicException(JwtExceptionCode.INVALID_JWT_TOKEN);
     }
   }
 
@@ -131,24 +140,34 @@ public class JwtTokenProvider {
     String accessToken = getAccessTokenFromRequest(request);
     String refreshToken = getRefreshTokenFromRequest(request);
 
+    if (accessToken == null && refreshToken == null) {
+      throw new BusinessLogicException(JwtExceptionCode.MISSING_TOKENS);
+    }
+
     if (accessToken != null) {
-      if (validateToken(accessToken) && redisTemplate.hasKey(accessToken)) {
-        redisTemplate.delete(accessToken);
-      } else {
-        log.warn("유효한토큰이 아니라 로그아웃을 할 수 없습니다.");
+      if (!validateAndDeleteToken(accessToken)) {
+        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
       }
     }
 
     if (refreshToken != null) {
-      if (validateToken(refreshToken) && redisTemplate.hasKey(refreshToken)) {
-        redisTemplate.delete(refreshToken);
-      } else {
-        log.warn("유효한토큰이 아니라 로그아웃을 할 수 없습니다.");
+      if (!validateAndDeleteToken(refreshToken)) {
+        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
       }
     }
 
   }
-
+  private boolean validateAndDeleteToken(String token) {
+    if (validateToken(token)) {
+      if (redisTemplate.hasKey(token)) {
+        redisTemplate.delete(token);
+        return true;
+      } else {
+        throw new BusinessLogicException(JwtExceptionCode.TOKEN_NOT_FOUND_IN_REDIS);
+      }
+    }
+    return false;
+  }
   private String generateJwtToken(Claims claims, long expirationTime) {
     Date now = new Date();
     Date expirationDate = new Date(now.getTime() + expirationTime);
@@ -196,7 +215,7 @@ public class JwtTokenProvider {
     try {
       userInfoJson = objectMapper.writeValueAsString(userInfoMap);
     } catch (JsonProcessingException e) {
-      e.printStackTrace();
+      throw new BusinessLogicException(JwtExceptionCode.JSON_PROCESSING_ERROR);
     }
 
     return userInfoJson;
