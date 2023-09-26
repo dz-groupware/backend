@@ -43,36 +43,17 @@ public class JwtTokenProvider {
   private final ObjectMapper objectMapper;
 
   public String createAccessToken(Authentication authentication, HttpServletRequest request)  {
-    Claims claims = generateClaims(authentication);
-    String accessToken = generateJwtToken(claims);
+    Claims claims = generateAccessClaims(authentication);
+    String accessToken = generateJwtToken(claims,accessExpirationTime);
     String userInfoJson = generateUserInfoJson(authentication, request);
-    storeTokenInRedis(accessToken, userInfoJson);
-
+    storeAccessTokenInRedis(accessToken, userInfoJson);
     return accessToken;
   }
 
   public String createRefreshToken(Authentication authentication){
-    Claims claims = Jwts.claims().setSubject(authentication.getName());
-    Date now = new Date();
-    Date expireDate = new Date(now.getTime() + refreshExpirationTime);
-
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
-
-    String refreshToken = Jwts.builder()
-        .setClaims(claims)
-        .setIssuedAt(now)
-        .setExpiration(expireDate)
-        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
-        .compact();
-
-    redisTemplate.opsForValue().set(
-        refreshToken,
-        principalDetails.toString(),
-        refreshExpirationTime,
-        TimeUnit.MILLISECONDS
-    );
-
+    Claims claims = generateRefreshClaims(authentication);
+    String refreshToken = generateJwtToken(claims,refreshExpirationTime);
+    storeRefreshTokenInRedis(refreshToken, authentication);
     return refreshToken;
   }
 
@@ -180,9 +161,9 @@ public class JwtTokenProvider {
 
   }
 
-  private String generateJwtToken(Claims claims) {
+  private String generateJwtToken(Claims claims, long expirationTime) {
     Date now = new Date();
-    Date expirationDate = new Date(now.getTime() + accessExpirationTime);
+    Date expirationDate = new Date(now.getTime() + expirationTime);
     return Jwts.builder()
         .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
         .setClaims(claims)
@@ -191,13 +172,16 @@ public class JwtTokenProvider {
         .compact();
   }
 
-  private Claims generateClaims(Authentication authentication) {
+  private Claims generateAccessClaims(Authentication authentication) {
     Claims claims = Jwts.claims().setSubject(authentication.getName());
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
-    claims.put("empId", principalDetails.getEmployeeId());
+    claims.put("empId", ((PrincipalDetails) authentication.getPrincipal()).getEmployeeId());
     return claims;
   }
+  private Claims generateRefreshClaims(Authentication authentication) {
+    Claims claims = Jwts.claims().setSubject(authentication.getName());
+    return claims;
+  }
+
   private String generateUserInfoJson(Authentication authentication, HttpServletRequest request) {
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
@@ -221,12 +205,23 @@ public class JwtTokenProvider {
     return userInfoJson;
   }
 
-  private void storeTokenInRedis(String token, String userInfoJson) {
+  private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
     redisTemplate.opsForValue().set(
-      token,
+      accessToken,
       userInfoJson,
       accessExpirationTime,
       TimeUnit.MILLISECONDS
+    );
+  }
+
+  private void storeRefreshTokenInRedis(String refreshToken, Authentication authentication) {
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
+    redisTemplate.opsForValue().set(
+        refreshToken,
+        principalDetails.toString(),
+        refreshExpirationTime,
+        TimeUnit.MILLISECONDS
     );
   }
 }
