@@ -37,12 +37,10 @@ public class JwtController {
               loginReqDto.getLoginPw()
           )
       );
-      String[] result = jwtTokenProvider.createAccessToken(authentication, request);
+
       tokenDto = new TokenDto(
-          result[0],
-          jwtTokenProvider.createRefreshToken(authentication),
-          result[1],
-          result[2]
+          jwtTokenProvider.createAccessToken(authentication, request),
+          jwtTokenProvider.createRefreshToken(authentication)
       );
 
     }catch(BadCredentialsException e){
@@ -61,8 +59,10 @@ public class JwtController {
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
 
+
+
     return ResponseEntity.accepted().body(new SingleResponseDto<>(
-        "{\"empId\":\""+tokenDto.getEmpId()+"\",\"compId\":\""+tokenDto.getCompId()+"\"}"));
+        "{\"empId\":\""+SecurityUtil.getEmployeeId()+"\",\"compId\":\""+SecurityUtil.getCompanyId()+"\"}"));
   }
 
   @PostMapping("/reissue")
@@ -71,12 +71,9 @@ public class JwtController {
     jwtTokenProvider.validateToken(refreshToken);
     Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken, request);
 
-    String[] result = jwtTokenProvider.createAccessToken(authentication,request);
     TokenDto tokenDto = new TokenDto(
-        result[0],
-        jwtTokenProvider.createRefreshToken(authentication),
-        result[1],
-        result[2]
+        jwtTokenProvider.createAccessToken(authentication, request),
+        jwtTokenProvider.createRefreshToken(authentication)
     );
 
     Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
@@ -88,7 +85,7 @@ public class JwtController {
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
     return ResponseEntity.accepted().body(new SingleResponseDto<>(
-        "{\"empId\":\""+tokenDto.getEmpId()+"\",\"compId\":\""+tokenDto.getCompId()+"\"}"));
+        "{\"empId\":\""+SecurityUtil.getEmployeeId()+"\",\"compId\":\""+SecurityUtil.getCompanyId()+"\"}"));
   }
 
   @PostMapping("/re-login")
@@ -107,12 +104,9 @@ public class JwtController {
         userDetails.getAuthorities()
     );
 
-    String[] result = jwtTokenProvider.createAccessToken(authentication,request);
     TokenDto tokenDto = new TokenDto(
-        result[0],
-        jwtTokenProvider.createRefreshToken(authentication),
-        result[1],
-        result[2]
+        jwtTokenProvider.createAccessToken(authentication, request),
+        jwtTokenProvider.createRefreshToken(authentication)
     );
 
     Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
@@ -126,7 +120,7 @@ public class JwtController {
 
     // 성공 응답 반환
     return ResponseEntity.accepted().body(new SingleResponseDto<>(
-        "{\"empId\":\""+tokenDto.getEmpId()+"\",\"compId\":\""+tokenDto.getCompId()+"\"}"));
+        "{\"empId\":\""+SecurityUtil.getEmployeeId()+"\",\"compId\":\""+SecurityUtil.getCompanyId()+"\"}"));
   }
 
   @PostMapping("/logout")
