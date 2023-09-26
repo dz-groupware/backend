@@ -6,7 +6,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +26,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Log4j2
 public class JwtTokenProvider {
-
+  public static final String ACCESS_TOKEN_NAME = "accessToken";
+  public static final String REFRESH_TOKEN_NAME = "refreshToken";
   private final RedisTemplate<String, String> redisTemplate;
 
   @Value("${spring.jwt.secret.key}")
@@ -43,43 +43,10 @@ public class JwtTokenProvider {
   private final ObjectMapper objectMapper;
 
   public String createAccessToken(Authentication authentication, HttpServletRequest request)  {
-    Claims claims = Jwts.claims().setSubject(authentication.getName());
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
-    Date now = new Date();
-    Date expirationDate = new Date(now.getTime() + accessExpirationTime);
-    claims.put("empId", principalDetails.getEmployeeId());
-
-    String clientIp = request.getRemoteAddr();
-    String userAgent = request.getHeader("User-Agent");
-    Map<String, Object> userInfoMap = new HashMap<>();
-    userInfoMap.put("empId", principalDetails.getEmployeeId());
-    userInfoMap.put("userId", principalDetails.getUserId());
-    userInfoMap.put("compId", principalDetails.getCompanyId());
-    userInfoMap.put("deptId", principalDetails.getDepartmentId());
-    userInfoMap.put("clientIp", clientIp);
-    userInfoMap.put("userAgent", userAgent);
-
-    String userInfoJson = null;
-    try {
-      userInfoJson = objectMapper.writeValueAsString(userInfoMap);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-
-    String accessToken = Jwts.builder()
-        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
-        .setClaims(claims)
-        .setIssuedAt(now)
-        .setExpiration(expirationDate)
-        .compact();
-
-    redisTemplate.opsForValue().set(
-        accessToken, // key
-        userInfoJson,
-        accessExpirationTime,
-        TimeUnit.MILLISECONDS
-    );
+    Claims claims = generateClaims(authentication);
+    String accessToken = generateJwtToken(claims);
+    String userInfoJson = generateUserInfoJson(authentication, request);
+    storeTokenInRedis(accessToken, userInfoJson);
 
     return accessToken;
   }
@@ -213,4 +180,53 @@ public class JwtTokenProvider {
 
   }
 
+  private String generateJwtToken(Claims claims) {
+    Date now = new Date();
+    Date expirationDate = new Date(now.getTime() + accessExpirationTime);
+    return Jwts.builder()
+        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+        .setClaims(claims)
+        .setIssuedAt(now)
+        .setExpiration(expirationDate)
+        .compact();
+  }
+
+  private Claims generateClaims(Authentication authentication) {
+    Claims claims = Jwts.claims().setSubject(authentication.getName());
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
+    claims.put("empId", principalDetails.getEmployeeId());
+    return claims;
+  }
+  private String generateUserInfoJson(Authentication authentication, HttpServletRequest request) {
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
+    String clientIp = request.getRemoteAddr();
+    String userAgent = request.getHeader("User-Agent");
+    Map<String, Object> userInfoMap = new HashMap<>();
+    userInfoMap.put("empId", principalDetails.getEmployeeId());
+    userInfoMap.put("userId", principalDetails.getUserId());
+    userInfoMap.put("compId", principalDetails.getCompanyId());
+    userInfoMap.put("deptId", principalDetails.getDepartmentId());
+    userInfoMap.put("clientIp", clientIp);
+    userInfoMap.put("userAgent", userAgent);
+
+    String userInfoJson = null;
+    try {
+      userInfoJson = objectMapper.writeValueAsString(userInfoMap);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+
+    return userInfoJson;
+  }
+
+  private void storeTokenInRedis(String token, String userInfoJson) {
+    redisTemplate.opsForValue().set(
+      token,
+      userInfoJson,
+      accessExpirationTime,
+      TimeUnit.MILLISECONDS
+    );
+  }
 }

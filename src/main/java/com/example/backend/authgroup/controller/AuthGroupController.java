@@ -156,8 +156,4 @@ public class AuthGroupController {
     return ResponseEntity.ok().build();
   }
 
-  @GetMapping("/hello")
-  public String hello(){
-    return "hello";
-  }
 }
