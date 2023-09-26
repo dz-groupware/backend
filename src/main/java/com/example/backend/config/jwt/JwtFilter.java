@@ -26,7 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
     String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
     String requestURI = request.getRequestURI();
 
-
     if(!requestURI.startsWith("/api/v1/auth/login")){
       try {
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
