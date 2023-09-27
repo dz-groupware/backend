@@ -51,7 +51,7 @@ public class MenuServiceImpl implements MenuService {
     Long empId = pkDto.getEmpId();
     Long compId = pkDto.getCompId();
 
-    if(checkMapper.checkMaster(empId)) {
+    if(pkDto.isMasterYn()) {
       // 마스터인 경우
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
@@ -71,6 +71,10 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public List<RouteDto> getMenuList(PkDto pkDto) {
-    return menuMapper.getMenuList(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
+    if(pkDto.isMasterYn()){
+      return menuMapper.getMenuListForMaster(pkDto.getCompId());
+    }else{
+      return menuMapper.getMenuList(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
+    }
   }
 }

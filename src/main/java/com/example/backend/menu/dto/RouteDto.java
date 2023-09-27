@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RouteDto {
-  private Long id;
+  private Long menuId;
   private Long gnbId;
-  private String name;
+  private String gnbName;
   private String nameTree;
   private String page;
 }

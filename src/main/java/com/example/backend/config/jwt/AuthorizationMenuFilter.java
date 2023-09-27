@@ -32,13 +32,15 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
-
-    logger.info("### AuthorizationMenuFilter ###");
-
-    if ("/api/v1/auth/login".equals(request.getRequestURI())) {
+    // 로그인이나 테스트 용이면 필터를 건너뛰도록
+    String requestURI = request.getRequestURI();
+    if(requestURI.startsWith("/api/v1/auth/login") || requestURI.startsWith("/api/v1/test")) {
+      logger.info("### AuthorizationMenuFilter : skip ###");
       chain.doFilter(request, response);
       return;
     }
+
+    logger.info("### AuthorizationMenuFilter ###");
 
     String accessToken = tokenProvider.getAccessTokenFromRequest(request);
 
@@ -59,21 +61,27 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
     if (pkDto == null) {
       logger.info("pk is not in redis");
       pkDto = redisMapper.getAllKeys(empId);
+      pkDto.setMasterYn(redisMapper.checkMaster(pkDto.getEmpId()));
       redisForPayload.opsForValue().set("empId", pkDto);
     }
 
-    List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
-
     String menuId = request.getHeader("menuId");
-
     logger.info("in menuFilter : "+menuId);
 
-    // menuId == null 지울예정
-    if (menuId == null || menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
+    if(pkDto.isMasterYn()) {
+      // 마스터이면 권한 확인 안하고 넘어감
       request.setAttribute("pkDto", pkDto);
       chain.doFilter(request, response);
     } else {
-      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
+      // menuId == null 지울예정
+      if (menuId == null || menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
+        request.setAttribute("pkDto", pkDto);
+        chain.doFilter(request, response);
+      } else {
+        logger.info("denied");
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      }
     }
   }
 }

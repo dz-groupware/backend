@@ -59,10 +59,7 @@ public class JwtController {
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
 
-
-
-    return ResponseEntity.accepted().body(new SingleResponseDto<>(
-        "{\"empId\":\""+SecurityUtil.getEmployeeId()+"\",\"compId\":\""+SecurityUtil.getCompanyId()+"\"}"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 반환 완료"));
   }
 
   @PostMapping("/reissue")
@@ -84,8 +81,7 @@ public class JwtController {
     refreshTokenCookie.setPath("/");
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
-    return ResponseEntity.accepted().body(new SingleResponseDto<>(
-        "{\"empId\":\""+SecurityUtil.getEmployeeId()+"\",\"compId\":\""+SecurityUtil.getCompanyId()+"\"}"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 반환 완료"));
   }
 
   @PostMapping("/re-login")
@@ -119,14 +115,11 @@ public class JwtController {
     response.addCookie(refreshTokenCookie);
 
     // 성공 응답 반환
-    return ResponseEntity.accepted().body(new SingleResponseDto<>(
-        "{\"empId\":\""+SecurityUtil.getEmployeeId()+"\",\"compId\":\""+SecurityUtil.getCompanyId()+"\"}"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 반환 완료"));
   }
 
   @PostMapping("/logout")
   public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-    String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
-    String refreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
     jwtTokenProvider.logout(request);
     Cookie accessTokenCookie = new Cookie("accessToken", null);
     Cookie refreshTokenCookie = new Cookie("refreshToken", null);
@@ -134,7 +127,7 @@ public class JwtController {
     accessTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
     refreshTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
     accessTokenCookie.setHttpOnly(true);
-    accessTokenCookie.setPath("/");
+    refreshTokenCookie.setHttpOnly(true);
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setPath("/");
 

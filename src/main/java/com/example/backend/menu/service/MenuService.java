@@ -13,5 +13,4 @@ public interface MenuService {
   List<MenuDto> getUpperMenuGnb(PkDto pkDto) ;
   List<MenuDto> getUpperMenuLnb(PkDto pkDto, Long menuId);
   List<RouteDto> getMenuList(PkDto pkDto);
-
 }

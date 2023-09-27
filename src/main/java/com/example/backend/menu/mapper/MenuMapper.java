@@ -20,6 +20,7 @@ public interface MenuMapper {
   List<MenuDto> getUpperMenuGnbForMaster(Long compId);
   List<MenuDto> getUpperMenuLnbForMaster(Long menuId, Long compId);
   List<RouteDto> getMenuList(Long empId, Long deptId, Long compId);
+  List<RouteDto> getMenuListForMaster(Long compId);
 
 
 
