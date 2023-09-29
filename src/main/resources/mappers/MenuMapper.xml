@@ -77,7 +77,7 @@
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) : 마스터-->
   <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, name_tree, child_node_yn FROM MENU
+    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
     where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId} order by sort_order desc;
   </select>
 
@@ -113,25 +113,5 @@
     and par_id = #{menuId} and id != par_id order by sort_order;
   </select>
 
-  <!-- 메뉴(라우팅) 리스트 -->
-  <select id="getMenuList" resultType="com.example.backend.menu.dto.RouteDto">
-    SELECT M.ID as menu_id, par.NAME as gnb_name, M.NAME_TREE, par.ID as gnb_id, P.NAME as page FROM MENU AS M
-    INNER JOIN PAGE AS P ON M.PAGE_ID = P.ID
-    left join menu as par on m.name_tree like concat(par.name, '%')
-    inner join (select menu_id from auth_menu
-    inner join (select auth_id from auth_employee where emp_id= #{empId}
-    union select auth_id from auth_department where dept_id = #{deptId}
-    union select auth_id from auth_company where comp_id = #{compId})admin
-    on auth_menu.auth_id = admin.auth_id)menuList
-    on menuList.menu_id = m.id where m.enabled_yn = 1 and m.deleted_yn = 0;
-  </select>
-
-  <!-- 메뉴(라우팅) 리스트 : 마스터 -->
-  <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
-    SELECT M.ID as menu_id, par.NAME as gnb_name, M.NAME_TREE, par.ID as gnb_id, P.NAME as page FROM MENU AS M
-    INNER JOIN PAGE AS P ON M.PAGE_ID = P.ID
-    left join menu as par on m.name_tree like concat(par.name, '%')
-    where m.enabled_yn = 1 and m.deleted_yn = 0 and m.comp_id = #{compId};
-  </select>
 
 </mapper>
