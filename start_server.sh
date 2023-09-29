@@ -3,5 +3,5 @@
 pkill -f 'backend-0.0.1-SNAPSHOT.jar'
 
 # 새로운 JAR 파일로 Java 애플리케이션 실행
-nohup java -jar ~/backend-0.0.1-SNAPSHOT.jar > ~/backend.log 2>&1 &
+TZ=Asia/Seoul nohup java -jar ~/backend-0.0.1-SNAPSHOT.jar > ~/backend.log 2>&1 &
 
