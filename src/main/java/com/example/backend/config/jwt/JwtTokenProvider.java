@@ -180,6 +180,7 @@ public class JwtTokenProvider {
   }
 
   private Claims generateAccessClaims(Authentication authentication) {
+
     Claims claims = Jwts.claims().setSubject(authentication.getName());
     claims.put("empId", ((PrincipalDetails) authentication.getPrincipal()).getEmployeeId());
     return claims;
