@@ -1,10 +1,10 @@
 package com.example.backend.employeemgmt.controller;
 
 import com.example.backend.common.SingleResponseDto;
-import com.example.backend.employee.service.EmployeeService;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtCheckSignUpResultResDto;
 import com.example.backend.employeemgmt.dto.EmployeeMgmtReqDto;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
 import com.example.backend.employeemgmt.service.EmployeeMgmtService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +63,30 @@ public class EmployeeMgmtController {
         employeeMgmtService.removeEmployeeMgmt(id,employeeMgmt);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/idcheck/{loginId}")
+    public ResponseEntity checkLoginId(@PathVariable String loginId) {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.checkLoginId(loginId)),
+                HttpStatus.OK);
+    }
+    @PostMapping("/signupcheck")
+    public ResponseEntity checkSignUp(@RequestBody EmployeeMgmtSignUpReqDto employeeMgmt) {
+        EmployeeMgmtCheckSignUpResultResDto result = employeeMgmtService.checkSignUp(employeeMgmt);
+
+        System.out.println(employeeMgmt.toString());
+        if (result.isFromCheck() && (result.getData() == null || result.getData().isEmpty())) {
+            // if 문에서 결과가 나왔지만 데이터가 없는 경우
+            return new ResponseEntity<>("No data found from check", HttpStatus.NOT_FOUND);
+        } else if (!result.isFromCheck()) {
+            // if 문에 들어가지 않은 경우
+            return new ResponseEntity<>("No data found", HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(new SingleResponseDto<>(result.getData()), HttpStatus.OK);
+    }
+
+
 
 }
 

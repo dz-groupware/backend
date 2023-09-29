@@ -32,4 +32,11 @@ public class S3Controller {
     System.out.println(multipartFile);
     return new ResponseEntity<String>(s3.upload(multipartFile), HttpStatus.OK);
   }
+
+  @PostMapping("/profile")
+  public ResponseEntity<String> profileUploadFile(@RequestParam("profileImage") MultipartFile multipartFile)
+          throws IOException {
+    System.out.println(multipartFile);
+    return new ResponseEntity<String>(s3.profileUploadFile(multipartFile), HttpStatus.OK);
+  }
 }
