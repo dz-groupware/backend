@@ -30,6 +30,7 @@ public class JwtController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginReqDto loginReqDto,HttpServletRequest request, HttpServletResponse response){
     TokenDto tokenDto = null;
+    System.out.println("in controller ");
     try {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(
@@ -37,11 +38,12 @@ public class JwtController {
               loginReqDto.getLoginPw()
           )
       );
-
+      System.out.println("asdfadf"+ authentication.toString());
       tokenDto = new TokenDto(
           jwtTokenProvider.createAccessToken(authentication, request),
           jwtTokenProvider.createRefreshToken(authentication)
       );
+      System.out.println(tokenDto.toString());
 
     }catch(BadCredentialsException e){
       log.error("유효하지않은 로그인아디와 패스워드입니다.");
@@ -59,7 +61,7 @@ public class JwtController {
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
 
-    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 반환 완료"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 발급"));
   }
 
   @PostMapping("/reissue")
@@ -69,7 +71,7 @@ public class JwtController {
     Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken, request);
 
     TokenDto tokenDto = new TokenDto(
-        jwtTokenProvider.createAccessToken(authentication, request),
+        jwtTokenProvider.createAccessToken(authentication,request),
         jwtTokenProvider.createRefreshToken(authentication)
     );
 
@@ -81,7 +83,7 @@ public class JwtController {
     refreshTokenCookie.setPath("/");
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
-    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 반환 완료"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
   }
 
   @PostMapping("/re-login")
@@ -115,11 +117,13 @@ public class JwtController {
     response.addCookie(refreshTokenCookie);
 
     // 성공 응답 반환
-    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 반환 완료"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
   }
 
   @PostMapping("/logout")
   public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
+    String refreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
     jwtTokenProvider.logout(request);
     Cookie accessTokenCookie = new Cookie("accessToken", null);
     Cookie refreshTokenCookie = new Cookie("refreshToken", null);
@@ -127,7 +131,7 @@ public class JwtController {
     accessTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
     refreshTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
     accessTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setHttpOnly(true);
+    accessTokenCookie.setPath("/");
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setPath("/");
 
