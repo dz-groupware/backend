@@ -252,7 +252,7 @@ public class JwtTokenProvider {
   private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
     System.out.println("레디스에다가 토큰 저장중");
     try {
-        redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
       String storedData = redisTemplate.opsForValue().get(accessToken);
       if (storedData != null) {
         System.out.println("레디스에 데이터를 성공적으로 저장했습니다.");
