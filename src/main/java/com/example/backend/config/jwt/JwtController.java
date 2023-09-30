@@ -30,7 +30,6 @@ public class JwtController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginReqDto loginReqDto,HttpServletRequest request, HttpServletResponse response){
     TokenDto tokenDto = null;
-    System.out.println("in controller ");
     try {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(
@@ -38,12 +37,10 @@ public class JwtController {
               loginReqDto.getLoginPw()
           )
       );
-      System.out.println("asdfadf"+ authentication.toString());
       tokenDto = new TokenDto(
           jwtTokenProvider.createAccessToken(authentication, request),
           jwtTokenProvider.createRefreshToken(authentication)
       );
-      System.out.println(tokenDto.toString());
 
     }catch(BadCredentialsException e){
       log.error("유효하지않은 로그인아디와 패스워드입니다.");

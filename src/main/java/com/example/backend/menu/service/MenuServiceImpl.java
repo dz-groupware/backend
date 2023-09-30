@@ -2,6 +2,7 @@ package com.example.backend.menu.service;
 
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.menu.dto.MenuDto;
+import com.example.backend.menu.dto.RouteDto;
 import com.example.backend.menu.mapper.MenuMapper;
 import com.example.backend.config.jwt.PkDto;
 import java.util.List;
@@ -50,7 +51,7 @@ public class MenuServiceImpl implements MenuService {
     Long empId = pkDto.getEmpId();
     Long compId = pkDto.getCompId();
 
-    if(checkMapper.checkMaster(empId)) {
+    if(pkDto.isMasterYn()) {
       // 마스터인 경우
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
@@ -66,5 +67,14 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public List<MenuDto> getUpperMenuLnb(PkDto pkDto, Long menuId) {
     return menuMapper.getUpperMenuLnb(menuId, pkDto.getCompId());
+  }
+
+  @Override
+  public List<RouteDto> getMenuList(PkDto pkDto) {
+    if(pkDto.isMasterYn()){
+      return menuMapper.getMenuListForMaster(pkDto.getCompId());
+    }else{
+      return menuMapper.getMenuList(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
+    }
   }
 }

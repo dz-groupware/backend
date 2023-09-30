@@ -2,6 +2,7 @@ package com.example.backend.menu.controller;
 
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.menu.dto.MenuDto;
+import com.example.backend.menu.dto.RouteDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
 import com.example.backend.config.jwt.PkDto;
@@ -60,6 +61,13 @@ public class MenuController {
   public ResponseEntity<?> getLnbByAdmin(@RequestAttribute PkDto pkDto, @RequestParam Long menuId) {
     return new ResponseEntity<>(
         new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuLnb(pkDto, menuId)),
+        HttpStatus.OK);
+  }
+
+  @GetMapping("/menuList")
+  public ResponseEntity<?> getMenuList(@RequestAttribute PkDto pkDto) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<List<RouteDto>>(menuService.getMenuList(pkDto)),
         HttpStatus.OK);
   }
 }

@@ -57,7 +57,7 @@ public class SecurityConfig {
 //                .requestMatchers("/**").permitAll() // 모든 주소 허용
         .antMatchers("/auth/login").permitAll() // 허용된 주소
         .anyRequest().authenticated() // Authentication 필요한 주소
-        .and()                  // exception handling for jwt
+        .and()                  // exception handling for jwt책
         .exceptionHandling()
         .accessDeniedHandler(jwtAccessDeniedHandler)
         .authenticationEntryPoint(jwtAuthenticationEntryPoint);
