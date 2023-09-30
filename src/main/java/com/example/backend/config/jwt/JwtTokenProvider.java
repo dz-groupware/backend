@@ -245,12 +245,14 @@ public class JwtTokenProvider {
   }
 
   private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
-    redisTemplate.opsForValue().set(
-      accessToken,
-      userInfoJson,
-      accessExpirationTime,
-      TimeUnit.MILLISECONDS
-    );
+    System.out.println("레디스에다가 토큰 저장중");
+    try {
+      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      e.printStackTrace();
+      // 로깅 라이브러리를 사용해도 됩니다.
+      System.out.println("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
+    }
   }
 
   private void storeRefreshTokenInRedis(String refreshToken, Authentication authentication) {
