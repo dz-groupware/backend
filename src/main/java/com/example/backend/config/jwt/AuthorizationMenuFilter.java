@@ -58,7 +58,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
         .get("empId", Long.class);
 
     PkDto pkDto = redisForPayload.opsForValue().get(String.valueOf(empId));
-
+    System.out.println("들어온 accessToken"+ accessToken);
     if (pkDto == null) {
       logger.info("pk is not in redis");
       pkDto = redisMapper.getAllKeys(empId);
