@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +36,12 @@ public class JwtTokenProvider {
 
   @Value("${spring.jwt.secret.key}")
   private String secretKey;
-
   @Value("${spring.jwt.token.access-expiration-time}")
   private long accessExpirationTime;
-
   @Value("${spring.jwt.token.refresh-expiration-time}")
   private long refreshExpirationTime;
+  @Value("${useHttps}")
+  private boolean useHttps;
 
   private final PrincipalDetailsService userDetailsService;
   private final ObjectMapper objectMapper;
@@ -84,7 +85,29 @@ public class JwtTokenProvider {
       throw new BusinessLogicException(JwtExceptionCode.TYPE_MISMATCH);
     }
   }
+  // 쿠키에 토큰을 저장하는 메서드
+  public void setCookie(HttpServletResponse response, String name, String value) {
+    Cookie cookie = new Cookie(name, value);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    if (useHttps) {
+      cookie.setSecure(true);
+    }
+    response.addCookie(cookie);
+  }
 
+  // 쿠키에서 토큰을 삭제하는 메서드
+  public void deleteCookie(HttpServletResponse response, String name) {
+    Cookie cookie = new Cookie(name, null);
+    cookie.setMaxAge(0);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+
+    if (useHttps) {
+      cookie.setSecure(true);
+    }
+    response.addCookie(cookie);
+  }
   private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
     String incomingIp = request.getRemoteAddr();
     String incomingUserAgent = request.getHeader("User-Agent");
@@ -240,4 +263,6 @@ public class JwtTokenProvider {
         TimeUnit.MILLISECONDS
     );
   }
+
+
 }

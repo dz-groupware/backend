@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,57 +30,25 @@ public class JwtController {
 
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginReqDto loginReqDto,HttpServletRequest request, HttpServletResponse response){
-    TokenDto tokenDto = null;
-    try {
-      Authentication authentication = authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(
-              loginReqDto.getLoginId(),
-              loginReqDto.getLoginPw()
-          )
-      );
-      tokenDto = new TokenDto(
-          jwtTokenProvider.createAccessToken(authentication, request),
-          jwtTokenProvider.createRefreshToken(authentication)
-      );
-
-    }catch(BadCredentialsException e){
-      log.error("유효하지않은 로그인아디와 패스워드입니다.");
-      throw new Error("유효하지않은 로그인아디와 패스워드입니다.");
-    }
-
-    //리프레쉬만 httpOnly 로넘기기
-    Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
-    Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
-    accessTokenCookie.setHttpOnly(true);
-    accessTokenCookie.setPath("/");
-    refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setPath("/");
-
-    response.addCookie(accessTokenCookie);
-    response.addCookie(refreshTokenCookie);
+    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw()));
+    String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
+    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+    jwtTokenProvider.setCookie(response, "accessToken", accessToken);
+    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
 
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 발급"));
   }
 
   @PostMapping("/reissue")
   public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response){
-    String refreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
-    jwtTokenProvider.validateToken(refreshToken);
-    Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken, request);
+    String reqRefreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
+    jwtTokenProvider.validateToken(reqRefreshToken);
+    Authentication authentication = jwtTokenProvider.getAuthentication(reqRefreshToken, request);
 
-    TokenDto tokenDto = new TokenDto(
-        jwtTokenProvider.createAccessToken(authentication,request),
-        jwtTokenProvider.createRefreshToken(authentication)
-    );
-
-    Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
-    Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
-    accessTokenCookie.setHttpOnly(true);
-    accessTokenCookie.setPath("/");
-    refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setPath("/");
-    response.addCookie(accessTokenCookie);
-    response.addCookie(refreshTokenCookie);
+    String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
+    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+    jwtTokenProvider.setCookie(response, "accessToken", accessToken);
+    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
   }
 
@@ -92,49 +61,24 @@ public class JwtController {
       throw new Error("유효하지않은 아이디입니다.");
     }
     UserDetails userDetails = principalDetailsService.loadUserByUserIdAndEmpId(userId, empId);
-    System.out.println(userDetails.toString());
     Authentication authentication = new UsernamePasswordAuthenticationToken(
         userDetails,
         null,
         userDetails.getAuthorities()
     );
 
-    TokenDto tokenDto = new TokenDto(
-        jwtTokenProvider.createAccessToken(authentication, request),
-        jwtTokenProvider.createRefreshToken(authentication)
-    );
-
-    Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
-    Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
-    accessTokenCookie.setHttpOnly(true);
-    accessTokenCookie.setPath("/");
-    refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setPath("/");
-    response.addCookie(accessTokenCookie);
-    response.addCookie(refreshTokenCookie);
-
-    // 성공 응답 반환
+    String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
+    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+    jwtTokenProvider.setCookie(response, "accessToken", accessToken);
+    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
   }
 
   @PostMapping("/logout")
   public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-    String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
-    String refreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
     jwtTokenProvider.logout(request);
-    Cookie accessTokenCookie = new Cookie("accessToken", null);
-    Cookie refreshTokenCookie = new Cookie("refreshToken", null);
-
-    accessTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
-    refreshTokenCookie.setMaxAge(0); // 만료시간 0으로 설정
-    accessTokenCookie.setHttpOnly(true);
-    accessTokenCookie.setPath("/");
-    accessTokenCookie.setPath("/");
-    refreshTokenCookie.setPath("/");
-
-    response.addCookie(accessTokenCookie);
-    response.addCookie(refreshTokenCookie);
-
+    jwtTokenProvider.deleteCookie(response, JwtTokenProvider.ACCESS_TOKEN_NAME);
+    jwtTokenProvider.deleteCookie(response, JwtTokenProvider.REFRESH_TOKEN_NAME);
     return ResponseEntity.ok().build();
   }
 }
