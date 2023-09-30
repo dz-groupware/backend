@@ -253,9 +253,15 @@ public class JwtTokenProvider {
     System.out.println("레디스에다가 토큰 저장중");
     try {
         redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+      String storedData = redisTemplate.opsForValue().get(accessToken);
+      if (storedData != null) {
+        System.out.println("레디스에 데이터를 성공적으로 저장했습니다.");
+        System.out.println("저장된 데이터: " + storedData);
+      } else {
+        System.out.println("레디스에 데이터 저장에 실패했습니다.");
+      }
     } catch (Exception e) {
       e.printStackTrace();
-      // 로깅 라이브러리를 사용해도 됩니다.
       System.out.println("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
     }
   }
