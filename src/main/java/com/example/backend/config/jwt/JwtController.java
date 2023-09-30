@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,7 +27,8 @@ public class JwtController {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
   private final PrincipalDetailsService principalDetailsService;
-
+  @Value("${useHttps}")
+  private boolean useHttps;
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginReqDto loginReqDto,HttpServletRequest request, HttpServletResponse response){
     TokenDto tokenDto = null;
@@ -54,10 +56,13 @@ public class JwtController {
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setPath("/");
+    if (useHttps) {
+      accessTokenCookie.setSecure(true);
+      refreshTokenCookie.setSecure(true);
+    }
 
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
-
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 발급"));
   }
 
@@ -78,6 +83,11 @@ public class JwtController {
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setPath("/");
+    if (useHttps) {
+      accessTokenCookie.setSecure(true);
+      refreshTokenCookie.setSecure(true);
+    }
+
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
@@ -110,10 +120,13 @@ public class JwtController {
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setHttpOnly(true);
     refreshTokenCookie.setPath("/");
+    if (useHttps) {
+      accessTokenCookie.setSecure(true);
+      refreshTokenCookie.setSecure(true);
+    }
+
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
-
-    // 성공 응답 반환
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
   }
 
@@ -131,10 +144,13 @@ public class JwtController {
     accessTokenCookie.setPath("/");
     accessTokenCookie.setPath("/");
     refreshTokenCookie.setPath("/");
+    if (useHttps) {
+      accessTokenCookie.setSecure(true);
+      refreshTokenCookie.setSecure(true);
+    }
 
     response.addCookie(accessTokenCookie);
     response.addCookie(refreshTokenCookie);
-
     return ResponseEntity.ok().build();
   }
 }
