@@ -92,6 +92,7 @@ public class JwtTokenProvider {
     cookie.setPath("/");
     if (useHttps) {
       cookie.setSecure(true);
+      cookie.setDomain(".amaranth2023.com");
     }
     response.addCookie(cookie);
   }
