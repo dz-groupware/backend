@@ -2,10 +2,10 @@ server:
   port: ${SERVER_PORT:8080}
   servlet:
     context-path: /api/v1
-    session:
-      cookie:
-        same-site: none
-        secure: true
+#    session:
+#      cookie:
+#        same-site: none
+#        secure: true
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
