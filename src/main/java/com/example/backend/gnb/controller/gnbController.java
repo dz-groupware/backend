@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/home")
 public class gnbController {
+
   private final MenuService menuService;
   private final ModalService modalService;
 
@@ -26,24 +27,25 @@ public class gnbController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getBasicInfoById(@RequestAttribute PkDto pkDto){
+  public ResponseEntity<?> getBasicInfoById(@RequestAttribute PkDto pkDto) {
+    System.out.println("request home");
     return new ResponseEntity<>(new BasicResponseDto<>(
         menuService.getGnbById(pkDto),
         menuService.getFavorByEmpId(pkDto),
-        modalService.getAllProfile(pkDto)), HttpStatus.OK);
+        modalService.getAllProfile(pkDto), pkDto.getEmpId(), pkDto.getCompId()), HttpStatus.OK);
   }
 
-  @GetMapping("/profile")
-  public ResponseEntity<?> getOtherEmpOfUser(@RequestAttribute PkDto pkDto, @RequestParam Long empId)
-      throws JsonProcessingException {
-    // 요청으로 받은 empId와 토큰 empId가 같은 유저인지 확인하는 과정 필요.
-    if (modalService.checkEmpIds(pkDto, empId)) {
-      return new ResponseEntity<>(new BasicResponseDto<>(
-          menuService.getGnbById(pkDto),
-          menuService.getFavorByEmpId(pkDto),
-          modalService.getAllProfile(pkDto)), HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>(new SingleResponseDto<String>(""), HttpStatus.OK);
-    }
-  }
+//  @GetMapping("/profile")
+//  public ResponseEntity<?> getOtherEmpOfUser(@RequestAttribute PkDto pkDto, @RequestParam Long empId)
+//      throws JsonProcessingException {
+//    // 요청으로 받은 empId와 토큰 empId가 같은 유저인지 확인하는 과정 필요.
+//    if (modalService.checkEmpIds(pkDto, empId)) {
+//      return new ResponseEntity<>(new BasicResponseDto<>(
+//          menuService.getGnbById(pkDto),
+//          menuService.getFavorByEmpId(pkDto),
+//          modalService.getAllProfile(pkDto), pkDto.getEmpId(), pkDto.getCompId()), HttpStatus.OK);
+//    } else {
+//      return new ResponseEntity<>(new SingleResponseDto<String>(""), HttpStatus.OK);
+//    }
+//  }
 }
