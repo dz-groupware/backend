@@ -92,7 +92,6 @@ public class JwtTokenProvider {
     cookie.setPath("/");
     if (useHttps) {
       cookie.setSecure(true);
-      cookie.setDomain(".amaranth2023.com");
     }
     response.addCookie(cookie);
   }
@@ -107,7 +106,6 @@ public class JwtTokenProvider {
     StringBuilder cookieValue = new StringBuilder(cookie.toString());
     if (useHttps) {
       cookie.setSecure(true);
-      cookie.setDomain(".amaranth2023.com");
     }
     response.addCookie(cookie);
   }
