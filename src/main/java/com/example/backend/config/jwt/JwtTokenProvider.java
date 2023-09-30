@@ -123,12 +123,15 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
+    System.out.println("#######쿠키나와라" + cookies);
     if (cookies == null) {
       throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
-      if ("accessToken".equals(cookie.getName()))
+      if ("accessToken".equals(cookie.getName())){
+        System.out.println("#########access"+cookie.getName());
         return cookie.getValue();
+      }
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
@@ -247,7 +250,7 @@ public class JwtTokenProvider {
   private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
     System.out.println("레디스에다가 토큰 저장중");
     try {
-      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
     } catch (Exception e) {
       e.printStackTrace();
       // 로깅 라이브러리를 사용해도 됩니다.
