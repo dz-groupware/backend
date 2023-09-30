@@ -72,9 +72,10 @@ public class JwtTokenProvider {
   }
 
   private Map<String, Object> getUserInfoFromRedis(String token) {
-    String userInfoJson = null;
     try {
-      userInfoJson = redisTemplate.opsForValue().get(token);
+      System.out.println("에러터지는지점인데(전)" + token);
+      String userInfoJson = redisTemplate.opsForValue().get(token);
+      System.out.println("에러터지는 지점인데(후)" + userInfoJson);
       if (userInfoJson == null) { // 4. Null Check
         throw new BusinessLogicException(JwtExceptionCode.INVALID_REDIS_TOKEN);
       }
@@ -150,7 +151,7 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token){
     try{
-      System.out.println("validation");
+      System.out.println("validation"+ token);
       Jwts.parserBuilder()
           .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
           .build()
