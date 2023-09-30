@@ -116,7 +116,7 @@
   <!-- 메뉴(라우팅) 리스트 -->
   <select id="getMenuList" resultType="com.example.backend.menu.dto.RouteDto">
     SELECT M.ID as menu_id, par.NAME as gnb_name, M.NAME_TREE, par.ID as gnb_id, P.NAME as page FROM menu AS M
-    INNER JOIN PAGE AS P ON M.PAGE_ID = P.ID
+    INNER JOIN page AS P ON M.PAGE_ID = P.ID
     left join menu as par on m.name_tree like concat(par.name, '%')
     inner join (select menu_id from auth_menu
     inner join (select auth_id from auth_employee where emp_id= #{empId}
@@ -129,7 +129,7 @@
   <!-- 메뉴(라우팅) 리스트 : 마스터 -->
   <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
     SELECT M.ID as menu_id, par.NAME as gnb_name, M.NAME_TREE, par.ID as gnb_id, P.NAME as page FROM menu AS M
-    INNER JOIN PAGE AS P ON M.PAGE_ID = P.ID
+    INNER JOIN page AS P ON M.PAGE_ID = P.ID
     left join menu as par on m.name_tree like concat(par.name, '%')
     where m.enabled_yn = 1 and m.deleted_yn = 0 and m.comp_id = #{compId};
   </select>
