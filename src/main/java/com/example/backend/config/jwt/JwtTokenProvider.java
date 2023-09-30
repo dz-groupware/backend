@@ -90,16 +90,11 @@ public class JwtTokenProvider {
     Cookie cookie = new Cookie(name, value);
     cookie.setHttpOnly(true);
     cookie.setPath("/");
-
-    StringBuilder cookieValue = new StringBuilder(cookie.toString());
-
     if (useHttps) {
       cookie.setSecure(true);
-      cookieValue.append("; Secure");
-      cookieValue.append("; SameSite=None");
+      cookie.setDomain(".amaranth2023.com");
     }
-
-    response.addHeader("Set-Cookie", cookieValue.toString());
+    response.addCookie(cookie);
   }
 
   // 쿠키에서 토큰을 삭제하는 메서드
@@ -111,12 +106,10 @@ public class JwtTokenProvider {
 
     StringBuilder cookieValue = new StringBuilder(cookie.toString());
     if (useHttps) {
-      cookieValue.append("; Secure");
-      // cookieValue.append("; Domain=.amaranth2023.com");  // 필요한 경우에만 설정
+      cookie.setSecure(true);
+      cookie.setDomain(".amaranth2023.com");
     }
-    cookieValue.append("; SameSite=None");
-
-    response.addHeader("Set-Cookie", cookieValue.toString());
+    response.addCookie(cookie);
   }
   private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
     String incomingIp = request.getRemoteAddr();
