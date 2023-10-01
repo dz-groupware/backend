@@ -19,4 +19,5 @@ public interface DepartmentService {
   List<DeptListDto> findDeptNameAndCode(Long compId, String text);
 
   int addDeptTest(DeptDto dept);
+  boolean checkDeptCode(String text, Long id);
 }
