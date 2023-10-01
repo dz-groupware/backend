@@ -39,6 +39,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       chain.doFilter(request, response);
       return;
     }
+
     logger.info("### AuthorizationMenuFilter ###");
 
     String accessToken = tokenProvider.getAccessTokenFromRequest(request);
@@ -89,3 +90,4 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
     }
   }
 }
+
