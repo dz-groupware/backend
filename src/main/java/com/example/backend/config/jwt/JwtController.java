@@ -8,9 +8,12 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +33,19 @@ public class JwtController {
 
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginReqDto loginReqDto,HttpServletRequest request, HttpServletResponse response){
-    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw()));
+    Authentication authentication = null;
+    try {
+      authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw()));
+    } catch (BadCredentialsException e) {
+      System.out.println("여기1");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("잘못된 로그인 정보입니다.");
+    } catch (DisabledException e) {
+      System.out.println("여기2");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비활성화된 계정입니다.");
+    } catch (AccountExpiredException e) {
+      System.out.println("여기3");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("만료된 계정입니다.");
+    }
     String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
     String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
     jwtTokenProvider.setCookie(response, "accessToken", accessToken);

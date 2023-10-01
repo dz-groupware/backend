@@ -45,6 +45,9 @@ public class PrincipalDetails implements UserDetails {
     return principalUser.getDeptId();
   }
 
+  public Boolean getMasterYn() {
+    return principalUser.getMasterYn();
+  }
   @Override
   public String getPassword() {
     return principalUser.getLoginPw();
