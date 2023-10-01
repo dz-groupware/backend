@@ -8,10 +8,10 @@
   <select id="getCompanyAuthSummaryListForPage"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
-    a.name as auth_name,
-    a.id as auth_id,
-    c.id as company_id,
-    c.name as company_name
+    a.name AS auth_name,
+    a.id AS auth_id,
+    c.id AS company_id,
+    c.name AS company_name
     FROM auth_company ac
     JOIN company c ON ac.comp_id = c.id
     JOIN auth a ON ac.auth_id = a.id
@@ -22,11 +22,11 @@
   <select id="findCompanyAuthListOrderById"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
-    adb.id as id ,
-    c.id as company_id,
-    a.id as auth_id,
-    a.name as auth_name,
-    c.name as company_name
+    adb.id AS id ,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
@@ -55,11 +55,11 @@
   <select id="findCompanyAuthListOrderByAuthName"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
-    adb.id as id ,
-    c.id as company_id,
-    a.id as auth_id,
-    a.name as auth_name,
-    c.name as company_name
+    adb.id AS id ,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
@@ -95,22 +95,22 @@
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
-    WHERE c.id = #{companyId} and a.enabled_yn=1
+    WHERE c.id = #{companyId} AND a.enabled_yn=1
   </select>
 
   <select id="getCompanyGnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
     SELECT
-      m.id as menu_id,
-      m.par_id as menu_par_id,
-      m.comp_id as comp_id,
-      m.name as menu_name,
-      m.enabled_yn as enabled_yn,
-      m.sort_order as sort_order,
-      m.name_tree as name_tree,
-      m.id_tree as id_tree,
-      m.child_node_yn as child_node_yn,
-      m.admin_yn as admin_yn,
-      m.deleted_yn as deleted_yn
+      m.id AS menu_id,
+      m.par_id AS menu_par_id,
+      m.comp_id AS comp_id,
+      m.name AS menu_name,
+      m.enabled_yn AS enabled_yn,
+      m.sort_order AS sort_order,
+      m.name_tree AS name_tree,
+      m.id_tree AS id_tree,
+      m.child_node_yn AS child_node_yn,
+      m.admin_yn AS admin_yn,
+      m.deleted_yn AS deleted_yn
     FROM menu m
     WHERE comp_id = #{companyId}
     AND id = par_id
@@ -121,17 +121,17 @@
 
   <select id="getCompanyLnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
     SELECT
-    m.id as menu_id,
-    m.par_id as menu_par_id,
-    m.comp_id as comp_id,
-    m.name as menu_name,
-    m.enabled_yn as enabled_yn,
-    m.sort_order as sort_order,
-    m.id_tree as id_tree,
-    m.name_tree as name_tree,
-    m.child_node_yn as child_node_yn,
-    m.admin_yn as admin_yn,
-    m.deleted_yn as deleted_yn
+    m.id AS menu_id,
+    m.par_id AS menu_par_id,
+    m.comp_id AS comp_id,
+    m.name AS menu_name,
+    m.enabled_yn AS enabled_yn,
+    m.sort_order AS sort_order,
+    m.id_tree AS id_tree,
+    m.name_tree AS name_tree,
+    m.child_node_yn AS child_node_yn,
+    m.admin_yn AS admin_yn,
+    m.deleted_yn AS deleted_yn
     FROM menu m
     WHERE comp_id = #{companyId}
     AND par_id = #{parId}
@@ -144,17 +144,17 @@
   <select id="getGnbListOfAuth" resultType="com.example.backend.authgroup.dto.AuthMenuDto">
     SELECT
     m.id as menu_id,
-    m.par_id as menu_par_id,
-    m.comp_id as comp_id,
-    m.name as menu_name,
-    m.enabled_yn as enabled_yn,
-    m.sort_order as sort_order,
-    m.id_tree as menu_id_tree,
-    m.name_tree as menu_name_tree,
-    m.child_node_yn as child_node_yn,
-    m.admin_yn as admin_yn,
-    m.deleted_yn as deleted_yn,
-    a.id as auth_id,
+    m.par_id AS menu_par_id,
+    m.comp_id AS comp_id,
+    m.name AS menu_name,
+    m.enabled_yn AS enabled_yn,
+    m.sort_order AS sort_order,
+    m.id_tree AS menu_id_tree,
+    m.name_tree AS menu_name_tree,
+    m.child_node_yn AS child_node_yn,
+    m.admin_yn AS admin_yn,
+    m.deleted_yn AS deleted_yn,
+    a.id AS auth_id,
     CASE
       WHEN EXISTS (
       SELECT 1
@@ -175,18 +175,18 @@
 
   <select id="getLnbListOfAuth" resultType="com.example.backend.authgroup.dto.AuthMenuDto">
     SELECT
-    m.id as menu_id,
-    m.par_id as menu_par_id,
-    m.comp_id as comp_id,
-    m.name as menu_name,
-    m.enabled_yn as enabled_yn,
-    m.sort_order as sort_order,
-    m.id_tree as menu_id_tree,
-    m.name_tree as menu_name_tree,
-    m.child_node_yn as child_node_yn,
-    m.admin_yn as admin_yn,
-    m.deleted_yn as deleted_yn,
-    a.id as auth_id,
+    m.id AS menu_id,
+    m.par_id AS menu_par_id,
+    m.comp_id AS comp_id,
+    m.name AS menu_name,
+    m.enabled_yn AS enabled_yn,
+    m.sort_order AS sort_order,
+    m.id_tree AS menu_id_tree,
+    m.name_tree AS menu_name_tree,
+    m.child_node_yn AS child_node_yn,
+    m.admin_yn AS admin_yn,
+    m.deleted_yn AS deleted_yn,
+    a.id AS auth_id,
     CASE
       WHEN EXISTS (
       SELECT 1
@@ -199,7 +199,7 @@
     FROM auth a
     JOIN auth_menu am ON a.id = am.auth_id
     JOIN menu m ON am.menu_id = m.id
-    where m.deleted_yn = 0
+    WHERE m.deleted_yn = 0
     AND m.comp_id = #{companyId}
     AND a.id = #{authId}
     AND m.id != m.par_id
@@ -259,7 +259,7 @@
   </select>
 
   <insert id="addAuth" parameterType="com.example.backend.authgroup.dto.AddAuthDto" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-    INSERT INTO auth(name, enabled_yn) values(#{authName}, #{enabledYn});
+    INSERT INTO auth(name, enabled_yn) VALUES(#{authName}, #{enabledYn});
   </insert>
 
   <insert id="insertIntoAuthDashboard">
@@ -373,7 +373,7 @@
   <select id="findEmployeeAuthStatusListOrderById"
     resultType="com.example.backend.authgroup.dto.EmployeeAuthStatusDto">
     SELECT
-    adb.id as id,
+    adb.id AS id,
     c.id AS company_id,
     a.id AS auth_id,
     a.name AS auth_name,

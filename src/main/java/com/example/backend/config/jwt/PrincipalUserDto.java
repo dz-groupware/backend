@@ -16,4 +16,5 @@ public class PrincipalUserDto {
     private Long empId;
     private Long compId;
     private Long deptId;
+    private Boolean masterYn;
 }

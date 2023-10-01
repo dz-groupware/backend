@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.backend.employee.mapper.EmployeeMapper">
+  <select id="findCompEmpByEmpId" resultType="com.example.backend.employee.dto.EmployeeCompanyDto">
+    select emp_id as employee_id, comp_id as company_id FROM employee_company WHERE emp_id = #{employee_id};
+  </select>
+</mapper>
