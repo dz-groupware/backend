@@ -1,6 +1,7 @@
 package com.example.backend.redis;
 
 import com.example.backend.config.jwt.PkDto;
+import com.example.backend.config.jwt.Th;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ public class testRedisController {
   private final RedisService redisService;
   public testRedisController(RedisService redisService){
     this.redisService = redisService;
+
   }
 
   @GetMapping("header")

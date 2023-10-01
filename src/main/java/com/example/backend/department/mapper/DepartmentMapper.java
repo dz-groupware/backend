@@ -25,4 +25,5 @@ public interface DepartmentMapper {
   void modifyDeptTree(DeptTrans dept);
   DeptTrans getParDept(Long id);
   void modifyUpperDeptCNY(Long parId);
+  int checkDeptCode(String text, Long id);
 }

@@ -89,4 +89,10 @@ public class DepartmentController {
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.findDeptNameAndCode(compId, text)), HttpStatus.OK);
   }
+
+  @GetMapping("/duplicate-test")
+  public ResponseEntity<?> checkDeptCode(@RequestParam Long id, @RequestParam String text){
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.checkDeptCode(text, id)), HttpStatus.OK);
+  }
 }
