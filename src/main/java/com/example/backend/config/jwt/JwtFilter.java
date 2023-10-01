@@ -35,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
       String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
       try {
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+          System.out.println("JWTFILTER access" + accessToken);
           Authentication auth = jwtTokenProvider.getAuthentication(accessToken, request);
           SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
         }

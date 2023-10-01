@@ -72,9 +72,10 @@ public class JwtTokenProvider {
   }
 
   private Map<String, Object> getUserInfoFromRedis(String token) {
-    String userInfoJson = null;
     try {
-      userInfoJson = redisTemplate.opsForValue().get(token);
+      System.out.println("에러터지는지점인데(전)" + token);
+      String userInfoJson = redisTemplate.opsForValue().get(token);
+      System.out.println("에러터지는 지점인데(후)" + userInfoJson);
       if (userInfoJson == null) { // 4. Null Check
         throw new BusinessLogicException(JwtExceptionCode.INVALID_REDIS_TOKEN);
       }
@@ -92,6 +93,7 @@ public class JwtTokenProvider {
     cookie.setPath("/");
     if (useHttps) {
       cookie.setSecure(true);
+      cookie.setDomain("dev.amaranth2023.site");
     }
     response.addCookie(cookie);
   }
@@ -105,6 +107,7 @@ public class JwtTokenProvider {
 
     if (useHttps) {
       cookie.setSecure(true);
+      cookie.setDomain("dev.amaranth2023.site");
     }
     response.addCookie(cookie);
   }
@@ -123,12 +126,15 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
+    System.out.println("#######쿠키나와라" + cookies);
     if (cookies == null) {
       throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
-      if ("accessToken".equals(cookie.getName()))
+      if ("accessToken".equals(cookie.getName())){
+        System.out.println("#########access"+cookie.getName());
         return cookie.getValue();
+      }
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
@@ -145,7 +151,7 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token){
     try{
-      System.out.println("validation");
+      System.out.println("validation"+ token);
       Jwts.parserBuilder()
           .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
           .build()
@@ -245,12 +251,20 @@ public class JwtTokenProvider {
   }
 
   private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
-    redisTemplate.opsForValue().set(
-      accessToken,
-      userInfoJson,
-      accessExpirationTime,
-      TimeUnit.MILLISECONDS
-    );
+    System.out.println("레디스에다가 토큰 저장중");
+    try {
+      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+      String storedData = redisTemplate.opsForValue().get(accessToken);
+      if (storedData != null) {
+        System.out.println("레디스에 데이터를 성공적으로 저장했습니다.");
+        System.out.println("저장된 데이터: " + storedData);
+      } else {
+        System.out.println("레디스에 데이터 저장에 실패했습니다.");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
+    }
   }
 
   private void storeRefreshTokenInRedis(String refreshToken, Authentication authentication) {
