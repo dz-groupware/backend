@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/home")
 public class gnbController {
+
   private final MenuService menuService;
   private final ModalService modalService;
 
@@ -26,7 +27,7 @@ public class gnbController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getBasicInfoById(@RequestAttribute PkDto pkDto){
+  public ResponseEntity<?> getBasicInfoById(@RequestAttribute PkDto pkDto) {
     System.out.println("request home");
     return new ResponseEntity<>(new BasicResponseDto<>(
         menuService.getGnbById(pkDto),

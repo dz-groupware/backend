@@ -1,6 +1,5 @@
 package com.example.backend.menu.mapper;
 
-import com.example.backend.config.jwt.PkDto;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.dto.RouteDto;
 import java.util.List;
@@ -21,7 +20,6 @@ public interface MenuMapper {
   List<MenuDto> getUpperMenuLnbForMaster(Long menuId, Long compId);
   List<RouteDto> getMenuList(Long empId, Long deptId, Long compId);
   List<RouteDto> getMenuListForMaster(Long compId);
-
 
 
 }

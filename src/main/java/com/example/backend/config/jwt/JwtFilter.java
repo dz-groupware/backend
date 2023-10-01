@@ -23,8 +23,8 @@ public class JwtFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String requestURI = request.getRequestURI();
 
+    String requestURI = request.getRequestURI();
     // requestURI.startsWith("/api/v1/test") : 테스트 용 요청은 필터 확인 안하도록 변경 (추후 삭제될 수 있음)
 //    if (requestURI.startsWith("/api/v1/test")){
 //      filterChain.doFilter(request, response);
@@ -35,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
       String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
       try {
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+          System.out.println("JWTFILTER access" + accessToken);
           Authentication auth = jwtTokenProvider.getAuthentication(accessToken, request);
           SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
         }

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +36,12 @@ public class JwtTokenProvider {
 
   @Value("${spring.jwt.secret.key}")
   private String secretKey;
-
   @Value("${spring.jwt.token.access-expiration-time}")
   private long accessExpirationTime;
-
   @Value("${spring.jwt.token.refresh-expiration-time}")
   private long refreshExpirationTime;
+  @Value("${useHttps}")
+  private boolean useHttps;
 
   private final PrincipalDetailsService userDetailsService;
   private final ObjectMapper objectMapper;
@@ -71,9 +72,10 @@ public class JwtTokenProvider {
   }
 
   private Map<String, Object> getUserInfoFromRedis(String token) {
-    String userInfoJson = null;
     try {
-      userInfoJson = redisTemplate.opsForValue().get(token);
+      System.out.println("에러터지는지점인데(전)" + token);
+      String userInfoJson = redisTemplate.opsForValue().get(token);
+      System.out.println("에러터지는 지점인데(후)" + userInfoJson);
       if (userInfoJson == null) { // 4. Null Check
         throw new BusinessLogicException(JwtExceptionCode.INVALID_REDIS_TOKEN);
       }
@@ -84,7 +86,31 @@ public class JwtTokenProvider {
       throw new BusinessLogicException(JwtExceptionCode.TYPE_MISMATCH);
     }
   }
+  // 쿠키에 토큰을 저장하는 메서드
+  public void setCookie(HttpServletResponse response, String name, String value) {
+    Cookie cookie = new Cookie(name, value);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    if (useHttps) {
+      cookie.setSecure(true);
+      cookie.setDomain("dev.amaranth2023.site");
+    }
+    response.addCookie(cookie);
+  }
 
+  // 쿠키에서 토큰을 삭제하는 메서드
+  public void deleteCookie(HttpServletResponse response, String name) {
+    Cookie cookie = new Cookie(name, null);
+    cookie.setMaxAge(0);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+
+    if (useHttps) {
+      cookie.setSecure(true);
+      cookie.setDomain("dev.amaranth2023.site");
+    }
+    response.addCookie(cookie);
+  }
   private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
     String incomingIp = request.getRemoteAddr();
     String incomingUserAgent = request.getHeader("User-Agent");
@@ -100,12 +126,15 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
+    System.out.println("#######쿠키나와라" + cookies);
     if (cookies == null) {
       throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
-      if ("accessToken".equals(cookie.getName()))
+      if ("accessToken".equals(cookie.getName())){
+        System.out.println("#########access"+cookie.getName());
         return cookie.getValue();
+      }
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
@@ -122,7 +151,7 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token){
     try{
-      System.out.println("validation");
+      System.out.println("validation"+ token);
       Jwts.parserBuilder()
           .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
           .build()
@@ -180,7 +209,6 @@ public class JwtTokenProvider {
   }
 
   private Claims generateAccessClaims(Authentication authentication) {
-
     Claims claims = Jwts.claims().setSubject(authentication.getName());
     claims.put("empId", ((PrincipalDetails) authentication.getPrincipal()).getEmployeeId());
     return claims;
@@ -223,12 +251,20 @@ public class JwtTokenProvider {
   }
 
   private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
-    redisTemplate.opsForValue().set(
-      accessToken,
-      userInfoJson,
-      accessExpirationTime,
-      TimeUnit.MILLISECONDS
-    );
+    System.out.println("레디스에다가 토큰 저장중");
+    try {
+      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+      String storedData = redisTemplate.opsForValue().get(accessToken);
+      if (storedData != null) {
+        System.out.println("레디스에 데이터를 성공적으로 저장했습니다.");
+        System.out.println("저장된 데이터: " + storedData);
+      } else {
+        System.out.println("레디스에 데이터 저장에 실패했습니다.");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
+    }
   }
 
   private void storeRefreshTokenInRedis(String refreshToken, Authentication authentication) {
@@ -241,4 +277,6 @@ public class JwtTokenProvider {
         TimeUnit.MILLISECONDS
     );
   }
+
+
 }

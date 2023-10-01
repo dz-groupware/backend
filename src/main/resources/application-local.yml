@@ -1,0 +1,28 @@
+server:
+  port: 8010
+  servlet:
+    context-path: /api/v1
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dz_groupware
+    username: root
+    password: password
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  redis:
+    host: localhost # 로컬에서 테스트 할 때는 localhost로 사용
+    port: 6379
+  jwt:
+    secret:
+      key: abcasdfdsafadsadsfdasfdsafadsfadsfsadfdasfsda
+    token:
+      access-expiration-time: 43200000    # 12시간
+      refresh-expiration-time: 604800000   # 7일
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:/mappers/*.xml
+useHttps: false

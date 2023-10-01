@@ -39,6 +39,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       chain.doFilter(request, response);
       return;
     }
+
     logger.info("### AuthorizationMenuFilter ###");
 
     String accessToken = tokenProvider.getAccessTokenFromRequest(request);
@@ -56,7 +57,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
         .get("empId", Long.class);
 
     PkDto pkDto = redisForPayload.opsForValue().get(String.valueOf(empId));
-
+    System.out.println("들어온 accessToken"+ accessToken);
     if (pkDto == null) {
       logger.info("pk is not in redis");
       pkDto = redisMapper.getAllKeys(empId);
@@ -89,3 +90,4 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
     }
   }
 }
+
