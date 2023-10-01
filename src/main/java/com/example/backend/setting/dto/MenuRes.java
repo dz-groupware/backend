@@ -11,6 +11,7 @@ public class MenuRes {
   private Long parId = 0L;
   private Long compId = 0L;
   private String name = "";
+  private String parName = "";
   private String nameTree = "";
   private String idTree = "";
   private String iconUrl = "0";

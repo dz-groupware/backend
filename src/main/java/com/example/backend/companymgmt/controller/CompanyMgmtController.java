@@ -1,7 +1,7 @@
 package com.example.backend.companymgmt.controller;
 
 
-import com.example.backend.common.SingleResponseDto;
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.service.CompanyMgmtService;
 import org.springframework.http.HttpStatus;

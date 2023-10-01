@@ -1,6 +1,6 @@
 package com.example.backend.setting.mapper;
 
-import com.example.backend.setting.dto.Menu;
+import com.example.backend.setting.dto.Dto;
 import com.example.backend.setting.dto.MenuRes;
 import com.example.backend.setting.dto.MenuTrans;
 import java.util.List;
@@ -13,13 +13,13 @@ public interface SettingMapper {
 
   List<MenuRes> findMenuDetailById(Long menuId);
 
-  int addMenu(MenuRes menu);
+  void addMenu(MenuRes menu);
 
-  int modifyParId(Long id, String idTree);
-  int modifyMenuParId(Long parId, Long id, String idTree);
+  void modifyParId(Long id, String idTree);
+  void modifyMenuParId(Long parId, Long id, String idTree);
   int modifyGnbById();
 
-  int modifyMenuById(MenuRes menu);
+  void modifyMenuById(MenuRes menu);
 
   List<MenuRes> findMenuByName(String gnbName, String name);
 
@@ -34,8 +34,8 @@ public interface SettingMapper {
   List<MenuRes> findAllMenu(Long compId);
 
   MenuRes getUpperMenuById(Long parId);
-  int modifyUpperMenu(Long parId);
-  int deleteMenu(Long menuId);
+  void modifyUpperMenu(Long parId);
+  void deleteMenu(Long menuId);
   List<Long> getMenuIdByIdTree(String menuId);
 
   int checkMenuInMenu(String id, Long parId);
@@ -46,6 +46,12 @@ public interface SettingMapper {
   void modifyPreMoveMenu(MenuTrans menu);
   MenuTrans getParMenu(Long id);
   MenuTrans getPreParMenu(Long id);
+  int updateChildNodeYnOfParMenu(Long id);
+
+//  void testList(DtoList list);
+
+
+  void testList(List<Dto> list);
 
 }
 

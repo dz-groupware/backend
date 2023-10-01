@@ -2,12 +2,11 @@ package com.example.backend.config.jwt;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
-@Component
 public class SecurityUtil {
   public static Long getUserId() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println(auth.getPrincipal().toString());
     if (auth.getPrincipal() instanceof PrincipalDetails) {
       return ((PrincipalDetails) auth.getPrincipal()).getUserId();
     }

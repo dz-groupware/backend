@@ -22,7 +22,7 @@
   <select id="getGnbByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
     SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU
     INNER JOIN
-    (SELECT MENU_ID FROM AUTH_MENU INNER JOIN
+    (SELECT distinct MENU_ID FROM AUTH_MENU INNER JOIN
     (select auth_id from auth_employee where emp_id = #{empId} and deleted_yn = 0
     union
     SELECT AUTH_ID FROM AUTH_DEPARTMENT where dept_id = #{deptId} and deleted_yn = 0
@@ -30,12 +30,12 @@
     select AUTH_ID from auth_company where comp_id = #{compId} and deleted_yn = 0
     )ADMIN
     WHERE AUTH_MENU.DELETED_YN = 0 AND AUTH_MENU.AUTH_ID = ADMIN.AUTH_ID)MENU_LIST
-    WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=MENU_LIST.MENU_ID AND ID = PAR_ID;
+    WHERE ENABLED_YN = 1 AND DELETED_YN = 0 AND MENU.ID=MENU_LIST.MENU_ID AND ID = PAR_ID order by sort_order desc;
   </select>
 
   <!-- GNB 메뉴 리스트 : 마스터 -->
   <select id="getGnbForMaster">
-    select * from menu where id=par_id and comp_id=#{compId};
+    select * from menu where id=par_id and comp_id=#{compId} order by sort_order desc;
   </select>
 
   <!-- GNB 즐겨찾기 리스트 -->
@@ -72,30 +72,46 @@
     union select auth_id from AUTH_DEPARTMENT where dept_id=#{deptId}
     union select auth_id from auth_employee where emp_id=#{empId})auth
     where auth.auth_id = auth_menu.auth_id)menu_list
-    where menu_list.menu_id = menu.id and par_id=#{menuId} and id != par_id and enabled_yn=1 and deleted_yn=0;
+    where menu_list.menu_id = menu.id and par_id=#{menuId} and id != par_id and enabled_yn=1 and deleted_yn=0 order by sort_order desc;
   </select>
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) : 마스터-->
   <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
     SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
-    where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId};
+    where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId} order by sort_order desc;
   </select>
 
-  <!-- GNB 리스트 (모든 권한) -->
-  <select id="getGnbByAdmin" resultType="com.example.backend.menu.dto.MenuDto">
-    select distinct menu.id, par_id, name from auth_dashboard
+  <!-- 메뉴설정 : 상위메뉴 GNB 리스트 (권한 확인) -->
+  <select id="getUpperMenuGnb" resultType="com.example.backend.menu.dto.MenuDto">
+    select distinct menu.id, par_id, name, sort_order from auth_dashboard
     inner join auth_menu on auth_menu.auth_id = auth_dashboard.auth_id and comp_id= #{compId}
     inner join menu on menu.id = auth_menu.menu_id
     where auth_menu.deleted_yn = 0 and auth_dashboard.deleted_yn = 0
-    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id = par_id;
+    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id = par_id order by sort_order;
   </select>
 
-  <!-- GNB 리스트 (모든 권한) -->
-  <select id="getLnbByAdmin" resultType="com.example.backend.menu.dto.MenuDto">
-    select distinct menu.id, par_id, name from auth_dashboard
+  <!-- 메뉴설정 : 상위메뉴 LNB 리스트 (권한 확인) -->
+  <select id="getUpperMenuLnb" resultType="com.example.backend.menu.dto.MenuDto">
+    select distinct menu.id, par_id, name, sort_order from auth_dashboard
     inner join auth_menu on auth_menu.auth_id = auth_dashboard.auth_id and comp_id= #{compId}
     inner join menu on menu.id = auth_menu.menu_id
     where auth_menu.deleted_yn = 0 and auth_dashboard.deleted_yn = 0
-    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and par_id = #{menuId} and menu.id != par_id;
+    and menu.enabled_yn = 1 and menu.deleted_yn = 0 and par_id = #{menuId} and menu.id != menu.par_id
+    order by sort_order;
   </select>
+
+  <!-- 메뉴설정 : 상위메뉴 GNB 리스트 (마스터) -->
+  <select id="getUpperMenuGnbForMaster" resultType="com.example.backend.menu.dto.MenuDto">
+    select id, par_id, comp_id, name, sort_order from menu
+    where comp_id=#{compId} and enabled_yn = 1 and menu.deleted_yn = 0 and menu.id = par_id order by sort_order;
+  </select>
+
+  <!-- 메뉴설정 : 상위메뉴 LNB 리스트 (마스터) -->
+  <select id="getUpperMenuLnbForMaster" resultType="com.example.backend.menu.dto.MenuDto">
+    select id, par_id, comp_id, name, sort_order from menu
+    where comp_id=#{compId} and enabled_yn = 1 and menu.deleted_yn = 0
+    and par_id = #{menuId} and id != par_id order by sort_order;
+  </select>
+
+
 </mapper>

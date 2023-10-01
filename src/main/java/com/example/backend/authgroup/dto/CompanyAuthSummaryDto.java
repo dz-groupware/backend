@@ -12,6 +12,7 @@ public class CompanyAuthSummaryDto {
   private Long id;
   private Long companyId;
   private Long authId;
-  private String companyName;
   private String authName;
+  private String companyName;
+
 }

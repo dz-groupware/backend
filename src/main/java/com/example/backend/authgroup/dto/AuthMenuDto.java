@@ -19,4 +19,5 @@ public class AuthMenuDto {
   private Boolean adminYn;
   private Boolean deletedYn;
   private Long authId;
+  private Boolean hasMappedChild;
 }

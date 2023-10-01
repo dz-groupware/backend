@@ -13,7 +13,11 @@ public interface MenuMapper {
   int removeFavor(Long empId, Long menuId);
   List<MenuDto> getMenuById(Long menuId, Long empId, Long compId, Long deptId);
   List<MenuDto> getMenuForMaster(Long menuId, Long compId);
-  List<MenuDto> getGnbByAdmin(Long compId);
-  List<MenuDto> getLnbByAdmin(Long menuId, Long compId);
+  List<MenuDto> getUpperMenuGnb(Long compId);
+  List<MenuDto> getUpperMenuLnb(Long menuId, Long compId);
+  List<MenuDto> getUpperMenuGnbForMaster(Long compId);
+  List<MenuDto> getUpperMenuLnbForMaster(Long menuId, Long compId);
+
+
 
 }
