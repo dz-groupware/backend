@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,20 +65,19 @@ public class SettingController {
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> findFavorById(@RequestAttribute PkDto pkDto, @RequestParam Long menuId){
+  public ResponseEntity<?> findFavorById(@RequestAttribute PkDto pkDto, @RequestHeader Long menuId){
     // 현재 즐겨찾기 상태를 가져오기
     return new ResponseEntity<>(new SingleResponseDto<>(settingService.findFavorById(pkDto, menuId)), HttpStatus.OK);
   }
 
   @PostMapping("/favor")
-  public ResponseEntity<?> modifyFavorOn(@RequestAttribute PkDto pkDto, @RequestBody Long menuId) {
+  public ResponseEntity<?> modifyFavorOn(@RequestAttribute PkDto pkDto, @RequestHeader Long menuId) {
     // 즐겨찾기 저장 요청
     return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOn(pkDto, menuId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> modifyFavorOff(@RequestAttribute PkDto pkDto, @RequestParam Long menuId)
-      throws JsonProcessingException {
+  public ResponseEntity<?> modifyFavorOff(@RequestAttribute PkDto pkDto, @RequestHeader Long menuId){
     // 즐겨찾기 삭제 요청
     return new ResponseEntity<>(new SingleResponseDto<>(settingService.modifyFavorOff(pkDto, menuId)), HttpStatus.OK);
   }
@@ -93,6 +93,7 @@ public class SettingController {
 //    settingService.testRedisAndJwt();
 //    return "";
 //  }
+
 
 
   @GetMapping("/test/redis-modify")
