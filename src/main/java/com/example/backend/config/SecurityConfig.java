@@ -18,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -55,6 +56,7 @@ public class SecurityConfig {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt token으로 인증 > 세션 필요없음
         .and()
         .authorizeRequests()    // 다음 리퀘스트에 대한 사용권한 체크
+        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 //                .requestMatchers("/**").permitAll() // 모든 주소 허용
         .antMatchers("/auth/login").permitAll() // 허용된 주소
         .anyRequest().authenticated() // Authentication 필요한 주소
