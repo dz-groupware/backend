@@ -3,6 +3,7 @@ package com.example.backend.authgroup.service;
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.AddEmpAuthDto;
 import com.example.backend.authgroup.dto.EmployeeAuthStatusDto;
+import com.example.backend.authgroup.dto.UpdateAuthDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import com.example.backend.common.dto.Page;
 import com.example.backend.common.dto.PageDto;
@@ -115,6 +116,15 @@ public class AuthGroupServiceImpl implements AuthGroupService{
     return addAuthDto.getId();
   }
 
+  @Override
+  public Long updateAuth(UpdateAuthDto updateAuthDto) {
+    System.out.println("updatename"+ updateAuthDto.getAuthName());
+    System.out.println("updatename"+ updateAuthDto.getId());
+    System.out.println("updatename"+ updateAuthDto.isEnabledYn());
+    authGroupMapper.updateAuth(updateAuthDto);
+    return null;
+  }
+
   @Transactional
   @Override
   public void modifyMappedMenuOfAuth(Long authId, Map<Long, Boolean> checkedMenuItems) {
@@ -128,6 +138,13 @@ public class AuthGroupServiceImpl implements AuthGroupService{
     if(!checkedMenuIds.isEmpty()) {
       authGroupMapper.modifyMappedMenuOfAuth(authId, checkedMenuIds);
     }
+  }
+
+  @Transactional
+  @Override
+  public void deleteAuth(Long authId) {
+    authGroupMapper.softDeleteAuthByAuthId(authId);
+    authGroupMapper.softDeleteAuthDashboardByAuthId(authId);
   }
 
   @Transactional
@@ -151,7 +168,7 @@ public class AuthGroupServiceImpl implements AuthGroupService{
       String orderBy, String searchTerm, Long employeeId, int pageSize) {
     if(employeeMapper.isMaster(employeeId)){
       Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
-      return authGroupMapper.findEmployeeAuthListOrderByAuthName(lastAuthName,orderBy,searchTerm, companyId, pageSize);
+      return authGroupMapper.findMasterAuthListOrderByAuthName(lastAuthName,orderBy,searchTerm, companyId, pageSize);
     }
     return authGroupMapper.findEmployeeAuthListOrderByAuthName(lastAuthName, orderBy, searchTerm, employeeId, pageSize);
   }

@@ -531,4 +531,21 @@
     FROM auth_employee ae
     WHERE ae.emp_id = #{employee_Id}
   </delete>
+
+  <update id="softDeleteAuthDashboardByAuthId">
+    UPDATE auth_dashboard
+    SET deleted_yn = 1
+    WHERE auth_id = #{authId}
+  </update>
+  <update id="softDeleteAuthByAuthId">
+    UPDATE auth
+    SET deleted_yn = 1
+    WHERE id = #{authId}
+  </update>
+
+  <update id="updateAuth">
+    UPDATE auth
+    SET enabled_yn = #{enabledYn} , name = #{authName}
+    WHERE id = #{id}
+  </update>
 </mapper>

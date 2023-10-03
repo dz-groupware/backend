@@ -20,10 +20,7 @@ public class PrincipalDetailsService implements UserDetailsService {
   @Override
 
   public UserDetails loadUserByUsername(String username) {
-    System.out.println("여기는 불려?"+ username);
-    System.out.println();
     PrincipalUserDto principalUser = userMapper.findByLoginId(username);
-    System.out.println("출력되고 있나"+ principalUser.toString());
     if (principalUser == null) {
       throw new UsernameNotFoundException("Employee not found");
     }

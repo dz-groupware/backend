@@ -3,6 +3,7 @@ package com.example.backend.authgroup.controller;
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.AddEmpAuthDto;
 import com.example.backend.authgroup.dto.AuthResponseDto;
+import com.example.backend.authgroup.dto.UpdateAuthDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.authgroup.service.AuthGroupService;
 import com.example.backend.common.dto.SingleResponseDto;
@@ -12,6 +13,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,7 +94,13 @@ public class AuthGroupController {
   public ResponseEntity<?> addAuth(@RequestBody AddAuthDto addAuthDto) {
     Long newAuthId = authGroupService.addAuth(addAuthDto);
     AuthResponseDto responseDto = new AuthResponseDto(newAuthId);
-    return ResponseEntity.accepted().body(new SingleResponseDto<>(responseDto));
+    return ResponseEntity.ok(new SingleResponseDto<>(responseDto));
+  }
+
+  @PatchMapping("/auth")
+  public ResponseEntity<?> updateAuth(@RequestBody UpdateAuthDto updateAuthDto) {
+    authGroupService.updateAuth(updateAuthDto);
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/auth/{auth-id}/menu-mappings")
@@ -103,7 +111,7 @@ public class AuthGroupController {
 
   @DeleteMapping("/auth/{auth-id}")
   public ResponseEntity<Void> deleteAuth(@PathVariable("auth-id")Long authId) {
-    authGroupService.deactivateAuthByAuthId(authId);
+    authGroupService.deleteAuth(authId);
     return ResponseEntity.accepted().build();
   }
 
