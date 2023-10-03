@@ -24,7 +24,6 @@ public class AuthGroupServiceImpl implements AuthGroupService{
 
   private final AuthGroupMapper authGroupMapper;
   private final EmployeeMapper employeeMapper;
-
   public AuthGroupServiceImpl(AuthGroupMapper authGroupMapper,
       EmployeeMapper employeeMapper) {
     this.authGroupMapper = authGroupMapper;
@@ -140,17 +139,29 @@ public class AuthGroupServiceImpl implements AuthGroupService{
   @Override
   public List<CompanyAuthSummaryDto> findEmployeeAuthListOrderById(Long lastId, String orderBy,
       String searchTerm, Long employeeId, int pageSize) {
+    if(employeeMapper.isMaster(employeeId)){
+      Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
+      return authGroupMapper.findMasterAuthListOrderById(lastId,orderBy,searchTerm, companyId, pageSize);
+    }
     return authGroupMapper.findEmployeeAuthListOrderById(lastId,orderBy,searchTerm, employeeId, pageSize);
   }
 
   @Override
   public List<CompanyAuthSummaryDto> findEmployeeAuthListOrderByAuthName(String lastAuthName,
       String orderBy, String searchTerm, Long employeeId, int pageSize) {
+    if(employeeMapper.isMaster(employeeId)){
+      Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
+      return authGroupMapper.findEmployeeAuthListOrderByAuthName(lastAuthName,orderBy,searchTerm, companyId, pageSize);
+    }
     return authGroupMapper.findEmployeeAuthListOrderByAuthName(lastAuthName, orderBy, searchTerm, employeeId, pageSize);
   }
 
   @Override
   public Long getEmployeeAuthCount(Long employeeId) {
+    if(employeeMapper.isMaster(employeeId)){
+      Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
+      return authGroupMapper.getCompanyAuthCount(companyId);
+    }
     return authGroupMapper.getEmployeeAuthCount( employeeId);
   }
 

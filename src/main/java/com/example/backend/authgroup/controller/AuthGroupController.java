@@ -83,7 +83,7 @@ public class AuthGroupController {
     return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.getLnbListOfAuthWithAll(authId, parId)));
   }
 
-  @GetMapping("/auth/{auth-id}")
+  @GetMapping("/auth/{auth-id}/employees")
   public ResponseEntity<?> getEmpListOfAuth(@PathVariable("auth-id") Long authId) {
     return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.getEmpListOfAuth(authId)));
   }
@@ -107,13 +107,14 @@ public class AuthGroupController {
     return ResponseEntity.accepted().build();
   }
 
-  @GetMapping("/emp/{employee-id}/count")
-  public ResponseEntity<?> getEmployeeAuthCount( @PathVariable("employee-id")Long employeeId) {
+  @GetMapping("/employees/{employee-id}/count")
+  public ResponseEntity<?> getEmployeeAuthCount(@PathVariable("employee-id") Long employeeId) {
     return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.getEmployeeAuthCount(employeeId)));
   }
 
   @GetMapping("/employees/auth/list")
   public ResponseEntity<?> findEmployeeAuthList(
+      @RequestParam(required = false) Long companyId,
       @RequestParam(required = true) Long employeeId,
       @RequestParam(required = false) Long lastId,
       @RequestParam(required = false) String lastAuthName,

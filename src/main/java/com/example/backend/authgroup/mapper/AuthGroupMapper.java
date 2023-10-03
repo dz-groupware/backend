@@ -41,4 +41,6 @@ public interface AuthGroupMapper {
   void deleteAuthEmployeeByEmpId(Long employeeId);
   void addAuthEmployee(Long employeeId, List<Long> checkedAuthIds);
 
+  List<CompanyAuthSummaryDto> findMasterAuthListOrderById(Long lastId, String orderBy, String searchTerm, Long companyId, int pageSize);
+  List<CompanyAuthSummaryDto> findMasterAuthListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long companyId, int pageSize);
 }
