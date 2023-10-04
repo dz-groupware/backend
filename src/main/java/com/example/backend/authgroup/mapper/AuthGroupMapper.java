@@ -6,6 +6,7 @@ import com.example.backend.authgroup.dto.CompanyAuthSummaryDto;
 import com.example.backend.authgroup.dto.CompanyMenuDto;
 import com.example.backend.authgroup.dto.EmployeeAuthStatusDto;
 import com.example.backend.authgroup.dto.MenuAuthStatusDto;
+import com.example.backend.authgroup.dto.UpdateAuthDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,4 +42,11 @@ public interface AuthGroupMapper {
   void deleteAuthEmployeeByEmpId(Long employeeId);
   void addAuthEmployee(Long employeeId, List<Long> checkedAuthIds);
 
+  List<CompanyAuthSummaryDto> findMasterAuthListOrderById(Long lastId, String orderBy, String searchTerm, Long companyId, int pageSize);
+  List<CompanyAuthSummaryDto> findMasterAuthListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long companyId, int pageSize);
+
+  void softDeleteAuthDashboardByAuthId(Long authId);
+  void softDeleteAuthByAuthId(Long authId);
+
+  void updateAuth(UpdateAuthDto updateAuthDto);
 }

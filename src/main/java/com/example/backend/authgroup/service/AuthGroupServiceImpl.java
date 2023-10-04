@@ -3,6 +3,7 @@ package com.example.backend.authgroup.service;
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.AddEmpAuthDto;
 import com.example.backend.authgroup.dto.EmployeeAuthStatusDto;
+import com.example.backend.authgroup.dto.UpdateAuthDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import com.example.backend.common.dto.Page;
 import com.example.backend.common.dto.PageDto;
@@ -24,7 +25,6 @@ public class AuthGroupServiceImpl implements AuthGroupService{
 
   private final AuthGroupMapper authGroupMapper;
   private final EmployeeMapper employeeMapper;
-
   public AuthGroupServiceImpl(AuthGroupMapper authGroupMapper,
       EmployeeMapper employeeMapper) {
     this.authGroupMapper = authGroupMapper;
@@ -116,6 +116,15 @@ public class AuthGroupServiceImpl implements AuthGroupService{
     return addAuthDto.getId();
   }
 
+  @Override
+  public Long updateAuth(UpdateAuthDto updateAuthDto) {
+    System.out.println("updatename"+ updateAuthDto.getAuthName());
+    System.out.println("updatename"+ updateAuthDto.getId());
+    System.out.println("updatename"+ updateAuthDto.isEnabledYn());
+    authGroupMapper.updateAuth(updateAuthDto);
+    return null;
+  }
+
   @Transactional
   @Override
   public void modifyMappedMenuOfAuth(Long authId, Map<Long, Boolean> checkedMenuItems) {
@@ -133,6 +142,13 @@ public class AuthGroupServiceImpl implements AuthGroupService{
 
   @Transactional
   @Override
+  public void deleteAuth(Long authId) {
+    authGroupMapper.softDeleteAuthByAuthId(authId);
+    authGroupMapper.softDeleteAuthDashboardByAuthId(authId);
+  }
+
+  @Transactional
+  @Override
   public void deactivateAuthByAuthId(Long authId) {
     authGroupMapper.deactivateAuthByAuthId(authId);
   }
@@ -140,17 +156,29 @@ public class AuthGroupServiceImpl implements AuthGroupService{
   @Override
   public List<CompanyAuthSummaryDto> findEmployeeAuthListOrderById(Long lastId, String orderBy,
       String searchTerm, Long employeeId, int pageSize) {
+    if(employeeMapper.isMaster(employeeId)){
+      Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
+      return authGroupMapper.findMasterAuthListOrderById(lastId,orderBy,searchTerm, companyId, pageSize);
+    }
     return authGroupMapper.findEmployeeAuthListOrderById(lastId,orderBy,searchTerm, employeeId, pageSize);
   }
 
   @Override
   public List<CompanyAuthSummaryDto> findEmployeeAuthListOrderByAuthName(String lastAuthName,
       String orderBy, String searchTerm, Long employeeId, int pageSize) {
+    if(employeeMapper.isMaster(employeeId)){
+      Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
+      return authGroupMapper.findMasterAuthListOrderByAuthName(lastAuthName,orderBy,searchTerm, companyId, pageSize);
+    }
     return authGroupMapper.findEmployeeAuthListOrderByAuthName(lastAuthName, orderBy, searchTerm, employeeId, pageSize);
   }
 
   @Override
   public Long getEmployeeAuthCount(Long employeeId) {
+    if(employeeMapper.isMaster(employeeId)){
+      Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
+      return authGroupMapper.getCompanyAuthCount(companyId);
+    }
     return authGroupMapper.getEmployeeAuthCount( employeeId);
   }
 

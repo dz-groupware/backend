@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.backend.employee.mapper.EmployeeMapper">
+  <select id="findCompEmpByEmpId" resultType="com.example.backend.employee.dto.EmployeeCompanyDto">
+    SELECT emp_id AS employee_id, comp_id AS company_id FROM employee_company WHERE emp_id = #{employeeId}
+  </select>
+
+  <select id="isMaster" resultType="boolean">
+    SELECT master_yn FROM employee WHERE id=#{employeeId}
+  </select>
+
+  <select id="findCompIdOfEmpId" resultType="Long">
+    SELECT comp_id FROM employee_company WHERE emp_id=#{employeeId}
+  </select>
+
+  <update id="changeMasterYn" parameterType="com.example.backend.employee.dto.UpdateMasterYnRequest">
+    UPDATE employee
+    SET master_yn = !#{masterYn}
+    WHERE id = #{empId}
+  </update>
+</mapper>

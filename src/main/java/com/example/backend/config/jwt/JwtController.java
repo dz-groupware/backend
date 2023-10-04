@@ -1,14 +1,13 @@
 package com.example.backend.config.jwt;
 
 import com.example.backend.common.dto.SingleResponseDto;
-import javax.servlet.http.Cookie;
+import com.example.backend.common.error.BusinessLogicException;
+import com.example.backend.common.error.code.LoginExceptionCode;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +16,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,15 +37,13 @@ public class JwtController {
     try {
       authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw()));
     } catch (BadCredentialsException e) {
-      System.out.println("여기1");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("잘못된 로그인 정보입니다.");
+      throw new BusinessLogicException(LoginExceptionCode.UNMATCHED_PASSWORD);
     } catch (DisabledException e) {
-      System.out.println("여기2");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비활성화된 계정입니다.");
+      throw new BusinessLogicException(LoginExceptionCode.DISABLED);
     } catch (AccountExpiredException e) {
-      System.out.println("여기3");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("만료된 계정입니다.");
+      throw new BusinessLogicException(LoginExceptionCode.ACCOUNT_EXPIRED);
     }
+
     String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
     String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
     jwtTokenProvider.setCookie(response, "accessToken", accessToken);

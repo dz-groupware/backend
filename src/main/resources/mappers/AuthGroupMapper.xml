@@ -245,8 +245,8 @@
   <select id="getEmpListOfAuth" resultType="com.example.backend.authgroup.dto.UserListOfAuthDto">
     SELECT ed.id AS id, d.name AS dept_name, e.position as emp_position, e.name as emp_name
     FROM auth_department ad
-    JOIN department d ON d.id = ad.dept_id
-    JOIN employee_department ed ON ad.dept_id = ed.dept_id
+    JOIN department d ON d.id = ad.dept_id AND d.deleted_yn != 1
+    JOIN employee_department ed ON ad.dept_id = ed.dept_id AND ed.deleted_yn != 1
     JOIN employee e ON e.id = ed.emp_id
     WHERE ad.auth_id = #{authId} AND ad.deleted_yn != 1 AND ed.deleted_yn !=1
     UNION
@@ -255,7 +255,7 @@
     JOIN employee e ON e.id = ae.emp_id
     JOIN employee_department ed ON ae.emp_id = ed.emp_id
     JOIN department d ON d.id = ed.dept_id
-    WHERE ae.auth_id = #{authId} AND ae.deleted_yn != 1 AND ed.deleted_yn !=1
+    WHERE ae.auth_id = #{authId} AND ae.deleted_yn != 1 AND ed.deleted_yn !=1 AND ed.transferred_yn != 1 AND ed.org = 1
   </select>
 
   <insert id="addAuth" parameterType="com.example.backend.authgroup.dto.AddAuthDto" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
@@ -360,6 +360,79 @@
     LIMIT #{pageSize}
   </select>
 
+  <select id="findMasterAuthListOrderById"
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
+    SELECT
+    adb.id as id,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    WHERE c.id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
+    </if>
+    <choose>
+      <when test="orderBy == 'authDashboardIdDesc'">
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
+      </when>
+      <when test="orderBy == 'authDashboardIdAsc'">
+        AND adb.id &gt; #{lastId}
+        ORDER BY adb.id ASC
+      </when>
+      <otherwise>
+        AND adb.id &lt; #{lastId}
+        ORDER BY adb.id DESC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+  <select id="findMasterAuthListOrderByAuthName"
+    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
+    SELECT
+    adb.id as id,
+    c.id AS company_id,
+    a.id AS auth_id,
+    a.name AS auth_name,
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    WHERE c.id = #{companyId}
+    <if test="searchTerm != null and searchTerm != ''">
+      AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
+    </if>
+    <choose>
+      <when test="orderBy == 'authNameAsc'">
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc'">
+        AND a.name &lt; #{lastAuthName}
+        ORDER BY a.name DESC
+      </when>
+      <when test="orderBy == 'authNameAsc' and lastAuthName == null">
+        ORDER BY a.name ASC
+      </when>
+      <when test="orderBy == 'authNameDesc' and lastAuthName == null">
+        ORDER BY a.name DESC
+      </when>
+      <otherwise>
+        AND a.name &gt; #{lastAuthName}
+        ORDER BY a.name ASC
+      </otherwise>
+    </choose>
+    LIMIT #{pageSize}
+  </select>
+
+
   <select id="getEmployeeAuthCount" resultType="long">
     SELECT COUNT(*)
     FROM auth_dashboard adb
@@ -458,4 +531,21 @@
     FROM auth_employee ae
     WHERE ae.emp_id = #{employee_Id}
   </delete>
+
+  <update id="softDeleteAuthDashboardByAuthId">
+    UPDATE auth_dashboard
+    SET deleted_yn = 1
+    WHERE auth_id = #{authId}
+  </update>
+  <update id="softDeleteAuthByAuthId">
+    UPDATE auth
+    SET deleted_yn = 1
+    WHERE id = #{authId}
+  </update>
+
+  <update id="updateAuth">
+    UPDATE auth
+    SET enabled_yn = #{enabledYn} , name = #{authName}
+    WHERE id = #{id}
+  </update>
 </mapper>

@@ -1,7 +1,7 @@
 package com.example.backend.config.jwt;
 
 import com.example.backend.common.error.BusinessLogicException;
-import com.example.backend.common.error.JwtExceptionCode;
+import com.example.backend.common.error.code.JwtExceptionCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -93,7 +93,7 @@ public class JwtTokenProvider {
     cookie.setPath("/");
     if (useHttps) {
       cookie.setSecure(true);
-      cookie.setDomain("dev.amaranth2023.site");
+      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
   }
@@ -107,7 +107,7 @@ public class JwtTokenProvider {
 
     if (useHttps) {
       cookie.setSecure(true);
-      cookie.setDomain("dev.amaranth2023.site");
+      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
   }
