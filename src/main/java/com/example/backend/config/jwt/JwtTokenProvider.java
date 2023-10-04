@@ -97,6 +97,7 @@ public class JwtTokenProvider {
 //      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
+    System.out.println("쿠키출력 " + cookie.toString());
   }
 
   // 쿠키에서 토큰을 삭제하는 메서드
