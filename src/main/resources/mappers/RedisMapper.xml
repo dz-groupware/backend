@@ -4,27 +4,24 @@
 <mapper namespace="com.example.backend.redis.RedisMapper">
 
   <select id="findMenuId" resultType="java.lang.Long">
-    select menu_id from auth_menu
-    inner join
-    (select auth_id from auth_employee where emp_id= #{empId}
-    union
-    select auth_id from auth_department where dept_id = #{deptId}
-    union
-    select auth_id from auth_company where comp_id = #{compId})admin
-    on auth_menu.auth_id = admin.auth_id;
+    SELECT menu_id FROM auth_menu
+    INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId}
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId})admin
+    ON auth_menu.auth_id = admin.auth_id;
   </select>
 
   <select id="getAllKeys" resultType="com.example.backend.config.jwt.PkDto">
-    select e.id as emp_id, e.user_id, e.master_yn, ed.dept_id, ec.comp_id  from employee as e
-    left join employee_department as ed on ed.emp_id=e.id and org = 1
-    left join employee_company as ec on ec.emp_id = e.id
-    where e.id = #{empId} and (ed.transferred_yn = 0 or ed.transferred_yn is null)
-    and (ed.deleted_yn = 0 or  ed.deleted_yn is null)
-    and ec.resigned_yn = 0 and ec.deleted_yn = 0 and e.account_yn = 1 and e.deleted_yn = 0;
+    SELECT e.id as emp_id, e.user_id, e.master_yn, ed.dept_id, ec.comp_id FROM employee AS e
+    LEFT JOIN employee_department AS ed ON ed.emp_id = e.id and org = 1
+    LEFT JOIN employee_company AS ec ON ec.emp_id = e.id
+    WHERE e.id = #{empId} AND (ed.transferred_yn = 0 OR ed.transferred_yn IS NULL)
+    AND (ed.deleted_yn = 0 OR ed.deleted_yn is null)
+    AND ec.resigned_yn = 0 AND ec.deleted_yn = 0 AND e.account_yn = 1 AND e.deleted_yn = 0;
   </select>
 
   <!-- 마스터인지 확인 -->
   <select id="checkMaster" resultType="boolean">
-    select master_yn from employee where id=#{empId};
+    SELECT master_yn FROM employee WHERE id = #{empId};
   </select>
 </mapper>
