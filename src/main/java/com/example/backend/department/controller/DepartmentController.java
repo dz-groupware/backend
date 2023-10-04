@@ -27,14 +27,9 @@ public class DepartmentController {
 
   @GetMapping("")
   public ResponseEntity<?> getDepartment(@RequestAttribute PkDto pkDto) {
+    System.out.println("in getDepartment");
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getDepartmentBasicList(pkDto)), HttpStatus.OK);
-  }
-
-  @PostMapping("/dept")
-  public ResponseEntity<?> addDepartment(@RequestAttribute PkDto pkDto, @RequestBody DeptDto dept) {
-    return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.addDepartment(pkDto, dept)), HttpStatus.OK);
   }
 
   @GetMapping("dept-list")
@@ -49,27 +44,22 @@ public class DepartmentController {
         new SingleResponseDto<>(departmentService.getBasicDetailById(id)), HttpStatus.OK);
   }
 
-
   @GetMapping("detail-emp")
   public ResponseEntity<?> getEmpListByDeptId(@RequestParam Long id){
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getEmpListByDeptId(id)), HttpStatus.OK);
   }
 
+  @PostMapping("/dept")
+  public ResponseEntity<?> addDepartment(@RequestAttribute PkDto pkDto, @RequestBody DeptDto dept) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.addDepartment(pkDto, dept)), HttpStatus.OK);
+  }
+
   @PostMapping("/dept-modify")
   public ResponseEntity<?> modifyDepartment(@RequestBody DeptDto dept) {
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.modifyDepartment(dept)), HttpStatus.OK);
-  }
-
-  @PostMapping("/dept-all")
-  public ResponseEntity<?> modifyAllDepartment(@RequestBody List<DeptDto> dept) {
-
-
-    System.out.println(dept);
-    return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.modifyAllDepartment(dept)), HttpStatus.OK);
-
   }
 
   @DeleteMapping("dept")
@@ -94,5 +84,10 @@ public class DepartmentController {
   public ResponseEntity<?> checkDeptCode(@RequestParam Long id, @RequestParam String text){
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.checkDeptCode(text, id)), HttpStatus.OK);
+  }
+  @PostMapping("/dept-all")
+  public ResponseEntity<?> modifyAllDepartment(@RequestBody List<DeptDto> dept) {
+    return new ResponseEntity<>(
+        new SingleResponseDto<>(departmentService.modifyAllDepartment(dept)), HttpStatus.OK);
   }
 }

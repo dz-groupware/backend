@@ -1,4 +1,4 @@
-package com.example.backend.setting.dto;
+package com.example.backend.menu.dto;
 
 import lombok.Getter;
 import lombok.Setter;

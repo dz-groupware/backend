@@ -1,17 +1,14 @@
-package com.example.backend.gnb.controller;
+package com.example.backend.layout.controller;
 
-import com.example.backend.common.dto.SingleResponseDto;
-import com.example.backend.gnb.dto.BasicResponseDto;
+import com.example.backend.layout.dto.BasicResponseDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
 import com.example.backend.config.jwt.PkDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,12 +25,13 @@ public class gnbController {
 
   @GetMapping("")
   public ResponseEntity<?> getBasicInfoById(@RequestAttribute PkDto pkDto) {
-    System.out.println("request home");
     return new ResponseEntity<>(new BasicResponseDto<>(
         menuService.getGnbById(pkDto),
         menuService.getFavorByEmpId(pkDto),
         modalService.getAllProfile(pkDto), pkDto.getEmpId(), pkDto.getCompId()), HttpStatus.OK);
   }
+
+  // *
 
 //  @GetMapping("/profile")
 //  public ResponseEntity<?> getOtherEmpOfUser(@RequestAttribute PkDto pkDto, @RequestParam Long empId)

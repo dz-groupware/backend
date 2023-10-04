@@ -5,110 +5,105 @@
 
   <!-- 모든 프로필 정보 가져오기 -->
   <select id="getProfileByUserId" resultType="com.example.backend.modal.dto.ProfileRes">
-    select company.id as comp_id, company.name as comp_name, department.id as dept_id,
-    department.name as dept_name, employee.id as emp_id, employee.name as emp_name,
-    last_ip, last_access, employee.position, image_url from user
-    inner join employee on user.id = employee.user_id and employee.user_id = #{userId}
-    left join employee_department on employee.id = employee_department.emp_id and ( org = 1 or org is null)
-    left join employee_company on employee.id = employee_company.emp_id
-    left join department on department.id = employee_department.dept_id
-    left join company on company.id = employee_company.comp_id
-    where (employee_department.deleted_yn = 0 or employee_department.deleted_yn is null)
-    and (department.enabled_yn = 1 or department.enabled_yn is null)
-    and (employee_department.transferred_yn = 0 or employee_department.transferred_yn is null)
-    and employee_company.resigned_yn = 0 and employee_company.deleted_yn = 0
-    and (department.deleted_yn = 0 or department.deleted_yn is null);
+    SELECT company.id AS comp_id, company.name AS comp_name, department.id AS dept_id,
+    department.name AS dept_name, employee.id AS emp_id, employee.name AS emp_name,
+    last_ip, last_access, employee.position, image_url FROM user
+    INNER JOIN employee ON user.id = employee.user_id AND employee.user_id = #{userId}
+    LEFT JOIN employee_department ON employee.id = employee_department.emp_id AND (org = 1 OR org IS NULL)
+    LEFT JOIN employee_company ON employee.id = employee_company.emp_id
+    LEFT JOIN department ON department.id = employee_department.dept_id
+    LEFT JOIN company ON company.id = employee_company.comp_id
+    WHERE (employee_department.deleted_yn = 0 OR employee_department.deleted_yn IS NULL)
+    AND (department.enabled_yn = 1 OR department.enabled_yn IS NULL)
+    AND (employee_department.transferred_yn = 0 OR employee_department.transferred_yn IS NULL)
+    AND employee_company.resigned_yn = 0 AND employee_company.deleted_yn = 0
+    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL);
   </select>
 
   <!-- 조직도 트리 : 회사 리스트-->
   <select id="getCompToGnb" resultType="com.example.backend.modal.dto.TreeItemRes">
-    select id, company.par_id, name, sort_order, id as comp_id, 'comp' as type from company
-    inner join
-    (select par_id from company where id = #{compId})comp
-    where enabled_yn = 1 and deleted_yn = 0 and company.par_id = comp.par_id;
+    SELECT id, company.par_id, name, sort_order, id as comp_id, 'comp' AS type FROM company
+    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId})comp
+    WHERE enabled_yn = 1 AND deleted_yn = 0 AND company.par_id = comp.par_id;
   </select>
 
   <!-- 조직도 트리 : 회사 선택 시 부서 -->
   <select id="getGnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
-    select id, par_id, name, sort_order, comp_id, 'dept' as type from department
-    where comp_id=#{compId} and id = par_id and enabled_yn = 1 and deleted_yn = 0;
+    SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
+    WHERE comp_id = #{compId} AND id = par_id AND enabled_yn = 1 AND deleted_yn = 0;
   </select>
 
   <!-- 조직도 트리 : 부서 선택 시 부서 -->
   <select id="getLnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
-    select id, par_id, name, sort_order, comp_id, 'dept' as type from department
-    where comp_id=#{compId} and par_id = #{deptId} and id != par_id and enabled_yn = 1 and deleted_yn = 0;
+    SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
+    WHERE comp_id = #{compId} AND par_id = #{deptId} AND id != par_id AND enabled_yn = 1 AND deleted_yn = 0;
   </select>
 
   <!-- 사원 리스트 : 회사 선택 시 -->
   <select id="getEmpListByCompId" resultType="com.example.backend.modal.dto.EmpList">
-    select employee.name as emp_name, company.name as comp_name, department.name as dept_name,
-    employee.position, login_id, employee.mobile_number as number, priv_email as email, image_url from company
-    inner join employee_company on employee_company.resigned_yn = 0
-    and employee_company.deleted_yn = 0 and comp_id = company.id and company.id= #{compId}
-    inner join employee on employee.id = employee_company.emp_id and employee.account_yn = 1 and employee.deleted_yn = 0
-    left outer join user on user.id = employee.user_id and user.deleted_yn = 0
-    left outer join employee_department on employee_department.emp_id = employee.id
-    left outer join department on employee_department.dept_id = department.id  where org = 1 or org is null;
+    SELECT employee.name AS emp_name, company.name AS comp_name, department.name AS dept_name,
+    employee.position, login_id, employee.mobile_number AS number, priv_email AS email, image_url FROM company
+    INNER JOIN employee_company ON employee_company.resigned_yn = 0
+    AND employee_company.deleted_yn = 0 AND comp_id = company.id AND company.id= #{compId}
+    INNER JOIN employee ON employee.id = employee_company.emp_id AND employee.account_yn = 1 AND employee.deleted_yn = 0
+    LEFT OUTER JOIN user ON user.id = employee.user_id AND user.deleted_yn = 0
+    LEFT OUTER JOIN employee_department ON employee_department.emp_id = employee.id
+    LEFT OUTER JOIN department ON employee_department.dept_id = department.id WHERE org = 1 OR org IS NULL;
   </select>
 
   <!-- 사원 리스트 : 부서 선택 시 -->
   <select id="getEmpListByDeptId" resultType="com.example.backend.modal.dto.EmpList">
-    select employee.name as emp_name, company.name as comp_name, department.name as dept_name,
-    employee.position, user.login_id, employee.mobile_number as number, priv_email as email, image_url from employee_department
-    inner join department on employee_department.transferred_yn = 0 and department.deleted_yn = 0
-    and employee_department.dept_id=#{deptId}  and department.id = employee_department.dept_id
-    inner join employee_company on employee_department.emp_id = employee_company.emp_id and
-    employee_company.deleted_yn = 0 and employee_company.resigned_yn = 0 and employee_company.comp_id = #{compId}
-    inner join company on employee_company.comp_id = company.id and company.enabled_yn = 1 and company.deleted_yn = 0
-    inner join employee on employee_department.emp_id = employee.id and employee.account_yn = 1 and employee.deleted_yn = 0
-    inner join user on employee.user_id = user.id and user.deleted_yn = 0 ;
+    SELECT employee.name AS emp_name, company.name AS comp_name, department.name AS dept_name,
+    employee.position, user.login_id, employee.mobile_number AS number, priv_email AS email, image_url FROM employee_department
+    INNER JOIN department ON employee_department.transferred_yn = 0 AND department.deleted_yn = 0
+    AND employee_department.dept_id = #{deptId} AND department.id = employee_department.dept_id
+    INNER JOIN employee_company ON employee_department.emp_id = employee_company.emp_id AND
+    employee_company.deleted_yn = 0 AND employee_company.resigned_yn = 0 AND employee_company.comp_id = #{compId}
+    INNER JOIN company ON employee_company.comp_id = company.id AND company.enabled_yn = 1 AND company.deleted_yn = 0
+    INNER JOIN employee ON employee_department.emp_id = employee.id AND employee.account_yn = 1 AND employee.deleted_yn = 0
+    INNER JOIN user ON employee.user_id = user.id AND user.deleted_yn = 0 ;
   </select>
 
   <!-- 조직도 검색 (전체 옵션 - 부서) -->
   <select id="findDeptAllByText" resultType="com.example.backend.modal.dto.TreeItemRes">
-    select id, comp_id, department.par_id, name, sort_order, 'dept' as type from department
-    inner join (select par_id from company where id = #{compId1})comp
-    where department.comp_id = COMP.PAR_ID and name like #{text1} and enabled_yn = 1 and deleted_yn = 0
-    union
-    select id, id as comp_id, company.par_id, name, sort_order, 'comp' as type from company
-    INNER JOIN (select par_id from company where id = #{compId2})comp
-    where company.PAR_ID = comp.par_id and name like #{text2} and enabled_yn = 1 and deleted_yn = 0;
+    SELECT id, comp_id, department.par_id, name, sort_order, 'dept' AS type FROM department
+    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId1})comp
+    WHERE department.comp_id = comp.par_id AND name LIKE #{text1} AND enabled_yn = 1 AND deleted_yn = 0
+    UNION SELECT id, id AS comp_id, company.par_id, name, sort_order, 'comp' AS type FROM company
+    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId2})comp
+    WHERE company.par_id = comp.par_id AND name LIKE #{text2} AND enabled_yn = 1 AND deleted_yn = 0;
   </select>
 
   <!-- 조직도 검색 (전체 옵션 - 사원) -->
   <select id="findEmpAllByText" resultType="com.example.backend.modal.dto.EmpList">
-    select employee.name as emp_name, company.name as comp_name, department.name as dept_name,
-    employee.position, login_id, employee.mobile_number as number, priv_email as email, image_url from employee
-    inner join employee_company on employee_company.emp_id = employee.id and comp_id = #{compId}
-    left join employee_department on employee_department.emp_id = employee.id and (org = 1 or org is null)
-    left join company on employee_company.comp_id = company.id
-    left join department on department.id = employee_department.dept_id
-    inner join user on employee.user_id = user.id
-    where employee_company.deleted_yn = 0 and employee_company.resigned_yn = 0 and employee_company.comp_id =1
-    and company.enabled_yn = 1 and company.deleted_yn = 0 and employee.account_yn = 1 and employee.deleted_yn = 0
-    and (employee_department.transferred_yn = 0 or employee_department.transferred_yn is null)
-    and (department.deleted_yn = 0 or department.deleted_yn is null) and user.deleted_yn = 0
-    and employee.name like #{text1} or company.name like #{text2} or department.name like #{text3}  or
-    employee.position like #{text4}  or login_id like #{text5}  or employee.mobile_number like #{text6}  or priv_email like #{text7};
+    SELECT employee.name AS emp_name, company.name AS comp_name, department.name AS dept_name,
+    employee.position, login_id, employee.mobile_number AS number, priv_email AS email, image_url FROM employee
+    INNER JOIN employee_company ON employee_company.emp_id = employee.id AND comp_id = #{compId}
+    LEFT JOIN employee_department ON employee_department.emp_id = employee.id AND (org = 1 OR org IS NULL)
+    LEFT JOIN company ON employee_company.comp_id = company.id
+    LEFT JOIN department ON department.id = employee_department.dept_id
+    INNER JOIN user ON employee.user_id = user.id
+    WHERE employee_company.deleted_yn = 0 AND employee_company.resigned_yn = 0 AND employee_company.comp_id = 1
+    AND company.enabled_yn = 1 AND company.deleted_yn = 0 AND employee.account_yn = 1 AND employee.deleted_yn = 0
+    AND (employee_department.transferred_yn = 0 OR employee_department.transferred_yn IS NULL)
+    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL) AND user.deleted_yn = 0
+    AND employee.name LIKE #{text1} OR company.name LIKE #{text2} or department.name LIKE #{text3} or
+    employee.position LIKE #{text4} OR login_id LIKE #{text5} or employee.mobile_number LIKE #{text6} or priv_email LIKE #{text7};
   </select>
 
   <!-- 조직도 검색 (부서 옵션) -->
   <select id="findResultOfDept" resultType="com.example.backend.modal.dto.TreeItemRes">
-    select id, code, name from department where name_tree like #{text} and enabled_yn = 1 and
-    deleted_yn = 0;
+    SELECT id, code, name FROM department WHERE name_tree LIKE #{text} AND enabled_yn = 1 AND deleted_yn = 0;
   </select>
 
   <!-- 조직도 검색 (사원 옵션) -->
   <select id="findResultOfEmp" resultType="com.example.backend.modal.dto.ProfileRes">
-    select id, name, mobile_number as number, image_url, email, position from employee
-    where
-    name like #{text1} and deleted_yn = 0;
+    SELECT id, name, mobile_number AS number, image_url, email, position FROM employee
+    WHERE name LIKE #{text1} AND deleted_yn = 0;
   </select>
 
   <!-- 유저의 모든 사원id 가져오기-->
   <select id="checkEmpIds" resultType="java.lang.Long">
-    select id from employee where user_id = #{userId} and account_yn = 1 and deleted_yn = 0;
-
+    SELECT id FROM employee WHERE user_id = #{userId} AND account_yn = 1 AND deleted_yn = 0;
   </select>
 </mapper>

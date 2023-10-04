@@ -1,4 +1,4 @@
-package com.example.backend.setting.dto;
+package com.example.backend.menu.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +18,4 @@ public class Menu {
   private boolean childNodeYn = true;
   private boolean adminYn = true;
   private boolean deletedYn = false;
-
-
 }

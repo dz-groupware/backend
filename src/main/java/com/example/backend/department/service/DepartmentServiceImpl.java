@@ -19,6 +19,29 @@ public class DepartmentServiceImpl implements DepartmentService {
     this.departmentMapper = departmentMapper;
   }
 
+  // 부서 리스트
+  @Override
+  public List<DeptListDto> getDepartmentBasicList(PkDto pkDto) {
+    return departmentMapper.getDepartmentBasicList(pkDto.getCompId());
+  }
+
+  @Override
+  public List<DeptListDto> getDepartmentById(PkDto pkDto, Long parId) {
+    return departmentMapper.getDepartmentById(pkDto.getCompId(), parId);
+  }
+
+  // 부서 상세 정보
+  @Override
+  public DeptDto getBasicDetailById(Long id) {
+    return departmentMapper.getBasicDetailById(id);
+  }
+
+  @Override
+  public List<EmpListDto> getEmpListByDeptId(Long id){
+    return departmentMapper.getEmpListByDeptId(id);
+  }
+
+  // 부서 추가
   @Override
   public int addDepartment(PkDto pkDto, DeptDto dept) {
     Long compId = pkDto.getCompId();
@@ -55,56 +78,46 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
   }
 
-  @Override
-  public int addDeptTest(DeptDto dept){
-    System.out.println(dept.getParId());
-    System.out.println(dept.getParName());
-    System.out.println(dept.getId());
-    System.out.println(dept.getName());
-    System.out.println(dept.getAbbr());
-    System.out.println(dept.getCode());
-    System.out.println(dept.getIdTree());
-    System.out.println(dept.getNameTree());
-    System.out.println(dept.getSortOrder());
-    System.out.println(dept.getCompId());
-    System.out.println(dept.getStatus());
-    return 1;
-  }
-
-
-
-  @Override
-  public List<DeptListDto> getDepartmentBasicList(PkDto pkDto) {
-    return departmentMapper.getDepartmentBasicList(pkDto.getCompId());
-  }
-
-  @Override
-  public List<DeptListDto> getDepartmentById(PkDto pkDto, Long parId) {
-    Long compId = pkDto.getCompId();
-    return departmentMapper.getDepartmentById(compId, parId);
-  }
-
-  @Override
-  public DeptDto getBasicDetailById(Long id) {
-    return departmentMapper.getBasicDetailById(id);
-  }
-
-  @Override
-  public List<EmpListDto> getEmpListByDeptId(Long id){
-    return departmentMapper.getEmpListByDeptId(id);
-  }
+  // 부서 수정
   @Override
   public int modifyDepartment(DeptDto dept){
     departmentMapper.modifyDepartment(dept);
     return 1;
   }
 
+  // 부서 삭제
   @Override
   public int deleteDepartment(PkDto pkDto, Long id) {
     Long compId = pkDto.getCompId();
-    departmentMapper.deleteDepartment(compId, id, "%"+id.toString()+"%");
+    departmentMapper.deleteDepartment(compId, id, "%"+id.toString()+">%");
     return 1;
   }
+
+  // 부서 검색
+  @Override
+  public List<DeptListDto> getOptionCompList(PkDto pkDto) {
+    return departmentMapper.getOptionCompList(pkDto.getCompId());
+  }
+
+  @Override
+  public List<DeptListDto> findDeptNameAndCode(Long compId, String text){
+    return departmentMapper.findDeptNameAndCode(compId, text, text);
+  }
+
+  // 부서 코드 중복 확인
+  @Override
+  public boolean checkDeptCode(String text, Long id) {
+    int result = departmentMapper.checkDeptCode(text, id);
+    if (id == 0 && result == 0) {
+      return true;
+    }
+    if (result == 1) {
+      return true;
+    }
+    return false;
+  }
+
+  // 일괄 등록 (보류)
   @Override
   public int modifyAllDepartment(List<DeptDto> dept) {
     for (DeptDto deptDto : dept) {
@@ -125,20 +138,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     return 1;
   }
 
-  @Override
-  public List<DeptListDto> getOptionCompList(PkDto pkDto) {
-    return departmentMapper.getOptionCompList(pkDto.getCompId());
-  }
-
-  @Override
-  public List<DeptListDto> findDeptNameAndCode(Long compId, String text){
-    return departmentMapper.findDeptNameAndCode(compId, text, text);
-  }
-
-  public boolean checkDeptInDept(Long id, Long parId){
-    return departmentMapper.checkDeptInDept("%" + id.toString() + "%", parId) != 0;
-  }
-
+  // 부서 추가/수정 시 수행 될 로직
   public DeptTrans modifyTree(DeptTrans dept) {
     //departmentMapper.modifyDepartment(dept);
     // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
@@ -292,14 +292,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
   }
 
-  public boolean checkDeptCode(String text, Long id) {
-    int result = departmentMapper.checkDeptCode(text, id);
-    if (id == 0 && result == 0) {
-      return true;
-    }
-    if (result == 1) {
-      return true;
-    }
-    return false;
+  public boolean checkDeptInDept(Long id, Long parId){
+    return departmentMapper.checkDeptInDept("%" + id.toString() + "%", parId) != 0;
   }
+
 }

@@ -1,4 +1,4 @@
-package com.example.backend.gnb.dto;
+package com.example.backend.layout.dto;
 
 import java.util.HashMap;
 import java.util.Map;

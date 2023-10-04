@@ -44,3 +44,5 @@ server:
   port: 8010
   servlet:
     context-path: /api/v1
+
+useHttps: false

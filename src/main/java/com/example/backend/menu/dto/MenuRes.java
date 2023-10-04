@@ -1,4 +1,4 @@
-package com.example.backend.setting.dto;
+package com.example.backend.menu.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +14,11 @@ public class MenuRes {
   private String parName = "";
   private String nameTree = "";
   private String idTree = "";
-  private String iconUrl = "0";
+  private String iconUrl = "https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png";
   private int sortOrder = 0;
-  private int enabledYN = 0;
+  private boolean enabledYn = true;
   private boolean childNodeYn = true;
   private boolean adminYn = false;
   private boolean deletedYn = false;
+  private Long pageId = 1L;
 }

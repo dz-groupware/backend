@@ -5,17 +5,15 @@
 
   <!-- 마스터인지 확인 -->
   <select id="checkMaster" resultType="boolean">
-    select master_yn from employee where id=#{empId};
+    SELECT master_yn FROM employee WHERE id = #{empId};
   </select>
 
   <!-- 사원/부서/회사 존재여부 확인 -->
   <select id="checkExits">
-    SELECT COUNT(*) FROM EMPLOYEE WHERE ACCOUNT_YN=1 AND DELETED_YN = 0 AND ID= #{empId} AND USER_ID=#{userId}
-    UNION
-    SELECT COUNT(*)FROM EMPLOYEE_DEPARTMENT
-    WHERE transferred_yn = 0 and deleted_yn = 0 and emp_id = #{empId} and org = 1 AND DEPT_ID= #{deptId}
-    UNION
-    select COUNT(*)from employee_company where emp_id=#{empId} and resigned_yn=0 and deleted_yn = 0 AND COMP_ID=#{compId};
+    SELECT COUNT(*) FROM employee WHERE account_yn = 1 AND deleted_yn = 0 AND id = #{empId} AND user_id = #{userId}
+    UNION SELECT COUNT(*) FROM employee_department
+    WHERE transferred_yn = 0 AND deleted_yn = 0 AND emp_id = #{empId} AND org = 1 AND dept_id = #{deptId}
+    UNION SELECT COUNT(*) FROM employee_company WHERE emp_id = #{empId} AND resigned_yn = 0 AND deleted_yn = 0 AND comp_id = #{compId};
   </select>
 
 </mapper>
