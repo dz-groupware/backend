@@ -3,6 +3,7 @@ package com.example.backend.authgroup.service;
 import com.example.backend.authgroup.dto.AddAuthDto;
 import com.example.backend.authgroup.dto.AddEmpAuthDto;
 import com.example.backend.authgroup.dto.EmployeeAuthStatusDto;
+import com.example.backend.authgroup.dto.UpdateAuthDto;
 import com.example.backend.authgroup.dto.UserListOfAuthDto;
 import com.example.backend.common.dto.Page;
 import com.example.backend.authgroup.dto.AuthMenuDto;
@@ -26,6 +27,7 @@ public interface AuthGroupService {
   List<MenuAuthStatusDto> getLnbListOfAuthWithAll(Long authId, Long parId);
   List<UserListOfAuthDto> getEmpListOfAuth(Long authId);
   Long addAuth(AddAuthDto addAuthDto);
+  Long updateAuth(UpdateAuthDto updateAuthDto);
 
   void modifyMappedMenuOfAuth(Long authId, Map<Long, Boolean> checkedMenuItems);
   void deactivateAuthByAuthId(Long authId);
@@ -38,4 +40,6 @@ public interface AuthGroupService {
   List<EmployeeAuthStatusDto> findEmployeeAuthStatusListOrderById(Long lastId, String orderBy, String searchTerm, Long employeeId, int pageSize);
   List<EmployeeAuthStatusDto> findEmployeeAuthStatusListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, Long employeeId, int pageSize);
   void addAuthEmployee(AddEmpAuthDto addEmpAuthDto);
+
+  void deleteAuth(Long authId);
 }

@@ -36,4 +36,12 @@ public class SecurityUtil {
     }
     return null;
   }
+  public static Boolean getMasterYn() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println(auth.getPrincipal().toString());
+    if (auth.getPrincipal() instanceof PrincipalDetails) {
+      return ((PrincipalDetails) auth.getPrincipal()).getMasterYn();
+    }
+    return null;
+  }
 }

@@ -1,13 +1,12 @@
 package com.example.backend.employee.service;
 
-import com.example.backend.employee.dto.EmployeeReqDto;
+import com.example.backend.employee.dto.EmployeeCompanyDto;
+import com.example.backend.employee.dto.UpdateMasterYnRequest;
 import com.example.backend.employee.mapper.EmployeeMapper;
-import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
-
+public class EmployeeServiceImpl implements EmployeeService{
   private final EmployeeMapper employeeMapper;
 
   public EmployeeServiceImpl(EmployeeMapper employeeMapper) {
@@ -15,28 +14,26 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public List<EmployeeReqDto> findEmployeeList(Long companyId, int pageNumber, int pageSize) {
-    long offset = (long) (pageNumber - 1) * pageSize;
-    return employeeMapper.findEmployeeList(companyId, offset, pageSize);
+  public EmployeeCompanyDto findCompEmpByEmpId(Long employeeId) {
+    return employeeMapper.findCompEmpByEmpId(employeeId);
   }
 
   @Override
-  public void addEmployee(EmployeeReqDto employee) {
-    employeeMapper.addEmployee(employee);
+  public boolean isMaster(Long employeeId) {
+    return employeeMapper.isMaster(employeeId);
   }
 
   @Override
-  public void modifyEmployee(EmployeeReqDto employee) {
-    employeeMapper.modifyEmployee(employee);
+  public Long findCompIdOfEmpId(Long employeeId) {
+    return employeeMapper.findCompIdOfEmpId(employeeId);
   }
 
   @Override
-  public void removeEmployee(Long id) {
-    employeeMapper.removeEmployee(id);
-  }
-
-  @Override
-  public long getTotalElements() {
-    return employeeMapper.getTotalElements();
+  public boolean changeMasterYn(UpdateMasterYnRequest request) {
+    int updatedRows = employeeMapper.changeMasterYn(request);
+    if (updatedRows > 0) {
+      return true;
+    }
+    return false;
   }
 }

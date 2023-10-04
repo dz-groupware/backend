@@ -38,7 +38,7 @@
 
     GROUP BY c.id
   </select>
-
+<!--  나중에 employee 도메인쪽으로 옮기기-->
   <select id="getParDepartmentsWithEmployeeCount" resultType="com.example.backend.company.dto.DepartmentWithEmployeeCountDto">
     SELECT
       d.id AS departmentId,
@@ -89,7 +89,7 @@
       AND e.deleted_yn = 0
       AND ed.deleted_yn=0
       AND ed.transferred_yn=0
-    where dept_id = #{departmentId}
+    WHERE dept_id = #{departmentId} AND ed.org = 1
   </select>
 
   <select id="getEmployeeNoDepartment" resultType="com.example.backend.company.dto.DeptEmployeeDto">

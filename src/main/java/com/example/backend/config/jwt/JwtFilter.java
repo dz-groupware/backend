@@ -65,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
         throw new Error("유효하지 않은 JWT");
       }
     }
+
     filterChain.doFilter(request, response);
   }
 }

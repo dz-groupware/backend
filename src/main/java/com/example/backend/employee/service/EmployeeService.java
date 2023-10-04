@@ -1,13 +1,11 @@
 package com.example.backend.employee.service;
 
-import com.example.backend.employee.dto.EmployeeReqDto;
-import java.util.List;
+import com.example.backend.employee.dto.EmployeeCompanyDto;
+import com.example.backend.employee.dto.UpdateMasterYnRequest;
 
 public interface EmployeeService {
-
-  List<EmployeeReqDto> findEmployeeList(Long companyId, int pageNumber, int pageSize);
-  void addEmployee(EmployeeReqDto employee);
-  void modifyEmployee(EmployeeReqDto employee);
-  void removeEmployee(Long id);
-  long getTotalElements();
+  EmployeeCompanyDto findCompEmpByEmpId(Long employeeId);
+  boolean isMaster(Long employeeId);
+  Long findCompIdOfEmpId(Long employeeId);
+  boolean changeMasterYn(UpdateMasterYnRequest request);
 }

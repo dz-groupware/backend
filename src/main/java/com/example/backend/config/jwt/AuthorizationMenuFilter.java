@@ -66,20 +66,20 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
     }
 
     String menuId = request.getHeader("menuId");
-    if(menuId == null){
-      logger.info("denied : menuId is null");
-      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-      return;
-    }
+//    if(menuId == null){
+//      logger.info("denied : menuId is null");
+//      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//      return;
+//    }
     logger.info("in menuFilter : "+menuId);
-
+    System.out.println("pkdto......"+pkDto.getEmpId()+pkDto.isMasterYn());
     if(pkDto.isMasterYn()) {
       // 마스터이면 권한 확인 안하고 넘어감
       request.setAttribute("pkDto", pkDto);
       chain.doFilter(request, response);
     } else {
       List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
-      if (menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
+      if (menuId == null|| menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
         request.setAttribute("pkDto", pkDto);
         logger.info(pkDto.getEmpId());
         chain.doFilter(request, response);
