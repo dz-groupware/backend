@@ -1,9 +1,6 @@
 package com.example.backend.employeemgmt.service;
 
-import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtReqDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtResDto;
+import com.example.backend.employeemgmt.dto.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,4 +20,10 @@ public interface EmployeeMgmtService {
 
     void modifyEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt);
     void removeEmployeeMgmt(Long id, EmployeeMgmtReqDto employeeMgmt);
+
+    Boolean checkLoginId(String loginId);
+
+
+    @Transactional
+    EmployeeMgmtCheckSignUpResultResDto checkSignUp(EmployeeMgmtSignUpReqDto employeeMgmt);
 }

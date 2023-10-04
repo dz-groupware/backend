@@ -1,9 +1,7 @@
 package com.example.backend.employeemgmt.service;
 
 import com.example.backend.config.jwt.SecurityUtil;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtReqDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtResDto;
+import com.example.backend.employeemgmt.dto.*;
 import com.example.backend.employeemgmt.mapper.EmployeeMgmtMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,18 +35,23 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 
         List<EmployeeMgmtResDto> results = new ArrayList<>();
 
-
         for (Long empId : employeeIds) {
             List<EmployeeMgmtResDto> detailList = employeeMgmtMapper.getEmployeeMgmtDetailsById(empId, companyId);
-            for (EmployeeMgmtResDto data : detailList) {
-                results.add(data);
+
+            if (detailList == null || detailList.isEmpty()) {
+                // If detailList is null or empty, fetch basic details.
+                EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetailsById(empId, companyId);
+                if (basicDetails != null) {
+                    results.add(basicDetails);
+                }
+            } else {
+                // If detailList is not null and not empty, add its elements to results.
+                results.addAll(detailList);
             }
         }
 
         return results;
-
     }
-
 
     @Override
     public List<Map<Long, String>> getAllDepartmentMgmtList() {
@@ -72,48 +75,72 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
         }
     }
 
+
     @Override
     @Transactional
     public void addEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt) {
+        Long userId = null;
+
+        // 해당 사용자의 unique 정보를 가지고 user 테이블에서 확인
+        userId = employeeMgmtMapper.getUserIdByUniqueInfo(
+                employeeMgmt.getName(), employeeMgmt.getPrivEmail(),
+                employeeMgmt.getMobileNumber(), employeeMgmt.getLoginId(), employeeMgmt.getEmpIdNum());
+
+        if (userId == null) {
+            // 첫 번째 데이터로 user 테이블에 저장
+            employeeMgmtMapper.addEmployeeMgmtUser(employeeMgmt);
+            userId = employeeMgmt.getId();
+
+            if (userId == null) {
+                throw new RuntimeException("ID 생성 실패");
+            }
+        }
+
         Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
-
-
-        //transferredYn 이 바뀌어버려서 resignedYn true일경우로 바꿔서 해야함
         if (resignedYn) {
             employeeMgmt.setTransferredYn(true);
             employeeMgmt.setLeftDate(new Date());
             employeeMgmt.setAccountYn(false);
         }
-        // 사용자 추가
-        employeeMgmtMapper.addEmployeeMgmtUser(employeeMgmt);
 
-        // 생성된 ID를 employeeMgmt 객체에서 가져옵니다.
-        Long generatedId = employeeMgmt.getId();
 
-        if (generatedId == null) {
-            throw new RuntimeException("ID 생성 실패");
-        }
-
-        // 생성된 ID를 사용하여 직원 추가
         Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
-        //마스톼이엔 1처리 하는거 없어짐
-        employeeMgmtMapper.addEmployeeMgmtEmployee(generatedId, employeeMgmt, masterYn);
-        Long employeeId = employeeMgmt.getId();
 
-        // 생성된 ID와 회사 ID를 사용하여 직원-회사 관계 추가
+        // 사용자 추가 또는 수정에 관련된 나머지 작업들 수행
+        employeeMgmtMapper.addEmployeeMgmtEmployee(userId, employeeMgmt, masterYn);
+        Long employeeId = employeeMgmt.getId();
         employeeMgmtMapper.addEmployeeMgmtEmployeeCompany(employeeId, employeeMgmt, resignedYn);
 
-        // 대표가 아닐 경우에만 실행
         if (masterYn == false) {
             Boolean org = employeeMgmt.getTransferredYn() == true ? false : true;
             employeeMgmtMapper.addEmployeeMgmtEmployeeDepartment(employeeId, employeeMgmt, org);
         }
     }
 
+
     @Override
     @Transactional
     public void modifyEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt) {
+
         Long userId = employeeMgmtMapper.getUserIdById(employeeMgmt.getId());
+        employeeMgmt.setDeletedYn(false);
+
+        // departmentId가 null인지 대표인지 확인
+        if (employeeMgmt.getDepartmentId() == null && !employeeMgmt.getPosition().equals("대표")) {
+            Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
+            // 생성된 ID를 사용하여 직원 추가
+            Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
+            employeeMgmtMapper.addEmployeeMgmtEmployeeModify(userId, employeeMgmt, masterYn);
+            Long employeeId = employeeMgmt.getId();
+            employeeMgmtMapper.addEmployeeMgmtEmployeeCompany(employeeId, employeeMgmt, resignedYn);
+            if (masterYn == false) {
+                Boolean org = employeeMgmt.getTransferredYn() == true ? false : true;
+                employeeMgmtMapper.addEmployeeMgmtEmployeeDepartment(employeeId, employeeMgmt, org);
+            }
+            return; // 이후의 코드를 실행하지 않고 메서드를 종료
+        }
+
+
         List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
 
 
@@ -122,10 +149,8 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
             if (masterYn == false) {
                 Boolean org = employeeMgmt.getTransferredYn() == true ? false : true;
-
                 employeeMgmtMapper.modifyEmployeeMgmtEmployeeDepartment(empId, org, employeeMgmt);
             }
-            System.out.println("ddddddddddddddddddddddddddddddddddddddddddd");
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
             employeeMgmt.setLeftDate(employeeMgmt.getResignationDate());
             employeeMgmtMapper.modifyEmployeeMgmtUser(empId, employeeMgmt);
@@ -147,19 +172,13 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 // 대표가 아닐 때만 removeEmployeeMgmtEmployeeDepartment 매퍼를 호출
             if (!"대표".equals(employeeMgmt.getPosition())) {
                 employeeMgmt.setTransferredYn(true);
-                Boolean org = employeeMgmt.getTransferredYn() == false ? true : false;
 
-                // leftDate가 없는 경우 getResignationDate로 설정
-                if (employeeMgmt.getLeftDate() == null) {
-                    employeeMgmt.setLeftDate(employeeMgmt.getResignationDate());
-                }
 
-                employeeMgmtMapper.removeEmployeeMgmtEmployeeDepartment(empId, org, employeeMgmt);
+                employeeMgmtMapper.removeEmployeeMgmtEmployeeDepartment(empId, employeeMgmt);
             }
 
             employeeMgmt.setAccountYn(false);
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
-
 
 
             employeeMgmtMapper.removeEmployeeMgmtUser(empId, employeeMgmt);
@@ -168,6 +187,26 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 //
         }
     }
+
+    @Override
+    public Boolean checkLoginId(String loginId) {
+        String result = employeeMgmtMapper.checkLoginId(loginId);
+        return result != null;
+    }
+
+
+    @Override
+    @Transactional
+    public EmployeeMgmtCheckSignUpResultResDto checkSignUp(EmployeeMgmtSignUpReqDto employeeMgmt) {
+
+        if (employeeMgmtMapper.checkDuplicates(employeeMgmt)) {
+                List<EmployeeMgmtListResDto> result = employeeMgmtMapper.checkSignUp(employeeMgmt);
+                return new EmployeeMgmtCheckSignUpResultResDto(result, true);
+                }
+            return new EmployeeMgmtCheckSignUpResultResDto(null, false);
+        }
+
+
 }
 
 

@@ -72,7 +72,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       return;
     }
     logger.info("in menuFilter : "+menuId);
-
+    System.out.println("pkdto......"+pkDto.getEmpId()+pkDto.isMasterYn());
     if(pkDto.isMasterYn()) {
       // 마스터이면 권한 확인 안하고 넘어감
       request.setAttribute("pkDto", pkDto);

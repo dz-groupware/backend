@@ -10,12 +10,12 @@
     id, login_id, image_url, name, join_date
     FROM (
     SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
-    ROW_NUMBER() OVER(PARTITION BY e.id ORDER BY ed.id DESC) AS rn
+    ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
     FROM employee e
     INNER JOIN user u ON e.user_id = u.id
     INNER JOIN employee_company ec ON e.id = ec.emp_id
     LEFT JOIN employee_department ed ON e.id = ed.emp_id
-    WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
+    WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
     ) AS RankedEmployees
     WHERE rn = 1;
 </select>
@@ -26,16 +26,31 @@
         u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
         ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
         ,e.deleted_yn
-       from employee e
+        FROM employee e
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.id=#{empId} and ec.comp_id=#{companyId}
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND  (ed.transferred_yn=false or ed.transferred_yn is NULL)
+    </select>
+
+
+    <select id="getEmployeeMgmtOnlyBasicDetailsById"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
+        SELECT e.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
+        u.login_id, u.login_pw, u.priv_email,
+        u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
+        ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
+        ,e.deleted_yn
+        FROM employee e
+        INNER JOIN user u ON e.user_id=u.id
+        INNER JOIN employee_company ec ON e.id=ec.emp_id
+        LEFT JOIN employee_department ed ON e.id=ed.emp_id
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId}
     </select>
 
 
     <select id="getAllDepartmentMgmtList"  resultType="java.util.Map">
-        SELECT id,name from department where deleted_yn=false AND comp_id=#{companyId}
+        SELECT id,name FROM department where deleted_yn=false AND comp_id=#{companyId}
     </select>
 
 
@@ -50,7 +65,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL)
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -72,7 +87,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -93,7 +108,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL)
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -104,23 +119,41 @@
     <insert id="addEmployeeMgmtUser" useGeneratedKeys="true" keyProperty="dto.id">
         INSERT INTO `user` (`name`, `gender`, `priv_email`, `mobile_number`, `home_number`, `address`, `login_id`, `login_pw`, `user_id_num`,`deleted_yn`)
         VALUES (#{dto.name}, #{dto.gender}, #{dto.privEmail}, #{dto.mobileNumber}, #{dto.homeNumber}, #{dto.address}, #{dto.loginId},
-        #{dto.loginPw}, #{dto.empIdNum},#{deletedYn})
+        #{dto.loginPw}, #{dto.empIdNum},#{dto.deletedYn})
     </insert>
 
     <insert id="addEmployeeMgmtEmployee" useGeneratedKeys="true" keyProperty="dto.id">
         INSERT INTO `employee` (`user_id`, `name`, `gender`, `image_url`, `account_yn`,
         `mobile_number`, `home_number`, `address`, `emp_id_num`, `last_access`, `position`,`master_yn`,`deleted_yn`)
-        VALUES (#{id}, #{dto.name}, #{dto.gender}, #{dto.imageUrl}, #{dto.accountYn}, #{dto.mobileNumber},
-        #{dto.homeNumber}, #{dto.address}, #{dto.empIdNum}, NOW(),#{dto.position},#{masterYn},#{deletedYn})
+        VALUES (#{userId}, #{dto.name}, #{dto.gender}, #{dto.imageUrl}, #{dto.accountYn}, #{dto.mobileNumber},
+        #{dto.homeNumber}, #{dto.address}, #{dto.empIdNum}, NOW(),#{dto.position},#{masterYn},#{dto.deletedYn})
     </insert>
     <insert id="addEmployeeMgmtEmployeeCompany" >
         INSERT INTO `employee_company` (`comp_id`, `emp_id`, `join_date`, `resignation_date`,`deleted_yn`,`resigned_yn`)
-        VALUES (#{dto.compId}, #{dto.id}, #{dto.joinDate}, #{dto.resignationDate},#{deletedYn},#{resignedYn})
+        VALUES (#{dto.compId}, #{dto.id}, #{dto.joinDate}, #{dto.resignationDate},#{dto.deletedYn},#{resignedYn})
     </insert>
 
     <insert id="addEmployeeMgmtEmployeeDepartment" >
         INSERT INTO `employee_department` (`dept_id`, `emp_id`, `transferred_yn`,`join_date`, `left_date`, `org`,`position`,`deleted_yn`)
-        VALUES (#{dto.deptId}, #{dto.id},#{dto.transferredYn} ,#{dto.edjoinDate}, #{dto.leftDate},#{org},#{dto.position},#{deletedYn})
+        VALUES (#{dto.deptId}, #{dto.id},#{dto.transferredYn} ,#{dto.edjoinDate}, #{dto.leftDate},#{org},#{dto.position},#{dto.deletedYn})
+    </insert>
+
+    <select id="getUserIdByUniqueInfo">
+        SELECT id FROM user
+        WHERE name=#{name} AND priv_email=#{privEmail} AND mobile_number=#{mobileNumber} AND
+        login_id=#{loginId} AND user_id_num=#{empIdNum}
+    </select>
+
+
+
+
+<!--    부서정보 수정시 추가-->
+
+    <insert id="addEmployeeMgmtEmployeeModify" useGeneratedKeys="true" keyProperty="dto.id">
+        INSERT INTO `employee` (`user_id`, `name`, `gender`, `image_url`, `account_yn`,
+        `mobile_number`, `home_number`, `address`, `emp_id_num`, `last_access`, `position`,`master_yn`,`deleted_yn`)
+        VALUES (#{userId}, #{dto.name}, #{dto.gender}, #{dto.imageUrl}, #{dto.accountYn}, #{dto.mobileNumber},
+        #{dto.homeNumber}, #{dto.address}, #{dto.empIdNum}, NOW(),#{dto.position},#{masterYn},#{dto.deletedYn})
     </insert>
 
 
@@ -128,12 +161,12 @@
 
 <!--    delete-->
     <select id="getUserIdById" resultType="Long">
-        select user_id from employee where id=#{id}
+        SELECT user_id FROM employee WHERE id=#{id}
     </select>
 
 
     <select id="getEmployeeIdsByUserId" resultType="Long">
-        select id from employee where user_id=#{userId}
+        SELECT id FROM employee WHERE user_id=#{userId}
     </select>
 
 
@@ -191,7 +224,6 @@
         ed.transferred_yn = #{dto.transferredYn},
         ed.join_date = #{dto.edjoinDate},
         ed.left_date = #{dto.leftDate},
-        ed.org = #{org},
         ed.deleted_yn = #{dto.deletedYn}
         WHERE e.id = #{empId} AND ed.id=#{dto.departmentId}
 
@@ -258,6 +290,41 @@
         WHERE e.id = #{empId} AND ed.id=#{dto.departmentId}
 
     </update>
+
+
+<select id="checkLoginId" resultType="Boolean">
+    SELECT login_id FROM user WHERE login_id=#{loginId}
+</select>
+
+    <select id="checkSignUp"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
+        FROM employee e
+        INNER JOIN user u ON e.user_id = u.id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE e.name = #{dto.name} AND e.emp_id_num=#{dto.empIdNum}
+        AND u.priv_email=#{dto.privEmail}
+        AND u.mobile_number=#{dto.mobileNumber}
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+    <select id="checkDuplicates" resultType="Boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+        FROM user WHERE user_id_num=#{dto.empIdNum} or
+        priv_email=#{dto.privEmail} or mobile_number=#{dto.mobileNumber}
+    </select>
+
+
+
+
+
+
 
 
 
