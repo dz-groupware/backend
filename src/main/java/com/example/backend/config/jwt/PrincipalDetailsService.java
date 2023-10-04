@@ -1,5 +1,7 @@
 package com.example.backend.config.jwt;
 
+import com.example.backend.common.error.BusinessLogicException;
+import com.example.backend.common.error.code.LoginExceptionCode;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,11 +20,11 @@ public class PrincipalDetailsService implements UserDetailsService {
   }
 
   @Override
-
   public UserDetails loadUserByUsername(String username) {
     PrincipalUserDto principalUser = userMapper.findByLoginId(username);
     if (principalUser == null) {
-      throw new UsernameNotFoundException("Employee not found");
+      throw new BusinessLogicException(LoginExceptionCode.ID_NOT_FOUND);
+//      throw new UsernameNotFoundException("Employee not found");
     }
     return new PrincipalDetails(principalUser);
   }
@@ -30,7 +32,7 @@ public class PrincipalDetailsService implements UserDetailsService {
   public UserDetails loadUserByUserIdAndEmpId(Long userId, Long empId)  {
     PrincipalUserDto principalUser = userMapper.getAnotherLogin(userId,empId);
     if (principalUser == null) {
-      throw new UsernameNotFoundException("Employee not found");
+      throw new BusinessLogicException(LoginExceptionCode.ID_NOT_FOUND);
     }
     return new PrincipalDetails(principalUser);
   }

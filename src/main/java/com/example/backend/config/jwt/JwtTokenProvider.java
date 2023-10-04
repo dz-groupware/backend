@@ -1,7 +1,7 @@
 package com.example.backend.config.jwt;
 
 import com.example.backend.common.error.BusinessLogicException;
-import com.example.backend.common.error.JwtExceptionCode;
+import com.example.backend.common.error.code.JwtExceptionCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;

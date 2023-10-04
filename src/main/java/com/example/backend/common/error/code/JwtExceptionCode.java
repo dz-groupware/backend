@@ -1,8 +1,8 @@
-package com.example.backend.common.error;
+package com.example.backend.common.error.code;
 
 import lombok.Getter;
 
-public enum JwtExceptionCode {
+public enum JwtExceptionCode implements ExceptionCode {
   EXPIRED_JWT_TOKEN(401, "JWT 토큰이 만료 되었습니다."),
   NO_REDIS_CONNECTION(500, "레디스 연결이 되지 않았습니다."),
   MISSING_COOKIE(400, "요청된 쿠키가 없습니다."),
