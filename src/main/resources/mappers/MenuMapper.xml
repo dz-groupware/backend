@@ -77,7 +77,7 @@
 
   <!-- 라우팅 리스트 : 마스터 -->
   <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
-    SELECT m.id AS menu_id, par.name AS gnb_name, m.name_tree, par.id AS gnb_id, p.name AS page FROM menu AS m
+    SELECT m.id AS menu_id, par.name AS gnb_name, m.name_tree, par.id AS gnb_id, p.page FROM menu AS m
     INNER JOIN page AS p ON m.page_id = p.id
     LEFT JOIN menu AS par ON m.name_tree LIKE CONCAT(par.name, '%')
     WHERE m.enabled_yn = 1 AND m.deleted_yn = 0 AND m.comp_id = #{compId};

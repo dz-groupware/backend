@@ -111,7 +111,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (id == 0 && result == 0) {
       return true;
     }
-    if (result == 1) {
+    if (id > 0 && result == 1) {
       return true;
     }
     return false;
