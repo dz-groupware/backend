@@ -15,6 +15,7 @@ public class testRedisController {
   private final RedisService redisService;
   public testRedisController(RedisService redisService){
     this.redisService = redisService;
+
   }
 
   @GetMapping("header")

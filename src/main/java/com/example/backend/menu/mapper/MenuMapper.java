@@ -1,6 +1,7 @@
 package com.example.backend.menu.mapper;
 
 import com.example.backend.menu.dto.MenuDto;
+import com.example.backend.menu.dto.RouteDto;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,7 +18,8 @@ public interface MenuMapper {
   List<MenuDto> getUpperMenuLnb(Long menuId, Long compId);
   List<MenuDto> getUpperMenuGnbForMaster(Long compId);
   List<MenuDto> getUpperMenuLnbForMaster(Long menuId, Long compId);
-
+  List<RouteDto> getMenuList(Long empId, Long deptId, Long compId);
+  List<RouteDto> getMenuListForMaster(Long compId);
 
 
 }

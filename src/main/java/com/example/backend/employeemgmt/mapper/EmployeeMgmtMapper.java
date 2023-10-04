@@ -38,7 +38,7 @@ public interface EmployeeMgmtMapper {
 
     void removeEmployeeMgmtEmployeeCompany(@Param("empId")Long id, @Param("resignedYn")Boolean resignedYn, @Param("dto")EmployeeMgmtReqDto employeeMgmt);
 
-    void removeEmployeeMgmtEmployeeDepartment(@Param("empId")Long id,@Param("org") Boolean org, @Param("dto")EmployeeMgmtReqDto employeeMgmt);
+    void removeEmployeeMgmtEmployeeDepartment(@Param("empId")Long id, @Param("dto")EmployeeMgmtReqDto employeeMgmt);
 
     Long getUserIdById(Long id);
 
@@ -64,4 +64,7 @@ public interface EmployeeMgmtMapper {
     List<EmployeeMgmtListResDto> checkSignUp(@Param("dto")EmployeeMgmtSignUpReqDto employeeMgmt);
 
     Boolean checkDuplicates(@Param("dto")EmployeeMgmtSignUpReqDto employeeMgmt);
+
+
+    EmployeeMgmtResDto getEmployeeMgmtOnlyBasicDetailsById(Long empId, Long companyId);
 }

@@ -23,7 +23,6 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity(debug = true) // 스프링 시큐리티 필터(SecurityConfig)가 스프링 필터 체인에 등록
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-// @Secured 활성화, @PreAuthorize & @PostAuthorize 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -57,7 +56,7 @@ public class SecurityConfig {
 //                .requestMatchers("/**").permitAll() // 모든 주소 허용
         .antMatchers("/auth/login").permitAll() // 허용된 주소
         .anyRequest().authenticated() // Authentication 필요한 주소
-        .and()                  // exception handling for jwt
+        .and()                  // exception handling for jwt책
         .exceptionHandling()
         .accessDeniedHandler(jwtAccessDeniedHandler)
         .authenticationEntryPoint(jwtAuthenticationEntryPoint);

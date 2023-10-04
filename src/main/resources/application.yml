@@ -2,7 +2,10 @@ server:
   port: ${SERVER_PORT:8080}
   servlet:
     context-path: /api/v1
-
+#    session:
+#      cookie:
+#        same-site: none
+#        secure: true
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -27,7 +30,7 @@ cloud:
       accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
       secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
     s3:
-      bucket: ${CLOUD_AWS_S3_BUCEKT}
+      bucket: ${CLOUD_AWS_S3_BUCKET}
       dir: ${CLOUD_AWS_S3_DIR}
     region:
       static: ${CLOUD_AWS_REGION_STATIC}
@@ -37,3 +40,4 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:/mappers/*.xml
+useHttps: true

@@ -23,7 +23,7 @@ public interface EmployeeMgmtService {
 
     Boolean checkLoginId(String loginId);
 
+
+    @Transactional
     EmployeeMgmtCheckSignUpResultResDto checkSignUp(EmployeeMgmtSignUpReqDto employeeMgmt);
-
-
 }

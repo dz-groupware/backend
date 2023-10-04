@@ -4,6 +4,7 @@ package com.example.backend.companymgmt.controller;
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.service.CompanyMgmtService;
+import com.example.backend.config.jwt.PkDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

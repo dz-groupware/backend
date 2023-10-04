@@ -15,7 +15,7 @@
     INNER JOIN user u ON e.user_id = u.id
     INNER JOIN employee_company ec ON e.id = ec.emp_id
     LEFT JOIN employee_department ed ON e.id = ed.emp_id
-    WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
+    WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
     ) AS RankedEmployees
     WHERE rn = 1;
 </select>
@@ -30,7 +30,22 @@
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.id=#{empId} and ec.comp_id=#{companyId} and (org=1 or org is null)
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND  (ed.transferred_yn=false or ed.transferred_yn is NULL)
+    </select>
+
+
+    <select id="getEmployeeMgmtOnlyBasicDetailsById"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
+        SELECT e.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
+        u.login_id, u.login_pw, u.priv_email,
+        u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
+        ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
+        ,e.deleted_yn
+        FROM employee e
+        INNER JOIN user u ON e.user_id=u.id
+        INNER JOIN employee_company ec ON e.id=ec.emp_id
+        LEFT JOIN employee_department ed ON e.id=ed.emp_id
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId}
     </select>
 
 
@@ -50,7 +65,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL)
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -72,7 +87,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL)
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -93,7 +108,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL)
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -146,12 +161,12 @@
 
 <!--    delete-->
     <select id="getUserIdById" resultType="Long">
-        SELECT user_id FROM employee where id=#{id}
+        SELECT user_id FROM employee WHERE id=#{id}
     </select>
 
 
     <select id="getEmployeeIdsByUserId" resultType="Long">
-        SELECT id FROM employee where user_id=#{userId}
+        SELECT id FROM employee WHERE user_id=#{userId}
     </select>
 
 
@@ -209,7 +224,6 @@
         ed.transferred_yn = #{dto.transferredYn},
         ed.join_date = #{dto.edjoinDate},
         ed.left_date = #{dto.leftDate},
-        ed.org = #{org},
         ed.deleted_yn = #{dto.deletedYn}
         WHERE e.id = #{empId} AND ed.id=#{dto.departmentId}
 
@@ -293,8 +307,8 @@
         INNER JOIN user u ON e.user_id = u.id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false  AND (ed.org=1 or ed.org is NULL)
-        AND e.name = #{dto.name} AND e.emp_id_num=#{dto.empIdNum} AND u.priv_email=#{dto.privEmail}
+        WHERE e.name = #{dto.name} AND e.emp_id_num=#{dto.empIdNum}
+        AND u.priv_email=#{dto.privEmail}
         AND u.mobile_number=#{dto.mobileNumber}
         ) AS RankedEmployees
         WHERE rn = 1;
@@ -305,6 +319,15 @@
         FROM user WHERE user_id_num=#{dto.empIdNum} or
         priv_email=#{dto.privEmail} or mobile_number=#{dto.mobileNumber}
     </select>
+
+
+
+
+
+
+
+
+
 
 
 </mapper>

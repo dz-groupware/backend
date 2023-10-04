@@ -20,7 +20,7 @@
 
   <!-- GNB 메뉴 리스트 -->
   <select id="getGnbByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM MENU
+    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, NAME_TREE FROM menu
     INNER JOIN
     (SELECT distinct MENU_ID FROM AUTH_MENU INNER JOIN
     (select auth_id from auth_employee where emp_id = #{empId} and deleted_yn = 0
@@ -54,7 +54,7 @@
 
   <!-- GNB 즐겨찾기 리스트 : 마스터 -->
   <select id="getFavorForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-    select menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn from menu
+    select menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
     inner join (select * from favor where emp_id= #{empId})favor
     where menu.id=favor.menu_id;
   </select>
@@ -66,7 +66,7 @@
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) -->
   <select id="getMenuById" resultType="com.example.backend.menu.dto.MenuDto">
-    select id, par_id, name, icon_url, sort_order, name_tree, child_node_yn from menu inner join
+    select id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu inner join
     (SELECT auth_menu.MENU_ID FROM AUTH_MENU INNER JOIN
     (select auth_id from auth_company where comp_id= #{compId}
     union select auth_id from AUTH_DEPARTMENT where dept_id=#{deptId}
@@ -77,7 +77,7 @@
 
   <!-- LNB 리스트 (LNB 최상단 : GNB -> LNB) : 마스터-->
   <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, child_node_yn FROM MENU
+    SELECT id, par_id, NAME, ICON_URL, SORT_ORDER, name_tree, child_node_yn FROM menu
     where comp_id =#{compId} and menu.enabled_yn = 1 and menu.deleted_yn = 0 and menu.id != par_id and par_id=#{menuId} order by sort_order desc;
   </select>
 
@@ -102,16 +102,35 @@
 
   <!-- 메뉴설정 : 상위메뉴 GNB 리스트 (마스터) -->
   <select id="getUpperMenuGnbForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-    select id, par_id, comp_id, name, sort_order from menu
+    select id, par_id, comp_id, name, sort_order FROM menu
     where comp_id=#{compId} and enabled_yn = 1 and menu.deleted_yn = 0 and menu.id = par_id order by sort_order;
   </select>
 
   <!-- 메뉴설정 : 상위메뉴 LNB 리스트 (마스터) -->
   <select id="getUpperMenuLnbForMaster" resultType="com.example.backend.menu.dto.MenuDto">
-    select id, par_id, comp_id, name, sort_order from menu
+    select id, par_id, comp_id, name, sort_order FROM menu
     where comp_id=#{compId} and enabled_yn = 1 and menu.deleted_yn = 0
     and par_id = #{menuId} and id != par_id order by sort_order;
   </select>
 
+  <!-- 메뉴(라우팅) 리스트 -->
+  <select id="getMenuList" resultType="com.example.backend.menu.dto.RouteDto">
+    SELECT m.ID as menu_id, par.NAME as gnb_name, m.NAME_TREE, par.ID as gnb_id, p.NAME AS page FROM menu AS m
+    INNER JOIN page AS p ON m.PAGE_ID = p.ID
+    left join menu AS par on m.name_tree like concat(par.name, '%')
+    inner join (select menu_id from auth_menu
+    inner join (select auth_id from auth_employee where emp_id= #{empId}
+    union select auth_id from auth_department where dept_id = #{deptId}
+    union select auth_id from auth_company where comp_id = #{compId})admin
+    on auth_menu.auth_id = admin.auth_id)menuList
+    on menuList.menu_id = m.id where m.enabled_yn = 1 and m.deleted_yn = 0;
+  </select>
 
+  <!-- 메뉴(라우팅) 리스트 : 마스터 -->
+  <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
+    SELECT m.ID as menu_id, par.NAME as gnb_name, m.NAME_TREE, par.ID as gnb_id, p.NAME AS page FROM menu AS m
+    INNER JOIN page AS p ON m.PAGE_ID = p.ID
+    left join menu AS par on m.name_tree like concat(par.name, '%')
+    where m.enabled_yn = 1 and m.deleted_yn = 0 and m.comp_id = #{compId};
+  </select>
 </mapper>

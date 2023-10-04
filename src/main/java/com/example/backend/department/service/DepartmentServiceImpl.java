@@ -291,4 +291,15 @@ public class DepartmentServiceImpl implements DepartmentService {
       return originMenu;
     }
   }
+
+  public boolean checkDeptCode(String text, Long id) {
+    int result = departmentMapper.checkDeptCode(text, id);
+    if (id == 0 && result == 0) {
+      return true;
+    }
+    if (result == 1) {
+      return true;
+    }
+    return false;
+  }
 }

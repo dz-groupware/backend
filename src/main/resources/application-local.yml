@@ -21,10 +21,8 @@ spring:
     token:
       access-expiration-time: 43200000    # 12시간
       refresh-expiration-time: 604800000   # 7일
-
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:/mappers/*.xml
-
-
+useHttps: false

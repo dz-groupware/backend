@@ -95,4 +95,9 @@
   <update id="modifyUpperDeptCNY" parameterType="java.lang.Long">
     update department set child_node_yn = 0 where id = #{parId};
   </update>
+
+  <!-- 부서코드 중복 확인 -->
+  <select id="checkDeptCode" >
+    select count(*) from department where code = #{text} or id = #{id};
+  </select>
 </mapper>
