@@ -64,7 +64,7 @@ public class JwtTokenProvider {
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
     Claims claims = parseToken(token);
     Map<String, Object> userInfoMap = getUserInfoFromRedis(token);
-    validateIncomingRequest(request, userInfoMap);
+//    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
     UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
@@ -113,18 +113,18 @@ public class JwtTokenProvider {
     }
     response.addCookie(cookie);
   }
-  private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
-    String incomingIp = request.getRemoteAddr();
-    String incomingUserAgent = request.getHeader("User-Agent");
-    if (incomingIp == null ||incomingUserAgent == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_USER_AGENT);
-    }
-    String storedIp = (String) userInfoMap.get("clientIp");
-    String storedUserAgent = (String) userInfoMap.get("userAgent");
-    if (!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
-      throw new BusinessLogicException(JwtExceptionCode.MISMATCHED_USER_AGENT);
-    }
-  }
+//  private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
+//    String incomingIp = request.getRemoteAddr();
+//    String incomingUserAgent = request.getHeader("User-Agent");
+//    if (incomingIp == null ||incomingUserAgent == null) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISSING_USER_AGENT);
+//    }
+//    String storedIp = (String) userInfoMap.get("clientIp");
+//    String storedUserAgent = (String) userInfoMap.get("userAgent");
+//    if (!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISMATCHED_USER_AGENT);
+//    }
+//  }
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
