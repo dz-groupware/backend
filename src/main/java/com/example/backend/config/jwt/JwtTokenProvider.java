@@ -91,6 +91,7 @@ public class JwtTokenProvider {
     Cookie cookie = new Cookie(name, value);
     cookie.setHttpOnly(true);
     cookie.setPath("/");
+    cookie.setMaxAge((int) (System.currentTimeMillis()+60*1000*60));
     if (useHttps) {
       cookie.setSecure(true);
       cookie.setDomain("amaranth2023.site");
@@ -184,18 +185,17 @@ public class JwtTokenProvider {
         log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
       }
     }
-
   }
   private boolean validateAndDeleteToken(String token) {
-    if (validateToken(token)) {
-      if (redisTemplate.hasKey(token)) {
-        redisTemplate.delete(token);
-        return true;
-      } else {
-        throw new BusinessLogicException(JwtExceptionCode.TOKEN_NOT_FOUND_IN_REDIS);
-      }
+    if (redisTemplate.hasKey(token)) {
+      redisTemplate.delete(token);
     }
-    return false;
+    if (validateToken(token)) {
+      return true;
+    } else {
+      log.warn("유효하지 않은 토큰입니다.");
+      return false;
+    }
   }
   private String generateJwtToken(Claims claims, long expirationTime) {
     Date now = new Date();
