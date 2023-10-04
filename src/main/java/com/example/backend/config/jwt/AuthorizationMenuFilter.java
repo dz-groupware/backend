@@ -79,7 +79,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       chain.doFilter(request, response);
     } else {
       List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
-      if (menuList.contains(Long.parseLong(menuId))|| menuId.equals("0") || menuId == null) {
+      if (menuId == null|| menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
         request.setAttribute("pkDto", pkDto);
         logger.info(pkDto.getEmpId());
         chain.doFilter(request, response);
