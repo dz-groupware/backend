@@ -93,8 +93,8 @@ public class JwtTokenProvider {
     cookie.setPath("/");
     cookie.setMaxAge((int) (System.currentTimeMillis()+60*1000*60));
     if (useHttps) {
-//      cookie.setSecure(true);
-//      cookie.setDomain("amaranth2023.site");
+      cookie.setSecure(true);
+      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
     System.out.println("쿠키출력 " + cookie.toString());
@@ -108,8 +108,8 @@ public class JwtTokenProvider {
     cookie.setPath("/");
 
     if (useHttps) {
-//      cookie.setSecure(true);
-//      cookie.setDomain("amaranth2023.site");
+      cookie.setSecure(true);
+      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
   }
