@@ -184,7 +184,7 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             employeeMgmtMapper.removeEmployeeMgmtUser(empId, employeeMgmt);
             employeeMgmtMapper.removeEmployeeMgmtEmployee(empId, employeeMgmt);
             employeeMgmtMapper.removeEmployeeMgmtEmployeeCompany(empId, resignedYn, employeeMgmt);
-//
+
         }
     }
 

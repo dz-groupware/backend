@@ -21,8 +21,27 @@ spring:
     token:
       access-expiration-time: 43200000    # 12시간
       refresh-expiration-time: 604800000   # 7일
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:/mappers/*.xml
+
 useHttps: false
+
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIAUYIFBFKNLD3LQW7B
+      secretKey: 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
+    s3:
+      bucket: dz-test-image
+      dir: /*
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
