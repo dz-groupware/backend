@@ -91,7 +91,7 @@ public class JwtTokenProvider {
     Cookie cookie = new Cookie(name, value);
     cookie.setHttpOnly(true);
     cookie.setPath("/");
-    cookie.setMaxAge((int) (System.currentTimeMillis()+60*1000*60));
+    cookie.setMaxAge((int) (3*60*1000*60)); //3시간
     if (useHttps) {
       cookie.setSecure(true);
       cookie.setDomain("amaranth2023.site");
