@@ -20,4 +20,15 @@
     SET master_yn = !#{masterYn}
     WHERE id = #{empId}
   </update>
+
+  <select id="getEmployeeAfterUpdateMaster" resultType="com.example.backend.employee.dto.EmployeeMDto">
+    SELECT
+    e.id as emp_id,
+    e.name as emp_name,
+    e.position as emp_position,
+    e.master_yn as emp_master_yn
+    FROM employee e
+    WHERE e.id = #{employeeId}
+  </select>
+
 </mapper>
