@@ -36,7 +36,6 @@ public class S3Controller {
       uploadedUrl= s3.profileUploadFile(multipartFile);
     } catch (Exception e) {
       System.out.println("여기 에러터지나");
-      // 에러 메시지를 포함한 응답 반환
       return new ResponseEntity<String>("Error while uploading: " + e.getMessage(), HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<String>(uploadedUrl, HttpStatus.OK);

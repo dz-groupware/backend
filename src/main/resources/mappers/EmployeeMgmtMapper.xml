@@ -65,7 +65,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId}
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -87,7 +87,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -108,7 +108,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId} AND (ed.org=1 or ed.org is NULL) AND ec.resigned_yn=false
+        WHERE u.deleted_yn = false AND ec.comp_id = #{compId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
