@@ -7,11 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
@@ -28,15 +24,24 @@ public class S3Controller {
 
   @PostMapping("/img")
   public ResponseEntity<String> uploadFile(@RequestParam("images") MultipartFile multipartFile)
-      throws IOException {
+          throws IOException {
     System.out.println(multipartFile);
     return new ResponseEntity<String>(s3.upload(multipartFile), HttpStatus.OK);
   }
 
   @PostMapping("/profile")
-  public ResponseEntity<String> profileUploadFile(@RequestParam("profileImage") MultipartFile multipartFile)
-          throws IOException {
-    System.out.println(multipartFile);
-    return new ResponseEntity<String>(s3.profileUploadFile(multipartFile), HttpStatus.OK);
+  public ResponseEntity<?> profileUploadFile(@RequestParam("profileImage") MultipartFile multipartFile) {
+    String uploadedUrl= null;
+    try {
+      uploadedUrl= s3.profileUploadFile(multipartFile);
+    } catch (Exception e) {
+      System.out.println("여기 에러터지나");
+      // 에러 메시지를 포함한 응답 반환
+      return new ResponseEntity<String>("Error while uploading: " + e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<String>(uploadedUrl, HttpStatus.OK);
+
   }
+
+
 }

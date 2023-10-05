@@ -30,7 +30,7 @@
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND  (ed.transferred_yn=false or ed.transferred_yn is NULL)
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND (ed.org=1 OR ed.org IS NULL)AND  (ed.transferred_yn=false or ed.transferred_yn IS NULL)
     </select>
 
 

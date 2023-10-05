@@ -80,7 +80,7 @@ public class EmployeeMgmtController {
             return new ResponseEntity<>("No data found from check", HttpStatus.NOT_FOUND);
         } else if (!result.isFromCheck()) {
             // if 문에 들어가지 않은 경우
-            return new ResponseEntity<>("No data found", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("No data found", HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(new SingleResponseDto<>(result.getData()), HttpStatus.OK);
