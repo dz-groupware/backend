@@ -64,7 +64,7 @@ public class JwtTokenProvider {
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
     Claims claims = parseToken(token);
     Map<String, Object> userInfoMap = getUserInfoFromRedis(token);
-//    validateIncomingRequest(request, userInfoMap);
+    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
     UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
