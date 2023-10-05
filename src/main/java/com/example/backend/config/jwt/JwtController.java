@@ -37,15 +37,20 @@ public class JwtController {
     try {
       authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw()));
     } catch (BadCredentialsException e) {
+      System.out.println("controller, login 에러1");
       throw new BusinessLogicException(LoginExceptionCode.UNMATCHED_PASSWORD);
     } catch (DisabledException e) {
+      System.out.println("controller, login 에러2");
       throw new BusinessLogicException(LoginExceptionCode.DISABLED);
     } catch (AccountExpiredException e) {
+      System.out.println("controller, login 에러3");
       throw new BusinessLogicException(LoginExceptionCode.ACCOUNT_EXPIRED);
     }
 
     String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
     String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+    System.out.println("Controller쪽 엑세스" + accessToken);
+    System.out.println("Controller쪽 리프레시" + refreshToken);
     jwtTokenProvider.setCookie(response, "accessToken", accessToken);
     jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
 
