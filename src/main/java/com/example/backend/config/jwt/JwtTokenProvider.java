@@ -164,27 +164,27 @@ public class JwtTokenProvider {
     }
   }
 
-  public void logout(HttpServletRequest request) {
-    // 클라이언트로부터 쿠키 혹은 헤더에서 토큰을 가져옵니다.
-    String accessToken = getAccessTokenFromRequest(request);
-    String refreshToken = getRefreshTokenFromRequest(request);
-
-    if (accessToken == null && refreshToken == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_TOKENS);
-    }
-
-    if (accessToken != null) {
-      if (!validateAndDeleteToken(accessToken)) {
-        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
-      }
-    }
-
-    if (refreshToken != null) {
-      if (!validateAndDeleteToken(refreshToken)) {
-        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
-      }
-    }
-  }
+//  public void logout(HttpServletRequest request) {
+//    // 클라이언트로부터 쿠키 혹은 헤더에서 토큰을 가져옵니다.
+//    String accessToken = getAccessTokenFromRequest(request);
+//    String refreshToken = getRefreshTokenFromRequest(request);
+//
+//    if (accessToken == null && refreshToken == null) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISSING_TOKENS);
+//    }
+//
+//    if (accessToken != null) {
+//      if (!validateAndDeleteToken(accessToken)) {
+//        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
+//      }
+//    }
+//
+//    if (refreshToken != null) {
+//      if (!validateAndDeleteToken(refreshToken)) {
+//        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
+//      }
+//    }
+//  }
   private boolean validateAndDeleteToken(String token) {
     if (redisTemplate.hasKey(token)) {
       redisTemplate.delete(token);
