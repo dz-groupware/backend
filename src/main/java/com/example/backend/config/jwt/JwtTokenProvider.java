@@ -149,7 +149,7 @@ public class JwtTokenProvider {
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
-  public boolean validateToken(String token){
+  public boolean validateToken(String token,HttpServletResponse response){
     try{
       log.info("validate token "+ token);
       Jwts.parserBuilder()
@@ -159,6 +159,7 @@ public class JwtTokenProvider {
       return true;
     } catch(ExpiredJwtException e) {
       log.error("만료된 토큰입니다.");
+      deleteCookie(response, token);
       throw new BusinessLogicException(JwtExceptionCode.EXPIRED_JWT_TOKEN);
     } catch(JwtException e) {
       log.error("유효하지 않은 토큰입니다.");
@@ -187,17 +188,17 @@ public class JwtTokenProvider {
 //      }
 //    }
 //  }
-  private boolean validateAndDeleteToken(String token) {
-    if (redisTemplate.hasKey(token)) {
-      redisTemplate.delete(token);
-    }
-    if (validateToken(token)) {
-      return true;
-    } else {
-      log.warn("유효하지 않은 토큰입니다.");
-      return false;
-    }
-  }
+//  private boolean validateAndDeleteToken(String token,HttpServletResponse response) {
+//    if (redisTemplate.hasKey(token)) {
+//      redisTemplate.delete(token);
+//    }
+//    if (validateToken(token, response)) {
+//      return true;
+//    } else {
+//      log.warn("유효하지 않은 토큰입니다.");
+//      return false;
+//    }
+//  }
   private String generateJwtToken(Claims claims, long expirationTime) {
     Date now = new Date();
     Date expirationDate = new Date(now.getTime() + expirationTime);
