@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.redis.RedisMapper">
+
+  <select id="findMenuId" resultType="java.lang.Long">
+    SELECT menu_id FROM auth_menu
+    INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId}
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId})admin
+    ON auth_menu.auth_id = admin.auth_id;
+  </select>
+
+  <select id="getAllKeys" resultType="com.example.backend.config.jwt.PkDto">
+    SELECT e.id as emp_id, e.user_id, e.master_yn, ed.dept_id, ec.comp_id FROM employee AS e
+    LEFT JOIN employee_department AS ed ON ed.emp_id = e.id and org = 1
+    LEFT JOIN employee_company AS ec ON ec.emp_id = e.id
+    WHERE e.id = #{empId} AND (ed.transferred_yn = 0 OR ed.transferred_yn IS NULL)
+    AND (ed.deleted_yn = 0 OR ed.deleted_yn is null)
+    AND ec.resigned_yn = 0 AND ec.deleted_yn = 0 AND e.account_yn = 1 AND e.deleted_yn = 0;
+  </select>
+
+  <!-- 마스터인지 확인 -->
+  <select id="checkMaster" resultType="boolean">
+    SELECT master_yn FROM employee WHERE id = #{empId};
+  </select>
+</mapper>

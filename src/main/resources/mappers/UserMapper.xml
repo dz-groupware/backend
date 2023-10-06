@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.config.jwt.UserMapper">
+  <select id="findByLoginId" resultType="com.example.backend.config.jwt.PrincipalUserDto">
+    SELECT u.id AS user_id, u.name, u.login_id, u.login_pw, e.id AS emp_id, c.id AS comp_id, ed.dept_id AS dept_id, e.master_yn AS master_yn
+    FROM user u
+    JOIN employee e ON e.user_id = u.id
+    JOIN employee_company ec ON e.id = ec.emp_id
+    JOIN company c ON c.id = ec.comp_id
+    LEFT JOIN employee_department ed ON ed.emp_id = e.id
+    WHERE u.login_id = #{loginId} AND (org = 1 or org is NULL) AND u.deleted_yn=0
+    ORDER BY e.last_access desc limit 1
+  </select>
+
+  <select id="getAnotherLogin" resultType="com.example.backend.config.jwt.PrincipalUserDto">
+    SELECT u.id AS user_id, u.name, u.login_id, u.login_pw, e.id AS emp_id, c.id AS comp_id, ed.dept_id AS dept_id, e.master_yn AS master_yn
+    FROM user u
+    JOIN employee e ON e.user_id = u.id
+    JOIN employee_company ec ON e.id = ec.emp_id
+    JOIN company c ON c.id = ec.comp_id
+    LEFT JOIN employee_department ed ON ed.emp_id = e.id
+    WHERE u.id=#{userId} and e.id=#{empId} AND (org = 1 or org is NULL) AND u.deleted_yn=0
+  </select>
+</mapper>

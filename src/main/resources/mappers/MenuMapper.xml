@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.menu.mapper.MenuMapper">
+
+  <!-- GNB -->
+  <select id="getGnbByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu
+    INNER JOIN (SELECT DISTINCT menu_id FROM auth_menu
+    INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0)admin
+    WHERE auth_menu.deleted_yn = 0 AND auth_menu.auth_id = admin.auth_id)menu_list
+    WHERE enabled_yn = 1 AND deleted_yn = 0 AND menu.id = menu_list.menu_id AND id = par_id ORDER BY sort_order DESC;
+  </select>
+
+  <!-- GNB : 마스터 -->
+  <select id="getGnbForMaster">
+    SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu WHERE id = par_id AND comp_id = #{compId} ORDER BY sort_order DESC;
+  </select>
+
+  <!-- GNB 즐겨찾기 -->
+  <select id="getFavorByEmpId" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM
+    (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
+    INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
+    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
+    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    WHERE menu_list.menu_id = menu.id)menu
+    INNER JOIN (SELECT * FROM favor WHERE emp_id = #{empId})favor
+    WHERE menu.id = favor.menu_id;
+  </select>
+
+  <!-- GNB 즐겨찾기 : 마스터 -->
+  <select id="getFavorForMaster" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
+    INNER JOIN (SELECT * FROM favor WHERE emp_id = #{empId})favor
+    WHERE menu.id = favor.menu_id;
+  </select>
+
+  <!-- GNB 즐겨찾기 / 삭제 -->
+  <delete id="removeFavor">
+    DELETE FROM favor WHERE emp_id = #{empId} AND menu_id = #{menuId};
+  </delete>
+
+  <!-- GNB -> LNB -->
+  <select id="getMenuById" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
+    INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu
+    INNER JOIN (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
+    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    WHERE menu_list.menu_id = menu.id AND par_id = #{menuId} AND id != par_id AND enabled_yn=1 AND deleted_yn=0 ORDER BY sort_order DESC;
+  </select>
+
+  <!-- GNB -> LNB : 마스터 -->
+  <select id="getMenuForMaster" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
+    WHERE comp_id = #{compId} AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND menu.id != par_id AND par_id = #{menuId} ORDER BY sort_order DESC;
+  </select>
+
+  <!-- 라우팅 리스트 -->
+  <select id="getMenuList" resultType="com.example.backend.menu.dto.RouteDto">
+    SELECT m.id as menu_id, par.name AS gnb_name, m.name_tree, par.id AS gnb_id, p.page FROM menu AS m
+    INNER JOIN page AS p ON m.page_id = p.id
+    LEFT JOIN menu AS par ON m.name_tree LIKE CONCAT(par.name, '%')
+    INNER JOIN (SELECT menu_id FROM auth_menu
+    INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId}
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId})admin
+    ON auth_menu.auth_id = admin.auth_id)menuList
+    ON menuList.menu_id = m.id WHERE m.enabled_yn = 1 AND m.deleted_yn = 0;
+  </select>
+
+  <!-- 라우팅 리스트 : 마스터 -->
+  <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
+    SELECT m.id AS menu_id, par.name AS gnb_name, m.name_tree, par.id AS gnb_id, p.page FROM menu AS m
+    INNER JOIN page AS p ON m.page_id = p.id
+    LEFT JOIN menu AS par ON m.name_tree LIKE CONCAT(par.name, '%')
+    WHERE m.enabled_yn = 1 AND m.deleted_yn = 0 AND m.comp_id = #{compId};
+  </select>
+
+  <!-- 메뉴 검색 -->
+  <select id="findMenuByName" resultType="com.example.backend.menu.dto.MenuRes">
+    SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
+    INNER JOIN menu AS m
+    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id AND menu.deleted_yn = 0 ORDER BY menu.sort_order DESC;
+  </select>
+
+  <!-- 메뉴 설정 페이지 : 메뉴 추가 -->
+  <insert id="addMenu" parameterType="com.example.backend.menu.dto.MenuRes" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO menu(par_id, comp_id, name, enabled_yn, icon_url, sort_order, name_tree, child_node_yn, admin_yn, deleted_yn, page_id)
+    VALUES(59, #{compId}, #{name}, #{enabledYn}, #{iconUrl}, #{sortOrder}, #{nameTree}, #{childNodeYn}, #{adminYn}, #{deletedYn}, #{pageId});
+  </insert>
+
+  <!-- 메뉴 설정 페이지 : 대메뉴 par_id, id_tree 수정 -->
+  <update id="modifyParId">
+    UPDATE menu SET par_id = #{id}, id_tree = #{idTree} WHERE id = #{id};
+  </update>
+
+  <!-- 메뉴 childNodeYn 변경 -->
+  <update id="updateChildNodeYn">
+    UPDATE menu SET child_node_yn = 0 WHERE id = #{parId};
+  </update>
+
+  <!-- 메뉴 추가/수정 시 필요함 -->
+
+  <!-- 상위 메뉴 정보 가져오기 -->
+  <select id="getMenuByMenuId" parameterType="com.example.backend.menu.dto.MenuTrans">
+    SELECT id, par_id, name, id_tree, name_tree FROM menu WHERE id = #{parId};
+  </select>
+
+  <!-- id_tree 수정 -->
+  <update id="modifyIdTree">
+    UPDATE menu SET id_tree = #{idTree} WHERE id = #{id};
+  </update>
+
+  <!-- 메뉴 트리 변경 : 자신의 하위메뉴를 상위메뉴로 지정하는지 확인을 위함 -->
+  <select id="checkMenuInMenu" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM menu WHERE id_tree LIKE #{id} AND id = #{parId};
+  </select>
+
+  <!-- 이동할 메뉴 묶음 -->
+  <select id="getMoveMenuList" resultType="com.example.backend.menu.dto.MenuTrans">
+    SELECT id, par_id, name, id_tree, name_tree FROM menu WHERE id_tree LIKE #{id}
+  </select>
+
+  <!-- parId, idTree, nameTree 저장 -->
+  <update id="modifyPreMoveMenu" parameterType="com.example.backend.menu.dto.MenuTrans">
+      UPDATE menu SET par_id = #{parId}, id_tree = #{idTree}, name_tree = #{nameTree} WHERE id = #{id};
+  </update>
+
+  <!-- parId, idTree, nameTree 저장 : 리스트 -->
+  <resultMap id="result" type="com.example.backend.menu.dto.MenuTrans">
+    <id column="id" property="id" />
+    <result column="par_id" property="parId" />
+    <result column="id_tree" property="idTree" />
+    <result column="name_tree" property="nameTree" />
+  </resultMap>
+
+  <update id="modifyMoveMenuList" parameterType="java.util.List">
+    <foreach collection="list" item="item" separator=";">
+    UPDATE menu SET par_id = #{item.parId}, id_tree = #{item.idTree}, name_tree = #{item.nameTree} WHERE id = #{id};
+    </foreach>
+  </update>
+
+  <!-- 메뉴 설정 페이지 : 대메뉴/메뉴 수정 -->
+  <update id="modifyMenuById" parameterType="com.example.backend.menu.dto.MenuRes">
+    UPDATE menu SET par_id = #{parId}, comp_id = #{compId}, name = #{name}, enabled_yn = #{enabledYn}, icon_url = #{iconUrl},
+    sort_order = #{sortOrder}, name_tree = #{nameTree}, id_tree = #{idTree}, page_id = #{pageId} WHERE id = #{id};
+  </update>
+
+
+  <!-- 메뉴설정 : 상위메뉴 GNB 리스트 (권한 확인) -->
+  <select id="getUpperMenuGnb" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT DISTINCT menu.id, par_id, name, sort_order FROM auth_dashboard
+    INNER JOIN auth_menu ON auth_menu.auth_id = auth_dashboard.auth_id AND comp_id = #{compId}
+    INNER JOIN menu ON menu.id = auth_menu.menu_id
+    WHERE auth_menu.deleted_yn = 0 AND auth_dashboard.deleted_yn = 0
+    AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND menu.id = par_id ORDER BY sort_order DESC;
+  </select>
+
+  <!-- 메뉴설정 : 상위메뉴 LNB 리스트 (권한 확인) -->
+  <select id="getUpperMenuLnb" resultType="com.example.backend.menu.dto.MenuDto">
+    SELECT DISTINCT menu.id, par_id, name, sort_order FROM auth_dashboard
+    INNER JOIN auth_menu on auth_menu.auth_id = auth_dashboard.auth_id AND comp_id = #{compId}
+    INNER JOIN menu ON menu.id = auth_menu.menu_id
+    WHERE auth_menu.deleted_yn = 0 AND auth_dashboard.deleted_yn = 0
+    AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND par_id = #{menuId} AND menu.id != menu.par_id
+    ORDER BY sort_order;
+  </select>
+
+  <select id="getGnbList" resultType="com.example.backend.menu.dto.GnbDetailDto">
+    SELECT id, name, par_id, sort_order, icon_url, enabled_yn FROM menu
+    WHERE comp_id = #{compId} AND id = par_id AND deleted_yn = 0 ORDER BY menu.sort_order DESC;
+  </select>
+
+  <!-- 대메뉴 수정 시 name_tree 수정을 위해 하위 메뉴 찾기 -->
+  <select id="findChildAll" resultType="com.example.backend.menu.dto.MenuTrans">
+    SELECT id, name_tree FROM menu WHERE id_tree LIKE #{id};
+  </select>
+
+  <!-- name_tree 만 수정 -->
+  <update id="modifyChildNameTree" parameterType="com.example.backend.menu.dto.MenuTrans">
+    UPDATE menu SET name_tree = #{nameTree} WHERE id = #{id};
+  </update>
+
+  <!-- 대메뉴 삭제 시 하위 메뉴 찾기 -->
+  <select id="findChildAllMenu" resultType="java.lang.Long">
+    SELECT id FROM menu WHERE id_tree LIKE #{StringId} OR id = #{id};
+  </select>
+
+  <!-- 메뉴 삭제 -->
+  <update id="deleteMenu">
+    UPDATE menu SET deleted_yn = 1 WHERE id = #{menuId}
+  </update>
+
+  <!-- 메뉴 설정 페이지 : 메뉴 par_id, id_tree 수정 -->
+  <update id="modifyMenuParId">
+    UPDATE menu SET par_id = #{parId}, id_tree = #{idTree} WHERE id = #{id};
+  </update>
+
+  <!-- 페이지 리스트 가져오기 -->
+  <select id="getPageList" resultType="com.example.backend.menu.dto.PageDto">
+    SELECT id, name FROM page;
+  </select>
+  <!--################-->
+
+</mapper>

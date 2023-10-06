@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.setting.mapper.SettingMapper">
+
+  <!-- 메뉴 설정 페이지 : GNB -->
+  <select id="findGnbList" resultType="com.example.backend.menu.dto.MenuRes">
+    SELECT id, par_id, name, icon_url, sort_order, enabled_yn FROM menu WHERE id = par_id;
+  </select>
+
+  <!-- 메뉴 설정 페이지 : 메뉴 상세 정보 -->
+  <select id="findMenuDetailById" resultType="com.example.backend.menu.dto.MenuRes">
+    SELECT * FROM menu WHERE id = #{menuId};
+  </select>
+
+
+
+
+
+  <!-- 메뉴 childNodeYn 변경 -->
+  <update id="modifyUpperMenu">
+    UPDATE menu SET child_node_yn = 0 WHERE id = #{parId};
+  </update>
+
+
+
+  <!-- 사용하는지 확인 필요 -->
+  <!-- 메뉴 검색 : GNB 선택 결과와 메뉴명 검색 결과 (메뉴트리를 그릴 수 있는 리스트 반환) -->
+  <select id="findAllMenu">
+    SELECT id, par_id, name FROM menu WHERE comp_id = #{compId} AND deleted_yn = 0;
+  </select>
+
+  <select id="getMenuIdByIdTree" resultType="java.lang.Long">
+    SELECT id, name, id_tree FROM menu WHERE id_tree LIKE #{menuId};
+  </select>
+
+
+
+
+
+  <select id="getPreParMenu" resultType="com.example.backend.menu.dto.MenuTrans">
+    SELECT id, menu.par_id, name, id_tree, name_tree FROM menu
+    INNER JOIN (SELECT par_id FROM menu WHERE id = #{id})origin WHERE origin.par_id = menu.id;
+  </select>
+
+  <update id="updateChildNodeYnOfParMenu" parameterType="java.lang.Long">
+    UPDATE menu SET child_node_yn = 0 WHERE id = #{id};
+  </update>
+
+  <resultMap id="result" type="com.example.backend.setting.dto.Dto">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="age" property="age" />
+  </resultMap>
+
+  <insert id="testList" parameterType="java.util.List" useGeneratedKeys = "true" keyProperty = "id">
+    INSERT INTO test(name, age) VALUES
+    <foreach collection="list" item="item" separator=",">
+      (#{item.name}, #{item.age})
+    </foreach>
+  </insert>
+
+</mapper>

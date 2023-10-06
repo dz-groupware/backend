@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.department.mapper.DepartmentMapper">
+
+  <!-- 부서 리스트 : 기본 -->
+  <select id="getDepartmentBasicList" resultType="com.example.backend.department.dto.DeptListDto">
+    SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn AS management_yn, child_node_yn FROM department
+    WHERE id = par_id AND deleted_yn = 0 AND enabled_yn = 1 AND comp_id = #{compId};
+  </select>
+
+  <!-- 부서 리스트 : 하위 -->
+  <select id="getDepartmentById" resultType="com.example.backend.department.dto.DeptListDto">
+    SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn as management_yn, child_node_yn FROM department
+    WHERE deleted_yn = 0 AND enabled_yn = 1 AND comp_id = #{compId} AND par_id = #{parId};
+  </select>
+
+  <!-- 부서의 상세 정보 : 기본 정보 -->
+  <select id="getBasicDetailById" resultType="com.example.backend.department.dto.DeptDto">
+    SELECT department.id, comp_id, par_id, department.name, code, sort_order, abbr, enabled_yn, included_yn,
+    managing_dept_yn AS management_yn, child_node_yn, dept.name AS par_name FROM department
+    INNER JOIN (SELECT id, name FROM department)dept ON dept.id = department.par_id
+    WHERE department.id = #{id}
+  </select>
+
+  <!-- 부서의 상세 정보 : 부서원 정보 -->
+  <select id="getEmpListByDeptId" resultType="com.example.backend.department.dto.EmpListDto">
+    SELECT department.name as dept_name, ed.position, employee.name AS emp_name,
+    department.sort_order, ed.emp_id, ed.org, employee_department.emp_id FROM employee_department
+    INNER JOIN employee_department AS ed ON ed.emp_id = employee_department.emp_id
+    INNER JOIN department ON department.id = ed.dept_id
+    INNER JOIN employee ON employee.id = employee_department.emp_id
+    WHERE employee_department.dept_id = #{id} AND ed.org = 1
+    AND ed.transferred_yn = 0 AND employee_department.transferred_yn = 0
+    AND employee_department.deleted_yn = 0 AND ed.deleted_yn = 0
+    AND department.deleted_yn = 0 AND employee.deleted_yn = 0
+    AND department.enabled_yn = 1 ;
+  </select>
+
+  <!-- 추가 -->
+  <insert id="addDepartment" parameterType="com.example.backend.department.dto.DeptDto">
+    INSERT INTO department(comp_id, par_id, name, code, abbr, enabled_yn, included_yn, managing_dept_yn, sort_order)
+    VALUES (#{compId}, #{parId}, #{name}, #{code}, #{abbr}, #{enabledYn}, #{includedYn}, #{managementYn}, #{sortOrder});
+  </insert>
+
+  <!-- 수정 -->
+  <update id="modifyDepartment" parameterType="com.example.backend.department.dto.DeptDto">
+    UPDATE department SET par_id = #{parId}, code = #{code}, name = #{name}, abbr = #{abbr},
+    enabled_yn = #{enabledYn}, managing_dept_yn = #{managementYn}, included_yn = #{includedYn}, sort_order = #{sortOrder}
+    WHERE id = #{id};
+  </update>
+
+  <!-- 삭제 -->
+  <update id="deleteDepartment">
+    UPDATE department SET deleted_yn = 1 WHERE id_tree LIKE #{StringId} OR id = #{id} AND comp_id = #{compId};
+  </update>
+
+  <!-- 부서 페이지 회사 옵션 리스트 -->
+  <select id="getOptionCompList" resultType="com.example.backend.department.dto.DeptListDto">
+    SELECT id AS comp_id, company.par_id, code ,name, sort_order FROM company
+    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId})comp ON comp.par_id = company.par_id
+    WHERE deleted_yn = 0 AND enabled_yn = 1;
+  </select>
+
+  <!-- 부서 검색 -->
+  <select id="findDeptNameAndCode" resultType="com.example.backend.department.dto.DeptListDto">
+    SELECT id, par_id, name, code, sort_order FROM department
+    WHERE deleted_yn = 0 AND enabled_yn = 1 AND comp_id = #{compId} AND (name LIKE #{text1} OR code LIKE #{text2});
+  </select>
+
+  <!-- 부서코드 중복 확인 -->
+  <select id="checkDeptCode" >
+    SELECT COUNT(*) FROM department WHERE code = #{text} OR id = #{id};
+  </select>
+
+
+
+  <!-- 부서 추가/수정 시 수행 될 로직 -->
+  <select id="checkDeptInDept" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM department WHERE id_tree LIKE #{id1} OR id_tree LIKE #{id2} AND id != #{parId};
+  </select>
+
+  <select id="getOriginDept" resultType="com.example.backend.department.dto.DeptTrans">
+    SELECT id, par_id, name, name_tree, id_tree FROM department WHERE id = #{id} AND id != par_id;
+  </select>
+
+  <select id="getMoveDeptList" resultType="com.example.backend.department.dto.DeptTrans">
+    SELECT id, par_id, name, id_tree, name_tree FROM department WHERE id_tree LIKE #{id};
+  </select>
+
+  <update id="modifyDeptTree" parameterType="com.example.backend.department.dto.DeptTrans">
+    UPDATE department SET id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} WHERE id = #{id};
+  </update>
+
+  <!-- 상위 부서 가져오기 -->
+  <select id="getParDept" resultType="com.example.backend.department.dto.DeptTrans">
+    SELECT id, par_id, name, id_tree, name_tree FROM department WHERE id = #{id};
+  </select>
+
+  <!-- 상위 부서 childNodeYn 변경 -->
+  <update id="modifyUpperDeptCNY" parameterType="java.lang.Long">
+    UPDATE department SET child_node_yn = 0 WHERE id = #{parId};
+  </update>
+
+</mapper>
