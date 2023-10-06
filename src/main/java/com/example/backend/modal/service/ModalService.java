@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface ModalService {
   List<ProfileRes> getAllProfile();
-  List<TreeItemRes> getOrgTree(PkDto pkDto, String type, Long deptId);
+  List<TreeItemRes> getOrgTree(String type, Long deptId);
 
   List<ProfileRes> findEmpList(String type, Long compId, Long deptId);
 
-  SingleResponseDto<?> findOrgResult(PkDto pkDto, String type, String text);
+  SingleResponseDto<?> findOrgResult(String type, String text);
 
-  boolean checkEmpIds(PkDto pkDto, Long empId);
+  boolean checkEmpIds(Long empId);
 }

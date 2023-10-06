@@ -6,8 +6,6 @@ import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
-
-import com.example.backend.config.jwt.PkDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -35,16 +33,16 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<TreeItemRes> getOrgTree(PkDto pkDto, String type, Long deptId) {
+  public List<TreeItemRes> getOrgTree(String type, Long deptId) {
     if(type.equals("basic")) {
 
-      return modalMapper.getCompToGnb(pkDto.getCompId());
+      return modalMapper.getCompToGnb(SecurityUtil.getCompanyId());
     }
     if (type.equals("comp")) {
-      return modalMapper.getGnbToLnb(pkDto.getCompId());
+      return modalMapper.getGnbToLnb(SecurityUtil.getCompanyId());
     }
     if (type.equals("dept")) {
-      return modalMapper.getLnbToLnb(pkDto.getCompId(), deptId);
+      return modalMapper.getLnbToLnb(SecurityUtil.getCompanyId(), deptId);
     }
     return new ArrayList<TreeItemRes>();
   }
@@ -62,11 +60,11 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public SingleResponseDto<?> findOrgResult(PkDto pkDto, String type, String text) {
+  public SingleResponseDto<?> findOrgResult(String type, String text) {
     if (type.equals("all")) {
       Map<String, List<?>> result = new HashMap<>();
-      result.put("Tree", modalMapper.findDeptAllByText(pkDto.getCompId(), text, pkDto.getCompId(), text));
-      result.put("List", modalMapper.findEmpAllByText(pkDto.getCompId(), text, text, text, text, text, text, text));
+      result.put("Tree", modalMapper.findDeptAllByText(SecurityUtil.getCompanyId(), text, SecurityUtil.getCompanyId(), text));
+      result.put("List", modalMapper.findEmpAllByText(SecurityUtil.getCompanyId(), text, text, text, text, text, text, text));
       return new SingleResponseDto<Map>(result);
     }
 
@@ -81,8 +79,8 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public boolean checkEmpIds(PkDto pkDto, Long empId){
-    List<Long> result = modalMapper.checkEmpIds(pkDto.getUserId());
+  public boolean checkEmpIds(Long empId){
+    List<Long> result = modalMapper.checkEmpIds(SecurityUtil.getUserId());
     for (int i=0; i<result.size(); i++){
       if (result.get(i) == empId) {
         return true;
