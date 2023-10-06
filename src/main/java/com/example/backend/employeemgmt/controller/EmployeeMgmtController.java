@@ -74,7 +74,6 @@ public class EmployeeMgmtController {
     public ResponseEntity checkSignUp(@RequestBody EmployeeMgmtSignUpReqDto employeeMgmt) {
         EmployeeMgmtCheckSignUpResultResDto result = employeeMgmtService.checkSignUp(employeeMgmt);
 
-        System.out.println(employeeMgmt.toString());
         if (result.isFromCheck() && (result.getData() == null || result.getData().isEmpty())) {
             // if 문에서 결과가 나왔지만 데이터가 없는 경우
             return new ResponseEntity<>("No data found from check", HttpStatus.NOT_FOUND);

@@ -35,7 +35,6 @@ public class EmployeeServiceImpl implements EmployeeService{
   @Override
   public EmployeeMDto changeMasterYn(UpdateMasterYnRequest request) {
     if(SecurityUtil.getEmployeeId().equals(request.getEmpId())) {
-      System.out.println("이거출력되나 여기서 알아야함");
       throw new BusinessLogicException(UserExceptionCode.UnchangeableSelfAuthority);
     }
     int updatedRows = employeeMapper.changeMasterYn(request);

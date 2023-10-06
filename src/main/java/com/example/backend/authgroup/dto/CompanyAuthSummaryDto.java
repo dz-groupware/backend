@@ -14,5 +14,7 @@ public class CompanyAuthSummaryDto {
   private Long authId;
   private String authName;
   private String companyName;
+  private Boolean enabledYn;
+  private Long menuCount;
 
 }

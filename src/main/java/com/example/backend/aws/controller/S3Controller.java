@@ -5,6 +5,7 @@ import com.example.backend.aws.service.S3;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/s3")
+@Slf4j
 public class S3Controller {
 
   private final S3 s3;
@@ -25,7 +27,7 @@ public class S3Controller {
   @PostMapping("/img")
   public ResponseEntity<String> uploadFile(@RequestParam("images") MultipartFile multipartFile)
           throws IOException {
-    System.out.println(multipartFile);
+    log.info("multipartFile : " + multipartFile);
     return new ResponseEntity<String>(s3.upload(multipartFile), HttpStatus.OK);
   }
 
@@ -35,7 +37,6 @@ public class S3Controller {
     try {
       uploadedUrl= s3.profileUploadFile(multipartFile);
     } catch (Exception e) {
-      System.out.println("여기 에러터지나");
       // 에러 메시지를 포함한 응답 반환
       return new ResponseEntity<String>("Error while uploading: " + e.getMessage(), HttpStatus.NOT_FOUND);
     }
