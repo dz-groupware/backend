@@ -22,7 +22,7 @@ public interface DepartmentMapper {
   int checkDeptCode(String text, Long id);
 
 
-  int checkDeptInDept(String id, Long parId);
+  int checkDeptInDept(String id1, String id2, Long parId);
   DeptTrans getOriginDept (Long id);
   List<DeptTrans> getMoveDeptList (String id);
   void modifyDeptTree(DeptTrans dept);

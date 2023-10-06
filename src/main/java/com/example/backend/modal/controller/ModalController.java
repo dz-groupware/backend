@@ -25,9 +25,9 @@ public class ModalController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity<?> getAllProfile(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getAllProfile() {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<ProfileRes>>(modalService.getAllProfile(pkDto)),
+        new SingleResponseDto<List<ProfileRes>>(modalService.getAllProfile()),
         HttpStatus.OK);
   }
 

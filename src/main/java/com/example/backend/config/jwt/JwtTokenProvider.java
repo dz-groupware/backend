@@ -130,7 +130,7 @@ public class JwtTokenProvider {
     Cookie[] cookies = request.getCookies();
     System.out.println("#######쿠키나와라" + cookies);
     if (cookies == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+      throw             new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){
