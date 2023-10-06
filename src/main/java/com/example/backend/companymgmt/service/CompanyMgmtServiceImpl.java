@@ -9,6 +9,9 @@ import java.util.List;
 import com.example.backend.config.jwt.PkDto;
 import com.example.backend.config.jwt.SecurityUtil;
 
+import com.example.backend.employeemgmt.dto.EmployeeMgmtCheckSignUpResultResDto;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,17 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Long companyId = SecurityUtil.getCompanyId();
         return companyMgmtMapper.getCompanyMgmtList(companyId);
     }
+    @Override
+    public List<CompanyMgmtListResDto> getOpenedCompanyMgmtList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return companyMgmtMapper.getOpenedCompanyMgmtList(companyId);
+    }
+    @Override
+    public List<CompanyMgmtListResDto> getClosedCompanyMgmtList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return companyMgmtMapper.getClosedCompanyMgmtList(companyId);
+    }
+
 
     @Override
     public CompanyMgmtResDto getCompanyDetailsById(Long id) {
@@ -59,6 +73,12 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     @Transactional
     public void addCompanyMgmt(CompanyMgmtReqDto companyMgmt) {
         Long companyId = SecurityUtil.getCompanyId();
+        Boolean isDuplicated = companyMgmtMapper.getInfoDuplicated(companyMgmt);
+
+        if (isDuplicated) {
+            throw new RuntimeException("Data is duplicated");
+        }
+
         if (companyMgmt.getParId() == null || companyMgmt.getParId().equals("")) {
             companyMgmtMapper.addCompanyMgmt(companyMgmt);
             companyMgmtMapper.addIdTreeAndNameTreeWithLastInsertId(companyMgmt.getName());
@@ -72,6 +92,8 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     }
 
 
+
+
     @Override
     @Transactional
     public void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt) {
@@ -79,10 +101,10 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Long originalParId = companyMgmtMapper.getParIdFromDB(companyMgmt.getId());
         System.out.println(originalParId);
 
-        if (companyMgmt.getClosingDate() != null) {
-            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
-            return; // exit the method since we have removed the company
-        }
+//        if (companyMgmt.getClosingDate() != null) {
+//            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
+//            return; // exit the method since we have removed the company
+//        }
 
         int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
         if (circularCount > 0) {

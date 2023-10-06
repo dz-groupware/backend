@@ -4,21 +4,56 @@
 <mapper namespace="com.example.backend.employeemgmt.mapper.EmployeeMgmtMapper">
 
 
-<select id="getEmployeeMgmtList"
-        resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
-    SELECT
-    id, login_id, image_url, name, join_date
-    FROM (
-    SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
-    ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
-    FROM employee e
-    INNER JOIN user u ON e.user_id = u.id
-    INNER JOIN employee_company ec ON e.id = ec.emp_id
-    LEFT JOIN employee_department ed ON e.id = ed.emp_id
-    WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
-    ) AS RankedEmployees
-    WHERE rn = 1;
-</select>
+
+    <select id="getEmployeeMgmtList"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
+        FROM employee e
+        INNER JOIN user u ON e.user_id = u.id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
+        AND e.deleted_yn = false
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+    <select id="getIncumbentEmployeeMgmtList"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
+        FROM employee e
+        INNER JOIN user u ON e.user_id = u.id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.resignation_date IS NULL AND e.deleted_yn = false
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+    <select id="getQuitterEmployeeMgmtList"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
+        FROM employee e
+        INNER JOIN user u ON e.user_id = u.id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.resignation_date IS NOT NULL
+        AND e.deleted_yn = false
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
     <select id="getEmployeeMgmtDetailsById"
             resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
         SELECT e.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
@@ -30,7 +65,7 @@
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND (ed.org=1 OR ed.org IS NULL)AND  (ed.transferred_yn=false or ed.transferred_yn IS NULL)
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND (ed.org=1 OR ed.org IS NULL)
     </select>
 
 
