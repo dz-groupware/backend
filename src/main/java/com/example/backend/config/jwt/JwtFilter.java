@@ -8,11 +8,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
   private final JwtTokenProvider jwtTokenProvider;
 
@@ -35,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
       String accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
       try {
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
-//          System.out.println("JWTFILTER access" + accessToken);
+          log.info("JWTFILTER access" + accessToken);
           Authentication auth = jwtTokenProvider.getAuthentication(accessToken, request);
           SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
         }

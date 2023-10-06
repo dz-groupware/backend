@@ -38,24 +38,23 @@ public class AuthGroupController {
       @RequestParam(required = false) String lastAuthName,
       @RequestParam(required = true) int pageSize,
       @RequestParam(required = false) String searchTerm,
+      @RequestParam(required = false) Boolean canUseAuth,
       @RequestParam(required = false) String orderBy) throws UnsupportedEncodingException {
     String decodeSearchTerm = searchTerm==null? null : URLDecoder.decode(searchTerm,"UTF-8");
     if (lastAuthName != null) {
       String decodeLastAuthName = URLDecoder.decode(lastAuthName, "UTF-8");
-      System.out.println(decodeLastAuthName);
-      return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.findCompanyAuthListOrderByAuthName(decodeLastAuthName, orderBy, decodeSearchTerm, pageSize)));
+      return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.findCompanyAuthListOrderByAuthName(decodeLastAuthName, canUseAuth, orderBy, decodeSearchTerm, pageSize)));
     }
     if (lastId != null) {
-      return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.findCompanyAuthListOrderById(lastId, orderBy, decodeSearchTerm, pageSize)));
+      return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.findCompanyAuthListOrderById(lastId, canUseAuth, orderBy, decodeSearchTerm, pageSize)));
     }
     return ResponseEntity.badRequest().build();
   }
 
   @GetMapping("/companies/auth/count")
-  public ResponseEntity<?> getCompanyAuthCount() {
-    return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.getCompanyAuthCount()));
+  public ResponseEntity<?> getCompanyAuthCount(@RequestParam(required = false) Boolean canUseAuth) {
+    return ResponseEntity.ok(new SingleResponseDto<>(authGroupService.getCompanyAuthCount(canUseAuth)));
   }
-
 
   @GetMapping("/companies/gnb-list")
   public ResponseEntity<?> getCompanyGnbList(@RequestParam(required = false) Boolean enabledYn) {
