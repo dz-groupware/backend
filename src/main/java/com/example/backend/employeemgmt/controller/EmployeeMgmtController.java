@@ -21,6 +21,17 @@ public class EmployeeMgmtController {
         return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getEmployeeMgmtList()),
                 HttpStatus.OK);
     }
+    @GetMapping("/incumbent")
+    public ResponseEntity getIncumbentEmployeeMgmtList(){
+        return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getIncumbentEmployeeMgmtList()),
+                HttpStatus.OK);
+    }
+    @GetMapping("/quitter")
+    public ResponseEntity getQuitterEmployeeMgmtList(){
+        return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getQuitterEmployeeMgmtList()),
+                HttpStatus.OK);
+    }
+
 
     @GetMapping("/dep")
     public ResponseEntity getAllDepartmentMgmtList() {
