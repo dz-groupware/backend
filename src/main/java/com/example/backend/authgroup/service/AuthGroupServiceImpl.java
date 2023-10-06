@@ -34,36 +34,24 @@ public class AuthGroupServiceImpl implements AuthGroupService{
 
 
   @Override
-  public Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(int pageNumber, int pageSize) {
-    long offset = (long) (pageNumber - 1) * pageSize;
+  public List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long lastId, Boolean canUseAuth,
+      String orderBy, String searchTerm, int pageSize) {
     Long companyId = SecurityUtil.getCompanyId();
-    return new Page<>(authGroupMapper.getCompanyAuthSummaryListForPage(companyId, offset, pageSize),
-        new PageDto(pageNumber, pageSize,
-            authGroupMapper.getCompanyAuthCount(companyId))
-    );
-  }
-
-
-
-  @Override
-  public List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long lastId, String orderBy,
-      String searchTerm, int pageSize) {
-    Long companyId = SecurityUtil.getCompanyId();
-    return authGroupMapper.findCompanyAuthListOrderById(companyId, lastId, orderBy, searchTerm, pageSize);
+    return authGroupMapper.findCompanyAuthListOrderById(companyId, lastId, canUseAuth, orderBy, searchTerm, pageSize);
 
   }
 
   @Override
   public List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(String lastAuthName,
-      String orderBy, String searchTerm, int pageSize) {
+      Boolean canUseAuth, String orderBy, String searchTerm, int pageSize) {
     Long companyId = SecurityUtil.getCompanyId();
-    return authGroupMapper.findCompanyAuthListOrderByAuthName(companyId, lastAuthName, orderBy, searchTerm, pageSize);
+    return authGroupMapper.findCompanyAuthListOrderByAuthName(companyId, lastAuthName, canUseAuth, orderBy, searchTerm, pageSize);
   }
 
   @Override
-  public long getCompanyAuthCount() {
+  public long getCompanyAuthCount(Boolean canUseAuth) {
     Long companyId = SecurityUtil.getCompanyId();
-    return authGroupMapper.getCompanyAuthCount(companyId);
+    return authGroupMapper.getCompanyAuthCount(companyId, canUseAuth);
   }
 
   @Override
@@ -118,9 +106,6 @@ public class AuthGroupServiceImpl implements AuthGroupService{
 
   @Override
   public Long updateAuth(UpdateAuthDto updateAuthDto) {
-    System.out.println("updatename"+ updateAuthDto.getAuthName());
-    System.out.println("updatename"+ updateAuthDto.getId());
-    System.out.println("updatename"+ updateAuthDto.isEnabledYn());
     authGroupMapper.updateAuth(updateAuthDto);
     return null;
   }
@@ -177,7 +162,7 @@ public class AuthGroupServiceImpl implements AuthGroupService{
   public Long getEmployeeAuthCount(Long employeeId) {
     if(employeeMapper.isMaster(employeeId)){
       Long companyId = employeeMapper.findCompIdOfEmpId(employeeId);
-      return authGroupMapper.getCompanyAuthCount(companyId);
+      return authGroupMapper.getCompanyAuthCount(companyId,true);
     }
     return authGroupMapper.getEmployeeAuthCount( employeeId);
   }

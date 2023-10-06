@@ -15,10 +15,9 @@ import java.util.Map;
 
 public interface AuthGroupService {
 
-  Page<CompanyAuthSummaryDto> getCompanyAuthSummaryPage(int pageNumber, int pageSize);
-  List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long lastId, String orderBy, String searchTerm, int pageSize);
-  List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(String lastAuthName, String orderBy, String searchTerm, int pageSize);
-  long getCompanyAuthCount();
+  List<CompanyAuthSummaryDto> findCompanyAuthListOrderById(Long lastId, Boolean canUseAuth, String orderBy, String searchTerm, int pageSize);
+  List<CompanyAuthSummaryDto> findCompanyAuthListOrderByAuthName(String lastAuthName, Boolean canUseAuth,String orderBy, String searchTerm, int pageSize);
+  long getCompanyAuthCount(Boolean canUseAuth);
   List<CompanyMenuDto> getCompanyGnbList(Boolean enabledYn);
   List<CompanyMenuDto> getCompanyLnbList(Long parId, Boolean enabledYn);
   List<AuthMenuDto> getGnbListOfAuth(Long authId);

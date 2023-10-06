@@ -14,4 +14,5 @@ public interface CompanyMapper {
   List<DepartmentWithEmployeeCountDto> getSubsidiaryDepartmentsWithEmployeeCount(Long companyId, Long departmentId);
   List<DeptEmployeeDto> getEmployeeByDepartmentId(Long departmentId);
   List<DeptEmployeeDto> getEmployeeNoDepartment(Long companyId);
+
 }

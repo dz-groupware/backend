@@ -12,8 +12,10 @@ import com.example.backend.menu.dto.MenuTrans;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MenuServiceImpl implements MenuService {
 
@@ -98,13 +100,11 @@ public class MenuServiceImpl implements MenuService {
         menuMapper.addMenu(saveMenu);
         // 방금 추가 된 id 가져오기
         Long id = saveMenu.getId();
-        System.out.println("id : "+id);
-        System.out.println("id : "+id.toString());
         // par_id 와 id_tree 수정
         menuMapper.modifyParId(id, id.toString());
         return 1;
       } catch (Exception e) {
-        System.out.println(e);
+        log.info(e.getMessage());
         return -1;
       }
     }
@@ -134,7 +134,7 @@ public class MenuServiceImpl implements MenuService {
           menuMapper.modifyChildNameTree(saveChild);
         }
       } catch (Exception e) {
-        System.out.println(e);
+        log.error(e.getMessage());
         return -1;
       }
     }
@@ -175,8 +175,7 @@ public class MenuServiceImpl implements MenuService {
   // 메뉴 수정 시 트리 수정
   private MenuTrans modifyMenu(MenuTrans menu){
     // menu : 변경될 정보를 담은 메뉴 id: o, par_id: m, name: m, id_tree: o, name_tree: o (origin/modify)
-    System.out.println(menu.getName());
-    System.out.println(menu.getId());
+    log.info(menu.getName());
 
     //부모 노드 child_node_yn update : parMenu, preMenu로 불러와진 메뉴
     //updateChildNodeYnOfParMenu
@@ -192,7 +191,6 @@ public class MenuServiceImpl implements MenuService {
       MenuTrans originMenu = menuMapper.getMenuByMenuId(menu.getId());
       if(Objects.equals(originMenu.getId(), originMenu.getParId())){
         // 상위 메뉴가 없어. 어떤 메뉴의 하위 메뉴로 만들 수 없음. 메뉴 묶음을 이동 시키고, 루트 메뉴를 대메뉴로 만든다.
-        System.out.println("origin is gnb");
         // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu를 대메뉴 처럼 만든다.
         List<MenuTrans> preMenuList = menuMapper.getMoveMenuList("%" + menu.getParId().toString() + "%");
 

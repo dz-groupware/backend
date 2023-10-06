@@ -26,6 +26,20 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
         return employeeMgmtMapper.getEmployeeMgmtList(companyId);
     }
 
+
+
+    @Override
+    public List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return employeeMgmtMapper.getIncumbentEmployeeMgmtList(companyId);
+    }
+    @Override
+    public List<EmployeeMgmtListResDto> getQuitterEmployeeMgmtList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return employeeMgmtMapper.getQuitterEmployeeMgmtList(companyId);
+    }
+
+
     @Override
     public List<EmployeeMgmtResDto> getEmployeeDetailsById(Long id) {
         Long companyId = SecurityUtil.getCompanyId();
@@ -184,7 +198,7 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             employeeMgmtMapper.removeEmployeeMgmtUser(empId, employeeMgmt);
             employeeMgmtMapper.removeEmployeeMgmtEmployee(empId, employeeMgmt);
             employeeMgmtMapper.removeEmployeeMgmtEmployeeCompany(empId, resignedYn, employeeMgmt);
-//
+
         }
     }
 

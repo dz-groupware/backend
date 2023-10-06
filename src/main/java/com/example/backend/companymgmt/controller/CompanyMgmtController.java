@@ -20,19 +20,40 @@ public class CompanyMgmtController {
     this.companyMgmtService = companyMgmtService;
   }
 
+
+
   @GetMapping
   public ResponseEntity getCompanyMgmtList() {
 
     return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtList()),
-        HttpStatus.OK);
+            HttpStatus.OK);
+  }
+  @GetMapping("/open")
+  public ResponseEntity getOpenedCompanyMgmtList() {
+
+    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getOpenedCompanyMgmtList()),
+            HttpStatus.OK);
+  }
+
+  @GetMapping("/close")
+  public ResponseEntity getClosedCompanyMgmtList() {
+
+    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getClosedCompanyMgmtList()),
+            HttpStatus.OK);
   }
 
 
   @PostMapping
-  public ResponseEntity addCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
-    companyMgmtService.addCompanyMgmt(company);
-    return new ResponseEntity<>(new SingleResponseDto("성공"),
-        HttpStatus.CREATED);
+  public ResponseEntity<?> addCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
+    try {
+      companyMgmtService.addCompanyMgmt(company);
+      return new ResponseEntity<>(new SingleResponseDto("성공"), HttpStatus.CREATED);
+    } catch (RuntimeException e) {
+      if (e.getMessage().equals("Data is duplicated")) {
+        return new ResponseEntity<>(new SingleResponseDto("Data is duplicated"), HttpStatus.CONFLICT);
+      }
+      throw e;  // 위의 조건에 해당하지 않는 경우 예외를 다시 던집니다.
+    }
   }
 
   @GetMapping("/{id}")

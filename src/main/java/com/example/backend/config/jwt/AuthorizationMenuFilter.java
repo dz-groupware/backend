@@ -26,6 +26,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
     logger.info("in menuFilter : "+menuId);
 
     if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
+
       // 마스터이면 권한 확인 안하고 넘어감
       chain.doFilter(request, response);
     } else {

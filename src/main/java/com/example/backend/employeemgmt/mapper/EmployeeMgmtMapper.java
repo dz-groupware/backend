@@ -67,4 +67,8 @@ public interface EmployeeMgmtMapper {
 
 
     EmployeeMgmtResDto getEmployeeMgmtOnlyBasicDetailsById(Long empId, Long companyId);
+
+    List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList(Long companyId);
+
+    List<EmployeeMgmtListResDto> getQuitterEmployeeMgmtList(Long companyId);
 }
