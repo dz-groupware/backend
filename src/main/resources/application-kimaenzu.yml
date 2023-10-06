@@ -27,6 +27,7 @@ mybatis:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:/mappers/*.xml
 
+
 cloud:
   aws:
     credentials:
