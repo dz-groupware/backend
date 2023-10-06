@@ -13,4 +13,5 @@ public class EmployeeAuthStatusDto {
   private String companyName;
   private Boolean enabledYn;
   private Boolean hasAuth;
+  private Long menuCount;
 }

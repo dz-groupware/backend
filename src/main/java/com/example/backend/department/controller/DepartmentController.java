@@ -27,7 +27,6 @@ public class DepartmentController {
 
   @GetMapping("")
   public ResponseEntity<?> getDepartment(@RequestAttribute PkDto pkDto) {
-    System.out.println("in getDepartment");
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getDepartmentBasicList(pkDto)), HttpStatus.OK);
   }
