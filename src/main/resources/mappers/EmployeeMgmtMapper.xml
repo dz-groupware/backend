@@ -94,7 +94,7 @@
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
         FROM user u
         INNER JOIN employee e ON u.id = e.user_id
@@ -116,7 +116,7 @@
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
         FROM user u
         INNER JOIN employee e ON u.id = e.user_id
@@ -137,7 +137,7 @@
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
         FROM user u
         INNER JOIN employee e ON u.id = e.user_id

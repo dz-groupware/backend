@@ -64,12 +64,7 @@ public class CompanyMgmtController {
   }
 
 
-  @GetMapping("/par")
-  public ResponseEntity getAllCompanyMgmtParList() {
-    return new ResponseEntity<>(
-            new SingleResponseDto<>(companyMgmtService.getAllCompanyMgmtParList()),
-            HttpStatus.OK);
-  }
+
   @GetMapping("/company-list")
   public ResponseEntity findCompanyMgmtList(@RequestParam String name, int enabledType) {
     return new ResponseEntity<>(

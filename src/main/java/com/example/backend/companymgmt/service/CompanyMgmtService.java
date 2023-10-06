@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface CompanyMgmtService {
 
-  List<CompanyMgmtListResDto> getAllCompanyMgmtParList();
   List<CompanyMgmtListResDto> getOpenedCompanyMgmtList();
 
   List<CompanyMgmtListResDto>  getClosedCompanyMgmtList();

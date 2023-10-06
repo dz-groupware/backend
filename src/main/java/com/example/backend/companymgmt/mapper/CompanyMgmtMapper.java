@@ -15,7 +15,6 @@ public interface CompanyMgmtMapper {
 
 
   List<CompanyMgmtListResDto> getCompanyMgmtList(Long companyId);
-  List<CompanyMgmtListResDto> getAllCompanyMgmtParList(Long companyId);
   CompanyMgmtResDto getCompanyDetailsById(Long id,Long companyId);
 
   List<CompanyMgmtListResDto> findAllCompanyMgmtList(Long companyId,String name);
