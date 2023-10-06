@@ -2,6 +2,7 @@ package com.example.backend.modal.service;
 
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.modal.dto.ProfileRes;
 import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
@@ -29,8 +30,8 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<ProfileRes> getAllProfile(PkDto pkDto) {
-    return modalMapper.getProfileByUserId(pkDto.getUserId());
+  public List<ProfileRes> getAllProfile() {
+    return modalMapper.getProfileByUserId(SecurityUtil.getUserId());
   }
 
   @Override

@@ -77,7 +77,7 @@
 
   <!-- 부서 추가/수정 시 수행 될 로직 -->
   <select id="checkDeptInDept" resultType="java.lang.Integer">
-    SELECT COUNT(*) FROM department WHERE id_tree LIKE #{id} AND id = #{parId};
+    SELECT COUNT(*) FROM department WHERE id_tree LIKE #{id1} OR id_tree LIKE #{id2} AND id != #{parId};
   </select>
 
   <select id="getOriginDept" resultType="com.example.backend.department.dto.DeptTrans">
@@ -89,7 +89,7 @@
   </select>
 
   <update id="modifyDeptTree" parameterType="com.example.backend.department.dto.DeptTrans">
-    UPDATE dept SET id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} WHERE id = #{id};
+    UPDATE department SET id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} WHERE id = #{id};
   </update>
 
   <!-- 상위 부서 가져오기 -->

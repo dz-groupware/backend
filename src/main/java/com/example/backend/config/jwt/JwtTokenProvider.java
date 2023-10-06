@@ -128,7 +128,7 @@ public class JwtTokenProvider {
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
     if (cookies == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+      throw             new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){

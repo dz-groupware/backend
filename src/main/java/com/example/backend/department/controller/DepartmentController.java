@@ -3,7 +3,6 @@ package com.example.backend.department.controller;
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.service.DepartmentService;
-import com.example.backend.config.jwt.PkDto;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +25,15 @@ public class DepartmentController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getDepartment(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getDepartment() {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getDepartmentBasicList(pkDto)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getDepartmentBasicList()), HttpStatus.OK);
   }
 
   @GetMapping("dept-list")
-  public ResponseEntity<?> getDepartmentList(@RequestAttribute PkDto pkDto, @RequestParam Long parId) {
+  public ResponseEntity<?> getDepartmentList(@RequestParam Long parId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getDepartmentById(pkDto, parId)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getDepartmentById(parId)), HttpStatus.OK);
   }
 
   @GetMapping("detail-basic")
@@ -50,9 +49,9 @@ public class DepartmentController {
   }
 
   @PostMapping("/dept")
-  public ResponseEntity<?> addDepartment(@RequestAttribute PkDto pkDto, @RequestBody DeptDto dept) {
+  public ResponseEntity<?> addDepartment(@RequestBody DeptDto dept) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.addDepartment(pkDto, dept)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.addDepartment(dept)), HttpStatus.OK);
   }
 
   @PostMapping("/dept-modify")
@@ -62,15 +61,15 @@ public class DepartmentController {
   }
 
   @DeleteMapping("dept")
-  public ResponseEntity<?> deleteDepartment(@RequestAttribute PkDto pkDto, @RequestParam Long id) {
+  public ResponseEntity<?> deleteDepartment(@RequestParam Long id) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.deleteDepartment(pkDto, id)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.deleteDepartment(id)), HttpStatus.OK);
   }
 
   @GetMapping("/option-comp")
-  public ResponseEntity<?>  getOptionCompList(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?>  getOptionCompList() {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getOptionCompList(pkDto)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getOptionCompList()), HttpStatus.OK);
   }
 
   @GetMapping("/dept")

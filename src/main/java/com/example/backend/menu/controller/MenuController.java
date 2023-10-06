@@ -7,7 +7,6 @@ import com.example.backend.menu.dto.PageDto;
 import com.example.backend.menu.dto.RouteDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
-import com.example.backend.config.jwt.PkDto;
 import com.example.backend.menu.dto.MenuRes;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -33,33 +32,33 @@ public class MenuController {
   }
 
   @GetMapping("/gnb")
-  public ResponseEntity<?> getGnbById(@RequestAttribute PkDto pkDto) {
-    return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getGnbById(pkDto)), HttpStatus.OK);
+  public ResponseEntity<?> getGnbById() {
+    return new ResponseEntity<>(new SingleResponseDto<List<MenuDto>>(menuService.getGnbById()), HttpStatus.OK);
   }
 
   @GetMapping("/favor")
-  public ResponseEntity<?> getFavorByEmpId(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getFavorByEmpId() {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId(pkDto)), HttpStatus.OK);
+        new SingleResponseDto<List<MenuDto>>(menuService.getFavorByEmpId()), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> removeFavor(@RequestAttribute PkDto pkDto, @RequestParam Long menuId){
+  public ResponseEntity<?> removeFavor(@RequestParam Long menuId){
     return new ResponseEntity<>(
-        new SingleResponseDto<Integer>(menuService.removeFavor(pkDto, menuId)), HttpStatus.OK);
+        new SingleResponseDto<Integer>(menuService.removeFavor(menuId)), HttpStatus.OK);
   }
 
   @GetMapping("/lnb")
-  public ResponseEntity<?> getMenuById(@RequestAttribute PkDto pkDto, @RequestParam Long menuId) {
+  public ResponseEntity<?> getMenuById(@RequestParam Long menuId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getMenuById(pkDto, menuId)),
+        new SingleResponseDto<List<MenuDto>>(menuService.getMenuById(menuId)),
         HttpStatus.OK);
   }
 
   @GetMapping("/route-list")
-  public ResponseEntity<?> getMenuList(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getMenuList() {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<RouteDto>>(menuService.getMenuList(pkDto)),
+        new SingleResponseDto<List<RouteDto>>(menuService.getMenuList()),
         HttpStatus.OK);
   }
 
@@ -72,8 +71,8 @@ public class MenuController {
   }
 
   @PostMapping("/menu")
-  public ResponseEntity<?> saveMenu(@RequestAttribute PkDto pkDto, @RequestBody MenuRes menu, @RequestParam String type) {
-    return new ResponseEntity<>(menuService.saveMenu(pkDto, menu, type), HttpStatus.OK);
+  public ResponseEntity<?> saveMenu(@RequestBody MenuRes menu, @RequestParam String type) {
+    return new ResponseEntity<>(menuService.saveMenu( menu, type), HttpStatus.OK);
   }
 
   @DeleteMapping("/menu")
@@ -87,23 +86,23 @@ public class MenuController {
 
   // 상위 메뉴 선택 시
   @GetMapping("/gnb/admin")
-  public ResponseEntity<?> getGnbByAdmin(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getGnbByAdmin() {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuGnb(pkDto)),
+        new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuGnb()),
         HttpStatus.OK);
   }
 
   @GetMapping("/lnb/admin")
-  public ResponseEntity<?> getLnbByAdmin(@RequestAttribute PkDto pkDto, @RequestParam Long menuId) {
+  public ResponseEntity<?> getLnbByAdmin(@RequestParam Long menuId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuLnb(pkDto, menuId)),
+        new SingleResponseDto<List<MenuDto>>(menuService.getUpperMenuLnb(menuId)),
         HttpStatus.OK);
   }
 
   @GetMapping("/gnb-list")
-  public ResponseEntity<?> getGnbList(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getGnbList() {
     try{
-      return new ResponseEntity<>(new SingleResponseDto<>(menuService.getGnbList(pkDto)),
+      return new ResponseEntity<>(new SingleResponseDto<>(menuService.getGnbList()),
           HttpStatus.OK);
     } catch (InvalidMediaTypeException e) {
       return new ResponseEntity<>("유효하지 않은 요청입니다.", HttpStatus.BAD_REQUEST);

@@ -32,6 +32,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
+    // 여기부터
     // 로그인이나 테스트 용이면 필터를 건너뛰도록
     String requestURI = request.getRequestURI();
     if(requestURI.startsWith("/api/v1/auth/login") || requestURI.startsWith("/api/v1/test")) {
@@ -64,6 +65,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       redisForPayload.opsForValue().set("empId", pkDto);
     }
 
+    // 이거 쓰고
     String menuId = request.getHeader("menuId");
 //    if(menuId == null){
 //      logger.info("denied : menuId is null");
@@ -77,6 +79,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       request.setAttribute("pkDto", pkDto);
       chain.doFilter(request, response);
     } else {
+
       List<Long> menuList = redisMapper.findMenuId(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
       if (menuId == null|| menuList.contains(Long.parseLong(menuId))|| menuId.equals("0")) {
         request.setAttribute("pkDto", pkDto);

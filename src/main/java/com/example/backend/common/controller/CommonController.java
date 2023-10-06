@@ -24,17 +24,17 @@ public class CommonController {
 
   // 즐겨찾기
   @GetMapping("/favor")
-  public ResponseEntity<?> findFavorById(@RequestAttribute PkDto pkDto, @RequestHeader Long menuId){
+  public ResponseEntity<?> findFavorById(@RequestAttribute PkDto pkDto, @RequestHeader(name = "menuId") Long menuId){
     return new ResponseEntity<>(new SingleResponseDto<>(commonService.findFavorById(pkDto, menuId)), HttpStatus.OK);
   }
 
   @PostMapping("/favor")
-  public ResponseEntity<?> modifyFavorOn(@RequestAttribute PkDto pkDto, @RequestHeader Long menuId) {
+  public ResponseEntity<?> modifyFavorOn(@RequestAttribute PkDto pkDto, @RequestHeader(name = "menuId") Long menuId) {
     return new ResponseEntity<>(new SingleResponseDto<>(commonService.modifyFavorOn(pkDto, menuId)), HttpStatus.OK);
   }
 
   @DeleteMapping("/favor")
-  public ResponseEntity<?> modifyFavorOff(@RequestAttribute PkDto pkDto, @RequestHeader Long menuId){
+  public ResponseEntity<?> modifyFavorOff(@RequestAttribute PkDto pkDto, @RequestHeader(name = "menuId") Long menuId){
     return new ResponseEntity<>(new SingleResponseDto<>(commonService.modifyFavorOff(pkDto, menuId)), HttpStatus.OK);
   }
 
