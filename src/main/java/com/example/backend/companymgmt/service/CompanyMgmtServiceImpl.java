@@ -99,7 +99,6 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     public void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt) {
         //원래의 부모값을 저장
         Long originalParId = companyMgmtMapper.getParIdFromDB(companyMgmt.getId());
-        System.out.println(originalParId);
 
 //        if (companyMgmt.getClosingDate() != null) {
 //            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
@@ -119,10 +118,8 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
             //원래 parId를 parId로 갖고있는 다른 데이터가 없다면=자식이 없다면
             Boolean hasChild = companyMgmtMapper.checkParHaveChild(originalParId);
-            System.out.println(hasChild);
             if (hasChild == null || !hasChild) {
                 //childnode 1로 변경
-                System.out.println("childnodeeeeeeeeeeeeeeeeeeeeeeee");
                 companyMgmtMapper.doNotHaveChild(originalParId);
             }
 
@@ -139,12 +136,10 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
                 Map<String, String> originalTreeData = companyMgmtMapper.getTreeFromDB(companyMgmt.getId());
                 String originalIdTree = originalTreeData.get("originalIdTree");
                 String originalNameTree = originalTreeData.get("originalNameTree");
-                System.out.println(originalNameTree);
 
                 Map<String, String> updateTreeData = companyMgmtMapper.findParIdTreeAndNameTreeWithParId(companyMgmt.getParId());
                 String parIdTree = updateTreeData.get("parIdTree");
                 String parNameTree = updateTreeData.get("parNameTree");
-                System.out.println(parIdTree);
 
                 companyMgmtMapper.updateHaveParTree(originalIdTree, originalNameTree, parIdTree, parNameTree, companyMgmt.getId(),companyMgmt.getName());
             }

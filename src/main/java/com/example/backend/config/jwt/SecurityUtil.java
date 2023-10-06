@@ -6,7 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtil {
   public static Long getUserId() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println(auth.getPrincipal().toString());
     if (auth.getPrincipal() instanceof PrincipalDetails) {
       return ((PrincipalDetails) auth.getPrincipal()).getUserId();
     }
@@ -38,7 +37,6 @@ public class SecurityUtil {
   }
   public static Boolean getMasterYn() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println(auth.getPrincipal().toString());
     if (auth.getPrincipal() instanceof PrincipalDetails) {
       return ((PrincipalDetails) auth.getPrincipal()).getMasterYn();
     }

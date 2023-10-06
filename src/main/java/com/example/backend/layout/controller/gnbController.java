@@ -1,5 +1,6 @@
 package com.example.backend.layout.controller;
 
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.layout.dto.BasicResponseDto;
 import com.example.backend.menu.service.MenuService;
 import com.example.backend.modal.service.ModalService;
@@ -24,11 +25,11 @@ public class gnbController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> getBasicInfoById(@RequestAttribute PkDto pkDto) {
+  public ResponseEntity<?> getBasicInfoById() {
     return new ResponseEntity<>(new BasicResponseDto<>(
-        menuService.getGnbById(pkDto),
-        menuService.getFavorByEmpId(pkDto),
-        modalService.getAllProfile(pkDto), pkDto.getEmpId(), pkDto.getCompId()), HttpStatus.OK);
+        menuService.getGnbById(),
+        menuService.getFavorByEmpId(),
+        modalService.getAllProfile(), SecurityUtil.getEmployeeId(), SecurityUtil.getCompanyId()), HttpStatus.OK);
   }
 
   // *

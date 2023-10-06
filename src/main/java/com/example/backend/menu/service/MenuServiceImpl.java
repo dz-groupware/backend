@@ -1,6 +1,7 @@
 package com.example.backend.menu.service;
 
 import com.example.backend.common.mapper.CheckMapper;
+import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.menu.dto.GnbDetailDto;
 import com.example.backend.menu.dto.Menu;
 import com.example.backend.menu.dto.MenuDto;
@@ -13,8 +14,10 @@ import com.example.backend.menu.dto.MenuTrans;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MenuServiceImpl implements MenuService {
 
@@ -28,49 +31,50 @@ public class MenuServiceImpl implements MenuService {
 
   // GNB
   @Override
-  public List<MenuDto> getGnbById(PkDto pkDto) {
-    if(pkDto.isMasterYn()) {
-      return menuMapper.getGnbForMaster(pkDto.getCompId());
+  public List<MenuDto> getGnbById() {
+    Long compId = SecurityUtil.getCompanyId();
+    if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
+      return menuMapper.getGnbForMaster(compId);
     } else {
-      return menuMapper.getGnbByEmpId(pkDto.getEmpId(), pkDto.getCompId(), pkDto.getDeptId());
+      return menuMapper.getGnbByEmpId(compId, SecurityUtil.getCompanyId(), SecurityUtil.getDepartmentId());
     }
   }
 
   // GNB 즐겨찾기
   @Override
-  public List<MenuDto> getFavorByEmpId(PkDto pkDto) {
-    Long compId = pkDto.getCompId();
-    if(pkDto.isMasterYn()) {
+  public List<MenuDto> getFavorByEmpId() {
+    Long compId = SecurityUtil.getCompanyId();
+    if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getFavorForMaster(compId);
     } else {
-      return menuMapper.getFavorByEmpId(pkDto.getEmpId(), compId, pkDto.getDeptId());
+      return menuMapper.getFavorByEmpId(SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
     }
   }
 
   // GNB 즐겨찾기 / 삭제
   @Override
-  public int removeFavor(PkDto pkDto, Long menuId) {
-    return menuMapper.removeFavor(pkDto.getEmpId(), menuId);
+  public int removeFavor(Long menuId) {
+    return menuMapper.removeFavor(SecurityUtil.getEmployeeId(), menuId);
   }
 
   // GNB -> LNB
   @Override
-  public List<MenuDto> getMenuById(PkDto pkDto, Long menuId) {
-    Long compId = pkDto.getCompId();
-    if(pkDto.isMasterYn()) {
+  public List<MenuDto> getMenuById(Long menuId) {
+    Long compId = SecurityUtil.getCompanyId();
+    if(SecurityUtil.getMasterYn()) {
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
-      return menuMapper.getMenuById(menuId, pkDto.getEmpId(), compId, pkDto.getDeptId());
+      return menuMapper.getMenuById(menuId, SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
     }
   }
 
   // 라우팅 리스트
   @Override
-  public List<RouteDto> getMenuList(PkDto pkDto) {
-    if(pkDto.isMasterYn()){
-      return menuMapper.getMenuListForMaster(pkDto.getCompId());
+  public List<RouteDto> getMenuList() {
+    if(SecurityUtil.getMasterYn()) {
+      return menuMapper.getMenuListForMaster(SecurityUtil.getCompanyId());
     }else{
-      return menuMapper.getMenuList(pkDto.getEmpId(), pkDto.getDeptId(), pkDto.getCompId());
+      return menuMapper.getMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
     }
   }
 
@@ -83,12 +87,12 @@ public class MenuServiceImpl implements MenuService {
 
   // 대메뉴/메뉴 저장/수정
   @Override
-  public int saveMenu(PkDto pkDto, MenuRes menu, String type) {
+  public int saveMenu(MenuRes menu, String type) {
     // 대메뉴 추가
     if (type.equals("1")) {
       try {
         MenuRes saveMenu = new MenuRes();
-        saveMenu.setCompId(pkDto.getCompId());
+        saveMenu.setCompId(SecurityUtil.getCompanyId());
         saveMenu.setParId(menu.getParId());
         saveMenu.setName(menu.getName());
         saveMenu.setNameTree(menu.getName());
@@ -98,13 +102,11 @@ public class MenuServiceImpl implements MenuService {
         menuMapper.addMenu(saveMenu);
         // 방금 추가 된 id 가져오기
         Long id = saveMenu.getId();
-        System.out.println("id : "+id);
-        System.out.println("id : "+id.toString());
         // par_id 와 id_tree 수정
         menuMapper.modifyParId(id, id.toString());
         return 1;
       } catch (Exception e) {
-        System.out.println(e);
+        log.info(e.getMessage());
         return -1;
       }
     }
@@ -113,7 +115,7 @@ public class MenuServiceImpl implements MenuService {
       try {
         // 대메뉴 수정
         MenuRes saveMenu = new MenuRes();
-        saveMenu.setCompId(pkDto.getCompId());
+        saveMenu.setCompId(SecurityUtil.getCompanyId());
         saveMenu.setId(menu.getId());
         saveMenu.setParId(menu.getParId());
         saveMenu.setName(menu.getName());
@@ -134,14 +136,14 @@ public class MenuServiceImpl implements MenuService {
           menuMapper.modifyChildNameTree(saveChild);
         }
       } catch (Exception e) {
-        System.out.println(e);
+        log.error(e.getMessage());
         return -1;
       }
     }
 //     메뉴 추가
     if (type.equals("3")) {
       try{
-        menu.setCompId(pkDto.getCompId());
+        menu.setCompId(SecurityUtil.getCompanyId());
         // 상위 메뉴를 선택 안 했을 때 같은거 없음.
         MenuTrans parMenu = menuMapper.getMenuByMenuId(menu.getParId());
         menu.setNameTree(parMenu.getNameTree()+"/"+menu.getName());
@@ -175,8 +177,7 @@ public class MenuServiceImpl implements MenuService {
   // 메뉴 수정 시 트리 수정
   private MenuTrans modifyMenu(MenuTrans menu){
     // menu : 변경될 정보를 담은 메뉴 id: o, par_id: m, name: m, id_tree: o, name_tree: o (origin/modify)
-    System.out.println(menu.getName());
-    System.out.println(menu.getId());
+    log.info(menu.getName());
 
     //부모 노드 child_node_yn update : parMenu, preMenu로 불러와진 메뉴
     //updateChildNodeYnOfParMenu
@@ -192,7 +193,6 @@ public class MenuServiceImpl implements MenuService {
       MenuTrans originMenu = menuMapper.getMenuByMenuId(menu.getId());
       if(Objects.equals(originMenu.getId(), originMenu.getParId())){
         // 상위 메뉴가 없어. 어떤 메뉴의 하위 메뉴로 만들 수 없음. 메뉴 묶음을 이동 시키고, 루트 메뉴를 대메뉴로 만든다.
-        System.out.println("origin is gnb");
         // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu를 대메뉴 처럼 만든다.
         List<MenuTrans> preMenuList = menuMapper.getMoveMenuList("%" + menu.getParId().toString() + "%");
 
@@ -340,19 +340,19 @@ public class MenuServiceImpl implements MenuService {
 
   // 메뉴 설정 페이지 : 상위 메뉴 선택 모달
   @Override
-  public List<MenuDto> getUpperMenuGnb(PkDto pkDto) {
-    return menuMapper.getUpperMenuGnb(pkDto.getCompId());
+  public List<MenuDto> getUpperMenuGnb() {
+    return menuMapper.getUpperMenuGnb(SecurityUtil.getCompanyId());
   }
 
   @Override
-  public List<MenuDto> getUpperMenuLnb(PkDto pkDto, Long menuId) {
-    return menuMapper.getUpperMenuLnb(menuId, pkDto.getCompId());
+  public List<MenuDto> getUpperMenuLnb(Long menuId) {
+    return menuMapper.getUpperMenuLnb(menuId, SecurityUtil.getCompanyId());
   }
 
   // 메뉴 설정 페이지 : GNB 리스트
   @Override
-  public List<GnbDetailDto> getGnbList(PkDto pkDto) {
-    return menuMapper.getGnbList(pkDto.getCompId());
+  public List<GnbDetailDto> getGnbList() {
+    return menuMapper.getGnbList(SecurityUtil.getCompanyId());
   }
 
 

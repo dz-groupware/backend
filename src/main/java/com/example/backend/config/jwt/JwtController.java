@@ -37,38 +37,38 @@ public class JwtController {
     try {
       authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqDto.getLoginId(), loginReqDto.getLoginPw()));
     } catch (BadCredentialsException e) {
-      System.out.println("controller, login 에러1");
+      log.error(e.getMessage());
       throw new BusinessLogicException(LoginExceptionCode.UNMATCHED_PASSWORD);
     } catch (DisabledException e) {
-      System.out.println("controller, login 에러2");
+      log.error(e.getMessage());
       throw new BusinessLogicException(LoginExceptionCode.DISABLED);
     } catch (AccountExpiredException e) {
-      System.out.println("controller, login 에러3");
+      log.error(e.getMessage());
       throw new BusinessLogicException(LoginExceptionCode.ACCOUNT_EXPIRED);
     }
 
     String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
-    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
-    System.out.println("Controller쪽 엑세스" + accessToken);
-    System.out.println("Controller쪽 리프레시" + refreshToken);
+//    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+    log.info(accessToken);
+//    log.info(refreshToken);
     jwtTokenProvider.setCookie(response, "accessToken", accessToken);
-    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
+//    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
 
-    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 발급"));
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken 발급"));
   }
-
-  @PostMapping("/reissue")
-  public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response){
-    String reqRefreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
-    jwtTokenProvider.validateToken(reqRefreshToken);
-    Authentication authentication = jwtTokenProvider.getAuthentication(reqRefreshToken, request);
-
-    String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
-    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
-    jwtTokenProvider.setCookie(response, "accessToken", accessToken);
-    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
-    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
-  }
+//
+//  @PostMapping("/reissue")
+//  public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response){
+//    String reqRefreshToken = jwtTokenProvider.getRefreshTokenFromRequest(request);
+//    jwtTokenProvider.validateToken(reqRefreshToken);
+//    Authentication authentication = jwtTokenProvider.getAuthentication(reqRefreshToken, request);
+//
+//    String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
+//    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+//    jwtTokenProvider.setCookie(response, "accessToken", accessToken);
+//    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
+//    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
+//  }
 
   @PostMapping("/re-login")
   public ResponseEntity<?> anotherLogin(@RequestBody EmpIdRequestDto empIdRequestDto, HttpServletRequest request,HttpServletResponse response) {
@@ -86,17 +86,17 @@ public class JwtController {
     );
 
     String accessToken = jwtTokenProvider.createAccessToken(authentication, request);
-    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+//    String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
     jwtTokenProvider.setCookie(response, "accessToken", accessToken);
-    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
-    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken, refreshToken 재발급"));
+//    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
+    return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken 재발급"));
   }
 
   @PostMapping("/logout")
   public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-    jwtTokenProvider.logout(request);
+//    jwtTokenProvider.logout(request);
     jwtTokenProvider.deleteCookie(response, JwtTokenProvider.ACCESS_TOKEN_NAME);
-    jwtTokenProvider.deleteCookie(response, JwtTokenProvider.REFRESH_TOKEN_NAME);
+//    jwtTokenProvider.deleteCookie(response, JwtTokenProvider.REFRESH_TOKEN_NAME);
     return ResponseEntity.ok().build();
   }
 }

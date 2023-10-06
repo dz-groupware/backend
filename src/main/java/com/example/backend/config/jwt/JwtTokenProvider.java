@@ -56,7 +56,7 @@ public class JwtTokenProvider {
 
   public String createRefreshToken(Authentication authentication){
     Claims claims = generateRefreshClaims(authentication);
-    String refreshToken = generateJwtToken(claims,refreshExpirationTime);
+    String refreshToken = generateJwtToken(claims,accessExpirationTime);
     storeRefreshTokenInRedis(refreshToken, authentication);
     return refreshToken;
   }
@@ -73,9 +73,8 @@ public class JwtTokenProvider {
 
   private Map<String, Object> getUserInfoFromRedis(String token) {
     try {
-      System.out.println("에러터지는지점인데(전)" + token);
       String userInfoJson = redisTemplate.opsForValue().get(token);
-      System.out.println("에러터지는 지점인데(후)" + userInfoJson);
+      log.info("레디스에 갖고올 데이터가 없으면 옆에 값이 뜨질 않습니다"+userInfoJson);
       if (userInfoJson == null) { // 4. Null Check
         throw new BusinessLogicException(JwtExceptionCode.INVALID_REDIS_TOKEN);
       }
@@ -91,13 +90,13 @@ public class JwtTokenProvider {
     Cookie cookie = new Cookie(name, value);
     cookie.setHttpOnly(true);
     cookie.setPath("/");
-    cookie.setMaxAge((int) (System.currentTimeMillis()+60*1000*60));
+    cookie.setMaxAge((int) accessExpirationTime); //12시간
     if (useHttps) {
-//      cookie.setSecure(true);
-//      cookie.setDomain("amaranth2023.site");
+      cookie.setSecure(true);
+      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
-    System.out.println("쿠키출력 " + cookie.toString());
+    log.info("쿠키출력" + cookie.toString());
   }
 
   // 쿠키에서 토큰을 삭제하는 메서드
@@ -108,8 +107,8 @@ public class JwtTokenProvider {
     cookie.setPath("/");
 
     if (useHttps) {
-//      cookie.setSecure(true);
-//      cookie.setDomain("amaranth2023.site");
+      cookie.setSecure(true);
+      cookie.setDomain("amaranth2023.site");
     }
     response.addCookie(cookie);
   }
@@ -128,13 +127,12 @@ public class JwtTokenProvider {
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
-    System.out.println("#######쿠키나와라" + cookies);
     if (cookies == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+      throw             new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){
-        System.out.println("#########access"+cookie.getName());
+        log.info("");
         return cookie.getValue();
       }
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
@@ -153,40 +151,42 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token){
     try{
-      System.out.println("validation"+ token);
+      log.info("validate token "+ token);
       Jwts.parserBuilder()
           .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
           .build()
           .parseClaimsJws(token);
       return true;
     } catch(ExpiredJwtException e) {
+      log.error("만료된 토큰입니다.");
       throw new BusinessLogicException(JwtExceptionCode.EXPIRED_JWT_TOKEN);
     } catch(JwtException e) {
+      log.error("유효하지 않은 토큰입니다.");
       throw new BusinessLogicException(JwtExceptionCode.INVALID_JWT_TOKEN);
     }
   }
 
-  public void logout(HttpServletRequest request) {
-    // 클라이언트로부터 쿠키 혹은 헤더에서 토큰을 가져옵니다.
-    String accessToken = getAccessTokenFromRequest(request);
-    String refreshToken = getRefreshTokenFromRequest(request);
-
-    if (accessToken == null && refreshToken == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_TOKENS);
-    }
-
-    if (accessToken != null) {
-      if (!validateAndDeleteToken(accessToken)) {
-        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
-      }
-    }
-
-    if (refreshToken != null) {
-      if (!validateAndDeleteToken(refreshToken)) {
-        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
-      }
-    }
-  }
+//  public void logout(HttpServletRequest request) {
+//    // 클라이언트로부터 쿠키 혹은 헤더에서 토큰을 가져옵니다.
+//    String accessToken = getAccessTokenFromRequest(request);
+//    String refreshToken = getRefreshTokenFromRequest(request);
+//
+//    if (accessToken == null && refreshToken == null) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISSING_TOKENS);
+//    }
+//
+//    if (accessToken != null) {
+//      if (!validateAndDeleteToken(accessToken)) {
+//        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
+//      }
+//    }
+//
+//    if (refreshToken != null) {
+//      if (!validateAndDeleteToken(refreshToken)) {
+//        log.warn("유효한 액세스 토큰이 아니지만 로그아웃처리 하였습니다.");
+//      }
+//    }
+//  }
   private boolean validateAndDeleteToken(String token) {
     if (redisTemplate.hasKey(token)) {
       redisTemplate.delete(token);
@@ -252,19 +252,18 @@ public class JwtTokenProvider {
   }
 
   private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
-    System.out.println("레디스에다가 토큰 저장중");
+    log.info("레디스에 토큰 저장중");
     try {
       redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
       String storedData = redisTemplate.opsForValue().get(accessToken);
       if (storedData != null) {
-        System.out.println("레디스에 데이터를 성공적으로 저장했습니다.");
-        System.out.println("저장된 데이터: " + storedData);
+        log.info("성공 후 저장된 데이터: " + storedData);
       } else {
-        System.out.println("레디스에 데이터 저장에 실패했습니다.");
+        log.warn("레디스에 데이터 저장에 실패했습니다.");
       }
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
+      log.warn("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
     }
   }
 
