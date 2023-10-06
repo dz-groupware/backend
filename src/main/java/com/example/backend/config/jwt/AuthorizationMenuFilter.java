@@ -58,7 +58,6 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
         .get("empId", Long.class);
 
     PkDto pkDto = redisForPayload.opsForValue().get(String.valueOf(empId));
-//    System.out.println("들어온 accessToken"+ accessToken);
     if (pkDto == null) {
       logger.info("pk is not in redis");
       pkDto = redisMapper.getAllKeys(empId);
@@ -74,8 +73,7 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
 //      return;
 //    }
     logger.info("in menuFilter : "+menuId);
-    System.out.println("pkdto......"+pkDto.getEmpId()+pkDto.isMasterYn());
-    // 이거 쓰기
+    logger.info("pkdto......"+pkDto.getEmpId()+pkDto.isMasterYn());
     if(pkDto.isMasterYn()) {
       // 마스터이면 권한 확인 안하고 넘어감
       request.setAttribute("pkDto", pkDto);

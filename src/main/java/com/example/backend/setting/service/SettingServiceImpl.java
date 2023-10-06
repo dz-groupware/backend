@@ -49,19 +49,19 @@ public class SettingServiceImpl implements SettingService {
     dtoList.add(dto1);
     dtoList.add(dto2);
 
-    System.out.println("insert before ========================");
-    for (int i=0; i<dtoList.size(); i++){
-      System.out.println(i+" || "+dtoList.get(i).getName() + " || "+dtoList.get(i).getAge());
-    }
-    System.out.println("=================================");
+//    System.out.println("insert before ========================");
+//    for (int i=0; i<dtoList.size(); i++){
+//      System.out.println(i+" || "+dtoList.get(i).getName() + " || "+dtoList.get(i).getAge());
+//    }
+//    System.out.println("=================================");
 
     settingMapper.testList(dtoList);
 
-    System.out.println("insert after ========================");
-    for (int i=0; i< dtoList.size(); i++){
-      System.out.println(i+" || "+ dtoList.get(i).getId()+" || "+ dtoList.get(i).getName() + " || "+ dtoList.get(i).getAge());
-    }
-    System.out.println("=================================");
+//    System.out.println("insert after ========================");
+//    for (int i=0; i< dtoList.size(); i++){
+//      System.out.println(i+" || "+ dtoList.get(i).getId()+" || "+ dtoList.get(i).getName() + " || "+ dtoList.get(i).getAge());
+//    }
+//    System.out.println("=================================");
     return dtoList;
   }
 

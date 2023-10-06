@@ -5,20 +5,6 @@
 <mapper namespace="com.example.backend.authgroup.mapper.AuthGroupMapper">
   <!--  findCompanyList전용 companyId수정해서 mapper service에서도 해당 변수 넣어서 할 수 있게끔-->
 
-  <select id="getCompanyAuthSummaryListForPage"
-    resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
-    SELECT
-    a.name AS auth_name,
-    a.id AS auth_id,
-    c.id AS company_id,
-    c.name AS company_name
-    FROM auth_company ac
-    JOIN company c ON ac.comp_id = c.id
-    JOIN auth a ON ac.auth_id = a.id
-    WHERE ac.comp_id = #{companyId}
-    LIMIT #{pageSize} OFFSET #{offset}
-  </select>
-
   <select id="findCompanyAuthListOrderById"
     resultType="com.example.backend.authgroup.dto.CompanyAuthSummaryDto">
     SELECT
@@ -26,12 +12,22 @@
     c.id AS company_id,
     a.id AS auth_id,
     a.name AS auth_name,
-    c.name AS company_name
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
-    AND a.enabled_yn=1
+    AND a.deleted_yn=0
+    <if test="canUseAuth != null">
+      <if test="canUseAuth == true">
+        AND a.enabled_yn = 1
+      </if>
+      <if test="canUseAuth == false">
+        AND a.enabled_yn = 0
+      </if>
+    </if>
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -59,11 +55,22 @@
     c.id AS company_id,
     a.id AS auth_id,
     a.name AS auth_name,
-    c.name AS company_name
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     WHERE adb.comp_id = #{companyId}
+    AND a.deleted_yn=0
+    <if test="canUseAuth != null">
+      <if test="canUseAuth == true">
+        AND a.enabled_yn = 1
+      </if>
+      <if test="canUseAuth == false">
+        AND a.enabled_yn = 0
+      </if>
+    </if>
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -95,7 +102,23 @@
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
-    WHERE c.id = #{companyId} AND a.enabled_yn=1
+    WHERE c.id = #{companyId} AND a.deleted_yn=0
+    <if test="canUseAuth != null">
+      <if test="canUseAuth == true">
+        AND a.enabled_yn = 1
+      </if>
+      <if test="canUseAuth == false">
+        AND a.enabled_yn = 0
+      </if>
+    </if>
+  </select>
+
+  <select id="getCompanyAuthCountCanUse" resultType="long">
+    SELECT COUNT(*)
+    FROM auth_dashboard adb
+    JOIN company c ON adb.comp_id = c.id
+    JOIN auth a ON adb.auth_id = a.id
+    WHERE c.id = #{companyId} AND a.deleted_yn=0  AND a.enabled_yn=#{enabledYn}
   </select>
 
   <select id="getCompanyGnbList" resultType="com.example.backend.authgroup.dto.CompanyMenuDto">
@@ -294,12 +317,14 @@
     c.id AS company_id,
     a.id AS auth_id,
     a.name AS auth_name,
-    c.name AS company_name
+    c.name AS company_name,
+    a.enabled_yn AS enabled_yn,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
-    WHERE ae.emp_id IS NOT NULL AND a.enabled_yn = 1
+    WHERE ae.emp_id IS NOT NULL AND a.deleted_yn=0
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -328,12 +353,13 @@
     a.id AS auth_id,
     a.name AS auth_name,
     c.name AS company_name,
-    a.enabled_yn AS enabled_yn
+    a.enabled_yn AS enabled_yn,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
-    WHERE ae.emp_id IS NOT NULL AND a.enabled_yn = 1
+    WHERE ae.emp_id IS NOT NULL AND a.deleted_yn=0 AND a.enabled_yn=1
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -368,11 +394,12 @@
     a.id AS auth_id,
     a.name AS auth_name,
     c.name AS company_name,
-    a.enabled_yn AS enabled_yn
+    a.enabled_yn AS enabled_yn,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
-    WHERE c.id = #{companyId}
+    WHERE c.id = #{companyId} AND a.deleted_yn=0 AND a.enabled_yn=1
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -401,11 +428,12 @@
     a.id AS auth_id,
     a.name AS auth_name,
     c.name AS company_name,
-    a.enabled_yn AS enabled_yn
+    a.enabled_yn AS enabled_yn,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
-    WHERE c.id = #{companyId}
+    WHERE c.id = #{companyId} AND a.deleted_yn=0
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -439,8 +467,9 @@
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = ${employeeId}
-    WHERE ae.emp_id IS NOT NULL AND a.enabled_yn = 1;
+    WHERE ae.emp_id IS NOT NULL AND a.deleted_yn = 0 AND a.enabled_yn = 1;
   </select>
+
 
 
   <select id="findEmployeeAuthStatusListOrderById"
@@ -452,12 +481,13 @@
     a.name AS auth_name,
     c.name AS company_name,
     a.enabled_yn AS enabled_yn,
-    CASE WHEN ae.emp_id IS NOT NULL THEN 1 ELSE 0 END AS has_auth
+    CASE WHEN ae.emp_id IS NOT NULL THEN 1 ELSE 0 END AS has_auth,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
-    WHERE adb.comp_id = #{companyId}
+    WHERE adb.comp_id = #{companyId} AND a.deleted_yn=0 AND a.enabled_yn=1
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -487,12 +517,13 @@
     a.name AS auth_name,
     c.name AS company_name,
     a.enabled_yn AS enabled_yn,
-    CASE WHEN ae.emp_id IS NOT NULL THEN 1 ELSE 0 END AS has_auth
+    CASE WHEN ae.emp_id IS NOT NULL THEN 1 ELSE 0 END AS has_auth,
+    (SELECT COUNT(*) FROM auth_menu am WHERE am.auth_id = a.id AND am.deleted_yn=0) AS menu_count
     FROM auth_dashboard adb
     JOIN company c ON adb.comp_id = c.id
     JOIN auth a ON adb.auth_id = a.id
     LEFT JOIN auth_employee ae ON ae.auth_id = a.id AND ae.emp_id = #{employeeId}
-    WHERE adb.comp_id = #{companyId}
+    WHERE adb.comp_id = #{companyId} AND a.deleted_yn=0 AND a.enabled_yn=1
     <if test="searchTerm != null and searchTerm != ''">
       AND a.name LIKE CONCAT('%', #{searchTerm}, '%')
     </if>
@@ -537,6 +568,7 @@
     SET deleted_yn = 1
     WHERE auth_id = #{authId}
   </update>
+
   <update id="softDeleteAuthByAuthId">
     UPDATE auth
     SET deleted_yn = 1

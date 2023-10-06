@@ -50,4 +50,10 @@ public interface CompanyMgmtMapper {
 
 
   void modifyCompanyMgmtWithClosingDate(CompanyMgmtReqDto companyMgmt);
+
+  Boolean getInfoDuplicated(CompanyMgmtReqDto companyMgmt);
+
+  List<CompanyMgmtListResDto> getOpenedCompanyMgmtList(Long companyId);
+
+  List<CompanyMgmtListResDto> getClosedCompanyMgmtList(Long companyId);
 }

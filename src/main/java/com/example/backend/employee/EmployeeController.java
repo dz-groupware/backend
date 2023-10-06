@@ -1,6 +1,7 @@
 package com.example.backend.employee;
 
 import com.example.backend.common.dto.SingleResponseDto;
+import com.example.backend.employee.dto.EmployeeMDto;
 import com.example.backend.employee.dto.UpdateMasterYnRequest;
 import com.example.backend.employee.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class EmployeeController {
 
   @PatchMapping("/master")
   public ResponseEntity<?> changeMasterYnOfEmp(@RequestBody UpdateMasterYnRequest updateMasterYnRequest){
-    boolean isSuccess = employeeService.changeMasterYn(updateMasterYnRequest);
-    return ResponseEntity.ok(new SingleResponseDto<>(isSuccess));
+    EmployeeMDto result = employeeService.changeMasterYn(updateMasterYnRequest);
+    return ResponseEntity.ok(new SingleResponseDto<>(result));
   }
 }

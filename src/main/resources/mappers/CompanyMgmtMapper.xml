@@ -5,9 +5,6 @@
 
 
 
-
-
-
   <select id="getCompanyDetailsById"
     resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
     SELECT id,par_id,code, enabled_yn, name, abbr, business_type,
@@ -30,15 +27,29 @@
     SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and name LIKE #{name} and par_id=#{companyId}
   </select>
 
+
   <select id="getCompanyMgmtList"
-    resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
+          resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
     SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and par_id=#{companyId}
+  </select>
+
+
+  <select id="getOpenedCompanyMgmtList"
+          resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
+    SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and par_id=#{companyId} AND closing_date IS NULL
+  </select>
+  <select id="getClosedCompanyMgmtList"
+          resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
+    SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and par_id=#{companyId} AND closing_date IS NOT NULL
   </select>
 
 
 
 <!--post-->
-
+<select id ="getInfoDuplicated" resultType ="Boolean">
+  SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+  FROM company WHERE code=#{code} OR corp_num=#{corpNum} OR business_num=#{businessNum}
+</select>
 
   <insert id="addCompanyMgmt" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO company
@@ -147,7 +158,7 @@
 
   <update id="modifyCompanyMgmtWithClosingDate">
     UPDATE company SET
-    par_id=#{parId}, enabled_yn=#{enabledYn}, name=#{name}, abbr=#{abbr},
+    par_id=#{parId}, enabled_yn=0, name=#{name}, abbr=#{abbr},
     business_type=#{businessType},
     rep_name=#{repName}, rep_id_num=#{repIdNum},
     rep_tel=#{repTel}, business_num=#{businessNum}, corp_type=#{corpType}, corp_num=#{corpNum},

@@ -21,6 +21,17 @@ public class EmployeeMgmtController {
         return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getEmployeeMgmtList()),
                 HttpStatus.OK);
     }
+    @GetMapping("/incumbent")
+    public ResponseEntity getIncumbentEmployeeMgmtList(){
+        return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getIncumbentEmployeeMgmtList()),
+                HttpStatus.OK);
+    }
+    @GetMapping("/quitter")
+    public ResponseEntity getQuitterEmployeeMgmtList(){
+        return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getQuitterEmployeeMgmtList()),
+                HttpStatus.OK);
+    }
+
 
     @GetMapping("/dep")
     public ResponseEntity getAllDepartmentMgmtList() {
@@ -74,13 +85,12 @@ public class EmployeeMgmtController {
     public ResponseEntity checkSignUp(@RequestBody EmployeeMgmtSignUpReqDto employeeMgmt) {
         EmployeeMgmtCheckSignUpResultResDto result = employeeMgmtService.checkSignUp(employeeMgmt);
 
-        System.out.println(employeeMgmt.toString());
         if (result.isFromCheck() && (result.getData() == null || result.getData().isEmpty())) {
             // if 문에서 결과가 나왔지만 데이터가 없는 경우
             return new ResponseEntity<>("No data found from check", HttpStatus.NOT_FOUND);
         } else if (!result.isFromCheck()) {
             // if 문에 들어가지 않은 경우
-            return new ResponseEntity<>("No data found", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("No data found", HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(new SingleResponseDto<>(result.getData()), HttpStatus.OK);

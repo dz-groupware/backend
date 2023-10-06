@@ -106,4 +106,6 @@
     ON e.id = ed.emp_Id
     WHERE ec.comp_id = #{companyId} AND ed.dept_id IS NULL;
   </select>
+
+
 </mapper>

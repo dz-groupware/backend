@@ -10,6 +10,10 @@ public interface EmployeeMgmtService {
 
     List<EmployeeMgmtListResDto> getEmployeeMgmtList();
 
+    List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList();
+
+    List<EmployeeMgmtListResDto> getQuitterEmployeeMgmtList();
+
     List<EmployeeMgmtResDto> getEmployeeDetailsById(Long id);
 
 
