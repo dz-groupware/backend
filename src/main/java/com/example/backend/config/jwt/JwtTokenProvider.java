@@ -56,7 +56,7 @@ public class JwtTokenProvider {
 
   public String createRefreshToken(Authentication authentication){
     Claims claims = generateRefreshClaims(authentication);
-    String refreshToken = generateJwtToken(claims,refreshExpirationTime);
+    String refreshToken = generateJwtToken(claims,accessExpirationTime);
     storeRefreshTokenInRedis(refreshToken, authentication);
     return refreshToken;
   }
@@ -158,8 +158,10 @@ public class JwtTokenProvider {
           .parseClaimsJws(token);
       return true;
     } catch(ExpiredJwtException e) {
+      log.error("만료된 토큰입니다.");
       throw new BusinessLogicException(JwtExceptionCode.EXPIRED_JWT_TOKEN);
     } catch(JwtException e) {
+      log.error("유효하지 않은 토큰입니다.");
       throw new BusinessLogicException(JwtExceptionCode.INVALID_JWT_TOKEN);
     }
   }
