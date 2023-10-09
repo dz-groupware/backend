@@ -12,11 +12,6 @@ public interface SettingMapper {
   List<MenuRes> findMenuDetailById(Long menuId);
 
 
-
-
-
-
-
   int modifyGnbById();
   List<String> findAllIcon();
   List<MenuRes> findAllMenu(Long compId);

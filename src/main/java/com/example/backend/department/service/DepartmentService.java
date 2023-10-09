@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DepartmentService {
   List<DeptListDto> getDepartmentBasicList();
-  List<DeptListDto> getDepartmentById(Long parId);
+  List<DeptListDto> getDepartmentById(Long compId, Long parId);
   DeptDto getBasicDetailById(Long id);
   List<EmpListDto> getEmpListByDeptId(Long id);
   int addDepartment(DeptDto dept);

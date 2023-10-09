@@ -5,14 +5,16 @@
 
   <!-- 부서 리스트 : 기본 -->
   <select id="getDepartmentBasicList" resultType="com.example.backend.department.dto.DeptListDto">
-    SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn AS management_yn, child_node_yn FROM department
-    WHERE id = par_id AND deleted_yn = 0 AND enabled_yn = 1 AND comp_id = #{compId};
+    SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn AS management_yn,
+    child_node_yn, enabled_yn, included_yn FROM department
+    WHERE id = par_id AND deleted_yn = 0 AND comp_id = #{compId} ORDER BY sort_order ASC;
   </select>
 
   <!-- 부서 리스트 : 하위 -->
   <select id="getDepartmentById" resultType="com.example.backend.department.dto.DeptListDto">
-    SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn as management_yn, child_node_yn FROM department
-    WHERE deleted_yn = 0 AND enabled_yn = 1 AND comp_id = #{compId} AND par_id = #{parId};
+    SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn as management_yn, child_node_yn
+    , enabled_yn, included_yn FROM department
+    WHERE deleted_yn = 0 AND comp_id = #{compId} AND par_id = #{parId};
   </select>
 
   <!-- 부서의 상세 정보 : 기본 정보 -->
@@ -38,7 +40,7 @@
   </select>
 
   <!-- 추가 -->
-  <insert id="addDepartment" parameterType="com.example.backend.department.dto.DeptDto">
+  <insert id="addDepartment" parameterType="com.example.backend.department.dto.DeptDto" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO department(comp_id, par_id, name, code, abbr, enabled_yn, included_yn, managing_dept_yn, sort_order)
     VALUES (#{compId}, #{parId}, #{name}, #{code}, #{abbr}, #{enabledYn}, #{includedYn}, #{managementYn}, #{sortOrder});
   </insert>
