@@ -13,7 +13,7 @@ public interface CompanyMgmtService {
   List<CompanyMgmtListResDto> getOpenedCompanyMgmtList();
 
   List<CompanyMgmtListResDto>  getClosedCompanyMgmtList();
-    List<CompanyMgmtListResDto> getCompanyMgmtList( );
+    List<CompanyMgmtListResDto> getCompanyMgmtList();
 
     CompanyMgmtResDto getCompanyDetailsById(Long id);
 
