@@ -128,7 +128,8 @@ public class JwtTokenProvider {
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
     if (cookies == null) {
-      throw             new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+      log.warn("쿠키가 없습니다.");
+      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){
@@ -138,16 +139,16 @@ public class JwtTokenProvider {
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
-  public String getRefreshTokenFromRequest(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
-    }
-    for (Cookie cookie : cookies)
-      if ("refreshToken".equals(cookie.getName()))
-        return cookie.getValue();
-    throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
-  }
+//  public String getRefreshTokenFromRequest(HttpServletRequest request) {
+//    Cookie[] cookies = request.getCookies();
+//    if (cookies == null) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+//    }
+//    for (Cookie cookie : cookies)
+//      if ("refreshToken".equals(cookie.getName()))
+//        return cookie.getValue();
+//    throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
+//  }
 
   public boolean validateToken(String token,HttpServletResponse response){
     try{
