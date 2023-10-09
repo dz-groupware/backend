@@ -48,7 +48,7 @@ public class RedisConfig {
   @Bean(name = "factoryForMenu")
   public RedisConnectionFactory factoryForMenu(){
     LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(host, port);
-    lettuceConnectionFactory.setDatabase(1); // menuId Set 조회용
+    lettuceConnectionFactory.setDatabase(3); // menuId Set 조회용
     return lettuceConnectionFactory;
   }
 
