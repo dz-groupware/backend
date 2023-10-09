@@ -2,7 +2,6 @@ package com.example.backend.menu.service;
 
 import com.example.backend.menu.dto.GnbDetailDto;
 import com.example.backend.menu.dto.MenuDto;
-import com.example.backend.config.jwt.PkDto;
 import com.example.backend.menu.dto.PageDto;
 import com.example.backend.menu.dto.RouteDto;
 import com.example.backend.menu.dto.MenuRes;
