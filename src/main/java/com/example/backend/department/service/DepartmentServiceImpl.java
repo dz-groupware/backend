@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -26,8 +27,12 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public List<DeptListDto> getDepartmentById(Long parId) {
-    return departmentMapper.getDepartmentById(SecurityUtil.getCompanyId(), parId);
+  public List<DeptListDto> getDepartmentById(Long compId, Long parId) {
+    if (compId == 0L) {
+      return departmentMapper.getDepartmentById(SecurityUtil.getCompanyId(), parId);
+    } else {
+      return departmentMapper.getDepartmentById(compId, parId);
+    }
   }
 
   // 부서 상세 정보
@@ -43,6 +48,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   // 부서 추가
   @Override
+  @Transactional
   public int addDepartment(DeptDto dept) {
     System.out.println("in addDepartment"+dept.getAbbr());
     System.out.println("getStatus"+dept.getStatus());
@@ -51,18 +57,29 @@ public class DepartmentServiceImpl implements DepartmentService {
       dept.setCompId(compId);
       // 메뉴 추가
       if (dept.getStatus().equals("add")){
-        if (dept.getParId().toString().equals("")){
-          // 상위부서 없음
-          dept.setParId(dept.getId());
-          dept.setIdTree(dept.getId().toString());
-          dept.setNameTree(dept.getName());
+
+        DeptTrans updateTree =  new DeptTrans();
+        if (dept.getParId().toString().equals("0")){
+          // 상위부서 없음 == 상위메뉴 (id == parId로 저장하기엔 parId가 존재하지 않아서 안됨)
+          dept.setParId(1L);
+          departmentMapper.addDepartment(dept);
+          System.out.println(dept.getId().toString());
+          updateTree.setId(dept.getId());
+          updateTree.setParId(dept.getId());
+          updateTree.setIdTree(dept.getId().toString());
+          updateTree.setNameTree(dept.getName());
         } else {
           // 상위부서 찾기
+          departmentMapper.addDepartment(dept);
           DeptTrans parDept = departmentMapper.getParDept(dept.getParId());
-          dept.setIdTree(parDept.getIdTree()+">"+dept.getId().toString());
-          dept.setNameTree(parDept.getNameTree()+">"+dept.getName());
+          departmentMapper.modifyUpperDeptCNY(parDept.getId());
+          System.out.println(dept.getId().toString());
+          updateTree.setId(dept.getId());
+          updateTree.setParId(dept.getParId());
+          updateTree.setIdTree(parDept.getIdTree()+">"+dept.getId().toString());
+          updateTree.setNameTree(parDept.getNameTree()+">"+dept.getName());
         }
-        departmentMapper.addDepartment(dept);
+        departmentMapper.modifyDeptTree(updateTree);
       }
       // 메뉴 수정
       if (dept.getStatus().equals("modify")){
@@ -85,6 +102,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   // 부서 수정
   @Override
+  @Transactional
   public int modifyDepartment(DeptDto dept){
     departmentMapper.modifyDepartment(dept);
     return 1;
@@ -92,6 +110,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   // 부서 삭제
   @Override
+  @Transactional
   public int deleteDepartment(Long id) {
     Long compId = SecurityUtil.getCompanyId();
     departmentMapper.deleteDepartment(compId, id, "%"+id.toString()+">%");

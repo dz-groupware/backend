@@ -1,5 +1,7 @@
 package com.example.backend.modal.service;
 
+import com.example.backend.common.dto.Page;
+import com.example.backend.common.dto.PageDto;
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.config.jwt.SecurityUtil;
@@ -33,16 +35,15 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<TreeItemRes> getOrgTree(String type, Long deptId) {
+  public List<TreeItemRes> getOrgTree(String type, Long compId, Long deptId) {
     if(type.equals("basic")) {
-
       return modalMapper.getCompToGnb(SecurityUtil.getCompanyId());
     }
     if (type.equals("comp")) {
-      return modalMapper.getGnbToLnb(SecurityUtil.getCompanyId());
+      return modalMapper.getGnbToLnb(compId);
     }
     if (type.equals("dept")) {
-      return modalMapper.getLnbToLnb(SecurityUtil.getCompanyId(), deptId);
+      return modalMapper.getLnbToLnb(compId, deptId);
     }
     return new ArrayList<TreeItemRes>();
   }
@@ -87,5 +88,12 @@ public class ModalServiceImpl implements ModalService {
       }
     }
     return false;
+  }
+
+  @Override
+  public Page<ProfileRes> getProfiles(int pageNum){
+    Long pageSize = modalMapper.getPageCount(SecurityUtil.getUserId());
+    List<ProfileRes> result = modalMapper.getProfilePage(SecurityUtil.getUserId(), (pageNum - 1) * 3);
+    return new Page<ProfileRes>(result, new PageDto(pageNum, 3, pageSize));
   }
 }

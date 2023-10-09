@@ -34,7 +34,7 @@ public class ModalController {
   @GetMapping("/org/tree")
   public ResponseEntity<?> getOrgTree(@RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
     return new ResponseEntity<>(new SingleResponseDto<List<TreeItemRes>>(
-        modalService.getOrgTree(type, deptId)), HttpStatus.OK);
+        modalService.getOrgTree(type, compId, deptId)), HttpStatus.OK);
   }
 
   @GetMapping("/org/empList")
@@ -47,6 +47,10 @@ public class ModalController {
   @GetMapping("/org/search")
   public ResponseEntity<?> findOrgSearchResult(@RequestParam String type, @RequestParam String text) {
     return new ResponseEntity<>(modalService.findOrgResult(type, text), HttpStatus.OK);
+  }
 
+  @GetMapping("/profiles")
+  public ResponseEntity<?> getProfiles(@RequestParam int pageNum) {
+    return new ResponseEntity<>(modalService.getProfiles(pageNum), HttpStatus.OK);
   }
 }
