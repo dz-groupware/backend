@@ -23,7 +23,7 @@ public class RedisService {
     return redisMapper.findMenuId(empId, deptId, compId);
   }
 
-  public void saveMenuSetToRedis (String key, String value){
+  public void saveMenuSetToRedis (String key, String... value){
     redisForMenu.opsForSet().add(key, value);
   }
 }

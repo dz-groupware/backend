@@ -10,6 +10,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.lettuce.core.RedisException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class JwtTokenProvider {
     Cookie cookie = new Cookie(name, value);
     cookie.setHttpOnly(true);
     cookie.setPath("/");
-    cookie.setMaxAge((int) accessExpirationTime); //12시간
+    cookie.setMaxAge((int) accessExpirationTime/1000); //12시간
     if (useHttps) {
       cookie.setSecure(true);
       cookie.setDomain("amaranth2023.site");
@@ -128,13 +129,16 @@ public class JwtTokenProvider {
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
     if (cookies == null) {
-      throw             new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+      log.info("cookies is null");
+      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
+    log.info(Arrays.toString(cookies));
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){
-        log.info("");
+        log.info("find accessToken");
         return cookie.getValue();
       }
+    log.info("now Throw Error : INVALID_COOKIE ");
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
