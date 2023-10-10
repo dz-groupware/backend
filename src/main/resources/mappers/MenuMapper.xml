@@ -168,21 +168,15 @@
 
   <!-- 메뉴설정 : 상위메뉴 GNB 리스트 (권한 확인) -->
   <select id="getUpperMenuGnb" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT DISTINCT menu.id, par_id, name, sort_order FROM auth_dashboard
-    INNER JOIN auth_menu ON auth_menu.auth_id = auth_dashboard.auth_id AND comp_id = #{compId}
-    INNER JOIN menu ON menu.id = auth_menu.menu_id
-    WHERE auth_menu.deleted_yn = 0 AND auth_dashboard.deleted_yn = 0
-    AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND menu.id = par_id ORDER BY sort_order DESC;
+    SELECT menu.id, par_id, name, sort_order FROM menu
+    WHERE comp_id = #{compId} AND deleted_yn = 0 AND id = par_id ORDER BY sort_order DESC;
   </select>
 
   <!-- 메뉴설정 : 상위메뉴 LNB 리스트 (권한 확인) -->
   <select id="getUpperMenuLnb" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT DISTINCT menu.id, par_id, name, sort_order FROM auth_dashboard
-    INNER JOIN auth_menu on auth_menu.auth_id = auth_dashboard.auth_id AND comp_id = #{compId}
-    INNER JOIN menu ON menu.id = auth_menu.menu_id
-    WHERE auth_menu.deleted_yn = 0 AND auth_dashboard.deleted_yn = 0
-    AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND par_id = #{menuId} AND menu.id != menu.par_id
-    ORDER BY sort_order;
+    SELECT menu.id, par_id, name, sort_order FROM menu
+    where comp_id = #{compId} AND deleted_yn = 0 AND par_id = #{menuId} AND menu.id != menu.par_id
+    ORDER BY sort_order DESC;
   </select>
 
   <select id="getGnbList" resultType="com.example.backend.menu.dto.GnbDetailDto">
@@ -220,5 +214,28 @@
     SELECT id, name FROM page;
   </select>
   <!--################-->
+
+  <!-- 최근 추가된 pk 가져오기 -->
+  <select id="getTmpPk" resultType="java.lang.Long">
+    SELECT MAX(id) FROM menu;
+  </select>
+
+  <insert id="insertDefaultMenu" >
+    INSERT INTO `menu` (`par_id`, `name`, `enabled_yn`, `icon_url`, `sort_order`, `name_tree`, `id_tree`, `child_node_yn`, `admin_yn`, `comp_id`, `page_id`) VALUES
+    (#{parId}, '시스템설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정', #{idTree}, 0, 1, #{compId}, 1),
+    (#{parId}, '조직관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/조직관리', #{idTree}, 0, 0, #{compId}, 1),
+    (#{parId}, '사원관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/사원관리', #{idTree}, 0, 0, #{compId}, 1),
+    (#{parId}, '권한관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리', #{idTree}, 0, 0, #{compId}, 1),
+    (#{parId}, '회사관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/조직관리/회사관리', #{idTree}, 1, 1, #{compId}, 2),
+    (#{parId}, '부서관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/조직관리/부서관리', #{idTree}, 1, 1, #{compId}, 3),
+    (#{parId}, '사원관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/사원관리/사원관리', #{idTree}, 1, 1, #{compId}, 4),
+    (#{parId}, '메뉴설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리/메뉴설정', #{idTree}, 1, 1, #{compId}, 5),
+    (#{parId}, '권한Role설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리/권한Role설정', #{idTree}, 1, 1, #{compId}, 6),
+    (#{parId}, '권한설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리/권한설정', #{idTree}, 1, 1, #{compId}, 7);
+  </insert>
+
+  <update id="updateDefaultMenu">
+    update menu set par_id = #{parId}, id_tree = #{idTree} where id = #{id};
+  </update>
 
 </mapper>

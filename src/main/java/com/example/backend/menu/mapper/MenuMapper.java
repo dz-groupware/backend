@@ -46,12 +46,14 @@ public interface MenuMapper {
   void modifyMenuParId(Long parId, Long id, String idTree);
   List<PageDto> getPageList();
 
+  Long getTmpPk();
+  void insertDefaultMenu(Long parId, String idTree, Long compId);
 
+  void updateDefaultMenu(Long id, Long parId, String idTree);
 //  void modifyMenuParId(Long parId, Long id, String idTree);
 
 //  MenuTrans getParIdOfUpperMenu(Long id);
 //  void modifyPreMoveMenu(MenuTrans menu);
 //  MenuTrans getParMenu(Long id);
-//  List<MenuDto> getUpperMenuGnbForMaster(Long compId);
 //  List<MenuDto> getUpperMenuLnbForMaster(Long menuId, Long compId);
 }

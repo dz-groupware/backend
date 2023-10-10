@@ -111,4 +111,13 @@ public class MenuController {
   public ResponseEntity<?> getPageList() {
     return new ResponseEntity<>(new SingleResponseDto<List<PageDto>>(menuService.getPageList()), HttpStatus.OK);
   }
+
+  // 쨋든 이거임
+  @GetMapping("/defaultMenu")
+  public void insertDefaultMenu(Long compId) {
+    System.out.println("ha jebal..");
+    menuService.insertDefaultMenu(compId);
+  }
+
+
 }

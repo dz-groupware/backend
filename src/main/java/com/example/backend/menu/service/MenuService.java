@@ -21,5 +21,6 @@ public interface MenuService {
   int deleteMenu(Long menuId);
   int deleteMenuLnb(Long menuId);
   List<PageDto> getPageList();
+  void insertDefaultMenu(Long compId);
 //  MenuTrans modifyMenu(MenuTrans menu);
 }
