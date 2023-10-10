@@ -137,7 +137,7 @@
     AND (department.enabled_yn = 1 OR department.enabled_yn IS NULL)
     AND (employee_department.transferred_yn = 0 OR employee_department.transferred_yn IS NULL)
     AND employee_company.resigned_yn = 0 AND employee_company.deleted_yn = 0
-    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL) LIMIT 3 OFFSET #{pageNum};
+    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL) ORDER BY last_access DESC LIMIT 3 OFFSET #{pageNum} ;
   </select>
 
 

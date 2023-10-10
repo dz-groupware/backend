@@ -15,7 +15,7 @@ public interface MenuService {
   List<MenuDto> getUpperMenuGnb() ;
   List<MenuDto> getUpperMenuLnb( Long menuId);
   List<RouteDto> getMenuList();
-  List<MenuRes> findLnb(String gnbName, String name);
+  List<MenuRes> findLnb(String gnbName, String name, Long pageId);
   int saveMenu(MenuRes menu, String type);
   List<GnbDetailDto> getGnbList();
   int deleteMenu(Long menuId);

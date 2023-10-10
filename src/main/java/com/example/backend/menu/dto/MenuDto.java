@@ -15,5 +15,6 @@ public class MenuDto {
   private int sortOrder = 0;
   private String nameTree = "";
   private boolean enabledYn = true;
+  private boolean childNodeYn = true;
 
 }
