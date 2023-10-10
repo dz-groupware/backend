@@ -12,5 +12,5 @@ public interface EmployeeMapper {
   boolean isMaster(Long employeeId);
   Long findCompIdOfEmpId(Long employeeId);
   int changeMasterYn(UpdateMasterYnRequest request);
-  EmployeeMDto getEmployeeAfterUpdateMaster(Long employeeId);
+  EmployeeMDto getEmployeeAfterUpdateMaster(Long employeeId, Long companyId);
 }

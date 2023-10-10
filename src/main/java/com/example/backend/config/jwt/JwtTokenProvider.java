@@ -49,7 +49,7 @@ public class JwtTokenProvider {
 
   public String createAccessToken(Authentication authentication, HttpServletRequest request)  {
     Claims claims = generateAccessClaims(authentication);
-    String accessToken = generateJwtToken(claims,accessExpirationTime);
+    String accessToken = generateJwtToken(claims,accessExpirationTime); //4320000
     String userInfoJson = generateUserInfoJson(authentication, request);
     storeAccessTokenInRedis(accessToken, userInfoJson);
     return accessToken;
