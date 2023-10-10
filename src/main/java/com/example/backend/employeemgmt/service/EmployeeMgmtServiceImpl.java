@@ -144,9 +144,10 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 
         Long userId = employeeMgmtMapper.getUserIdById(employeeMgmt.getId());
         employeeMgmt.setDeletedYn(false);
-
+        System.out.println("employeeMgmt"+employeeMgmt.toString());
         // departmentId가 null인지 대표인지 확인
         if (employeeMgmt.getDepartmentId() == null && !employeeMgmt.getPosition().equals("대표")) {
+
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
             // 생성된 ID를 사용하여 직원 추가
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
@@ -234,6 +235,7 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Override
     public Boolean checkIfCompanyHasCEO(Long companyId) {
         Boolean result = employeeMgmtMapper.checkIfCompanyHasCEO(companyId);
+        System.out.println(result);
         return result;
     }
 

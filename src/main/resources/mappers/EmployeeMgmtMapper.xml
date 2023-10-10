@@ -97,7 +97,7 @@
         END AS hasCEO
         FROM employee e
         JOIN employee_company ec ON e.id = ec.emp_id
-        WHERE ec.comp_id = #{compId} AND e.position = '대표';
+        WHERE ec.comp_id = #{compId} AND e.position = '대표' AND e.deleted_yn=false;
     </select>
 
     <!-- text 랑 id 둘다로 찾는거 -->
