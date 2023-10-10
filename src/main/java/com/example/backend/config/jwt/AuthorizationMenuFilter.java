@@ -37,20 +37,21 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
     } else {
       String menuId = request.getHeader("menuId");
       logger.info("### AuthorizationMenuFilter : " + menuId + " ###");
-      // NoSQL 에서 menuSet 조회
       Set<String> result = redisService.getMenuSetFromRedis(SecurityUtil.getEmployeeId());
-      if (result == null) {
+      if (result.size() < 1) {
         // SQL 에서 menuList 조회
         List<Long> menuList = redisService.findMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
         // NoSql 에 menuSet 저장
-        redisService.saveMenuSetToRedis(String.valueOf(SecurityUtil.getEmployeeId()),
-            menuList.stream().map(Object::toString).collect(Collectors.joining(",")));
-        //
+        logger.info("result is null");
         result = menuList.stream().map(Object::toString).collect(Collectors.toSet());
+        redisService.saveMenuSetToRedis(String.valueOf(SecurityUtil.getEmployeeId()), result.toArray(new String[result.size()]));
       }
-      if (menuId != null && Objects.requireNonNull(result).contains(menuId)|| Objects.equals(menuId, "0")) {
+      if (Objects.equals(menuId, "0")) {
         chain.doFilter(request, response);
-      } else {
+      } else if (menuId != null && result.contains(menuId)) {
+        chain.doFilter(request, response);
+      }
+      else {
         logger.info("denied");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       }

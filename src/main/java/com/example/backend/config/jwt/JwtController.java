@@ -53,7 +53,6 @@ public class JwtController {
 //    log.info(refreshToken);
     jwtTokenProvider.setCookie(response, "accessToken", accessToken);
 //    jwtTokenProvider.setCookie(response, "refreshToken", refreshToken);
-
     return ResponseEntity.accepted().body(new SingleResponseDto<>("accessToken 발급"));
   }
 //

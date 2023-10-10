@@ -17,7 +17,7 @@ public interface EmployeeMgmtService {
     List<EmployeeMgmtResDto> getEmployeeDetailsById(Long id);
 
 
-    List<Map<Long, String>> getAllDepartmentMgmtList();
+    List<Map<Long, String>> getAllDepartmentMgmtList(Long companyId);
     List<EmployeeMgmtListResDto> findEmployeeMgmtList(Long compId, String text);
     @Transactional
     void addEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt);
@@ -30,4 +30,6 @@ public interface EmployeeMgmtService {
 
     @Transactional
     EmployeeMgmtCheckSignUpResultResDto checkSignUp(EmployeeMgmtSignUpReqDto employeeMgmt);
+
+    Boolean checkIfCompanyHasCEO(Long companyId);
 }

@@ -33,10 +33,16 @@ public class EmployeeMgmtController {
     }
 
 
-    @GetMapping("/dep")
-    public ResponseEntity getAllDepartmentMgmtList() {
+    @GetMapping("/dep/{companyId}")
+    public ResponseEntity getAllDepartmentMgmtList(@PathVariable Long companyId) {
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMgmtService.getAllDepartmentMgmtList()),
+                new SingleResponseDto<>(employeeMgmtService.getAllDepartmentMgmtList(companyId)),
+                HttpStatus.OK);
+    }
+    @GetMapping("/{companyId}/hasCEO")
+    public ResponseEntity checkIfCompanyHasCEO(@PathVariable Long companyId) {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.checkIfCompanyHasCEO(companyId)),
                 HttpStatus.OK);
     }
 

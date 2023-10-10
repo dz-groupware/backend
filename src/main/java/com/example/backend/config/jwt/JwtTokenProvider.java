@@ -10,6 +10,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.lettuce.core.RedisException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -126,11 +127,13 @@ public class JwtTokenProvider {
       log.warn("쿠키가 없습니다.");
       throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
     }
+    log.info(Arrays.toString(cookies));
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){
-        log.info("");
+        log.info("find accessToken");
         return cookie.getValue();
       }
+    log.info("now Throw Error : INVALID_COOKIE ");
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 

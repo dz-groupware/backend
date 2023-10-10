@@ -8,7 +8,9 @@
     SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu
     INNER JOIN (SELECT DISTINCT menu_id FROM auth_menu
     INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId} AND deleted_yn = 0
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department
+    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
+    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
     UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0)admin
     WHERE auth_menu.deleted_yn = 0 AND auth_menu.auth_id = admin.auth_id)menu_list
     WHERE enabled_yn = 1 AND deleted_yn = 0 AND menu.id = menu_list.menu_id AND id = par_id ORDER BY sort_order DESC;
@@ -25,7 +27,9 @@
     (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
     INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
     (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_department
+    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
+    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
     UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
     WHERE auth.auth_id = auth_menu.auth_id)menu_list
     WHERE menu_list.menu_id = menu.id)menu
@@ -81,12 +85,22 @@
     WHERE m.enabled_yn = 1 AND m.deleted_yn = 0 AND m.comp_id = #{compId};
   </select>
 
-  <!-- 메뉴 검색 -->
+  <!-- 메뉴 검색 : 전체 -->
   <select id="findMenuByName" resultType="com.example.backend.menu.dto.MenuRes">
     SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
     INNER JOIN menu AS m
-    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id AND menu.deleted_yn = 0 ORDER BY menu.sort_order DESC;
+    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id
+    AND menu.deleted_yn = 0 ORDER BY menu.sort_order DESC;
   </select>
+
+  <!-- 메뉴 검색 : 페이지 옵션-->
+  <select id="findMenuByOption" resultType="com.example.backend.menu.dto.MenuRes">
+    SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
+    INNER JOIN menu AS m
+    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id AND menu.deleted_yn = 0
+    AND menu.page_id = #{pageId} ORDER BY menu.sort_order DESC;
+  </select>
+
 
   <!-- 메뉴 설정 페이지 : 메뉴 추가 -->
   <insert id="addMenu" parameterType="com.example.backend.menu.dto.MenuRes" useGeneratedKeys="true" keyProperty="id">
