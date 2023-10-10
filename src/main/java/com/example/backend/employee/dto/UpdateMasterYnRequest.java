@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class UpdateMasterYnRequest {
 
   private Long empId;
+  private Long compId;
   private Boolean masterYn;
 }

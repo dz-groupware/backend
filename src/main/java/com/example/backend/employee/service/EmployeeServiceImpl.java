@@ -39,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
     int updatedRows = employeeMapper.changeMasterYn(request);
     if (updatedRows > 0) {
-      return employeeMapper.getEmployeeAfterUpdateMaster(request.getEmpId());
+      return employeeMapper.getEmployeeAfterUpdateMaster(request.getEmpId(),request.getCompId());
     }
     return null;
   }
