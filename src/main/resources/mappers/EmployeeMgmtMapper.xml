@@ -85,16 +85,27 @@
 
 
     <select id="getAllDepartmentMgmtList"  resultType="java.util.Map">
-        SELECT id,name FROM department where deleted_yn=false AND comp_id=#{companyId}
+        SELECT id,name FROM department WHERE deleted_yn=false AND comp_id=#{companyId}
     </select>
 
+
+    <select id="checkIfCompanyHasCEO" resultType="Boolean">
+        SELECT
+        CASE
+        WHEN COUNT(*) > 0 THEN TRUE
+        ELSE FALSE
+        END AS hasCEO
+        FROM employee e
+        JOIN employee_company ec ON e.id = ec.emp_id
+        WHERE ec.comp_id = #{compId} AND e.position = '대표';
+    </select>
 
     <!-- text 랑 id 둘다로 찾는거 -->
     <select id="findEmployeeMgmtList" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
         FROM user u
         INNER JOIN employee e ON u.id = e.user_id
@@ -116,7 +127,7 @@
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
         FROM user u
         INNER JOIN employee e ON u.id = e.user_id
@@ -137,7 +148,7 @@
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
         FROM user u
         INNER JOIN employee e ON u.id = e.user_id
@@ -327,7 +338,7 @@
     </update>
 
 
-<select id="checkLoginId" resultType="Boolean">
+<select id="checkLoginId" resultType="String">
     SELECT login_id FROM user WHERE login_id=#{loginId}
 </select>
 

@@ -36,6 +36,17 @@ out/
 ### VS Code ###
 .vscode/
 
-### git ignore###
+### ignore ###
 src/main/resources/application-local.yml
 src/main/resources/application-kimaenzu.yml
+<<<<<<< HEAD
+=======
+### git ignore###
+src/main/resources/application-local.yml
+<<<<<<< HEAD
+>>>>>>> 427102117cae6db2b22b1c5d5435130c564e0366
+=======
+src/main/resources/application-kimaenzu.yml
+>>>>>>> 8596fe04b56bcfc8317826123374bc99bc58155b
+=======
+>>>>>>> 5561c7df61bab5a9e93f6494d6a7c27a63d85772

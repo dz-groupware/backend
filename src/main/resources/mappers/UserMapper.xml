@@ -21,4 +21,9 @@
     LEFT JOIN employee_department ed ON ed.emp_id = e.id
     WHERE u.id=#{userId} and e.id=#{empId} AND (org = 1 or org is NULL) AND u.deleted_yn=0
   </select>
+
+  <update id="setLastAccess" parameterType="java.lang.Long">
+    UPDATE employee SET last_access = NOW() WHERE id = #{empId};
+  </update>
+
 </mapper>

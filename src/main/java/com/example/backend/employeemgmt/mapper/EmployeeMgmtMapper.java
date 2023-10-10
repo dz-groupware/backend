@@ -15,7 +15,7 @@ public interface EmployeeMgmtMapper {
     List<EmployeeMgmtListResDto> getEmployeeMgmtList(Long companyId);
 
     List<EmployeeMgmtResDto> getEmployeeMgmtDetailsById(@Param("empId")Long empId,@Param("companyId")Long companyId);
-    List<Map<Long, String>> getAllDepartmentMgmtList(Long companyId);
+    List<Map<Long, String>> getAllDepartmentMgmtList(@Param("companyId")Long comanyId);
 
     List<EmployeeMgmtListResDto> findEmployeeMgmtList(Long compId, String text);
 
@@ -71,4 +71,6 @@ public interface EmployeeMgmtMapper {
     List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList(Long companyId);
 
     List<EmployeeMgmtListResDto> getQuitterEmployeeMgmtList(Long companyId);
+
+    Boolean checkIfCompanyHasCEO(Long companyId);
 }

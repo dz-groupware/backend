@@ -50,11 +50,6 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         return companyMgmtMapper.getCompanyDetailsById(id, companyId);
     }
 
-    @Override
-    public List<CompanyMgmtListResDto> getAllCompanyMgmtParList() {
-        Long companyId = SecurityUtil.getCompanyId();
-        return companyMgmtMapper.getAllCompanyMgmtParList(companyId);
-    }
 
     @Override
     public List<CompanyMgmtListResDto> findCompanyMgmtList(String name, int enabledType) {
@@ -104,10 +99,11 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 //            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
 //            return; // exit the method since we have removed the company
 //        }
-
-        int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
-        if (circularCount > 0) {
-            throw new IllegalArgumentException("Circular reference detected! Cannot move company under its own subtree.");
+        if (!Objects.equals(companyMgmt.getId(), companyMgmt.getParId())) {
+            int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
+            if (circularCount > 0) {
+                throw new IllegalArgumentException("Circular reference detected! Cannot move company under its own subtree.");
+            }
         }
 
 
