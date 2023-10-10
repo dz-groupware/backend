@@ -36,6 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### git ignore###
+### ignore ###
 src/main/resources/application-local.yml
 src/main/resources/application-kimaenzu.yml

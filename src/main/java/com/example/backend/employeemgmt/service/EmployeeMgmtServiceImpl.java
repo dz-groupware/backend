@@ -68,8 +68,7 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     }
 
     @Override
-    public List<Map<Long, String>> getAllDepartmentMgmtList() {
-        Long companyId = SecurityUtil.getCompanyId();
+    public List<Map<Long, String>> getAllDepartmentMgmtList(Long companyId) {
         return employeeMgmtMapper.getAllDepartmentMgmtList(companyId);
     }
 
@@ -94,6 +93,10 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Transactional
     public void addEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt) {
         Long userId = null;
+
+        if(employeeMgmt.getImageUrl()==null || employeeMgmt.getImageUrl()==""){
+            employeeMgmt.setImageUrl("https://img.freepik.com/free-vector/young-businessman-showing-ok-sign-hand-drawn-cartoon-art-illustration_56104-1093.jpg?size=626&ext=jpg&ga=GA1.1.2127282484.1692942479&semt=sph");
+        }
 
         // 해당 사용자의 unique 정보를 가지고 user 테이블에서 확인
         userId = employeeMgmtMapper.getUserIdByUniqueInfo(
@@ -135,6 +138,9 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Override
     @Transactional
     public void modifyEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt) {
+        if(employeeMgmt.getImageUrl()==null || employeeMgmt.getImageUrl()==""){
+            employeeMgmt.setImageUrl("https://img.freepik.com/free-vector/young-businessman-showing-ok-sign-hand-drawn-cartoon-art-illustration_56104-1093.jpg?size=626&ext=jpg&ga=GA1.1.2127282484.1692942479&semt=sph");
+        }
 
         Long userId = employeeMgmtMapper.getUserIdById(employeeMgmt.getId());
         employeeMgmt.setDeletedYn(false);
@@ -205,8 +211,13 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Override
     public Boolean checkLoginId(String loginId) {
         String result = employeeMgmtMapper.checkLoginId(loginId);
-        return result != null;
+        if (result != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
 
 
     @Override
@@ -219,6 +230,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
                 }
             return new EmployeeMgmtCheckSignUpResultResDto(null, false);
         }
+
+    @Override
+    public Boolean checkIfCompanyHasCEO(Long companyId) {
+        Boolean result = employeeMgmtMapper.checkIfCompanyHasCEO(companyId);
+        return result;
+    }
 
 
 }

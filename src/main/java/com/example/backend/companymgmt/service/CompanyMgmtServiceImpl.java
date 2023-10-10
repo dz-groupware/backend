@@ -50,11 +50,6 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         return companyMgmtMapper.getCompanyDetailsById(id, companyId);
     }
 
-    @Override
-    public List<CompanyMgmtListResDto> getAllCompanyMgmtParList() {
-        Long companyId = SecurityUtil.getCompanyId();
-        return companyMgmtMapper.getAllCompanyMgmtParList(companyId);
-    }
 
     @Override
     public List<CompanyMgmtListResDto> findCompanyMgmtList(String name, int enabledType) {
