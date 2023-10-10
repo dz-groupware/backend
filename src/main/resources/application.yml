@@ -22,7 +22,7 @@ spring:
     secret:
       key: ${SPRING_JWT_SECRET_KEY}
     token:
-      access-expiration-time: 6000
+      access-expiration-time: 43200000
       refresh-expiration-time: 604800000
 cloud:
   aws:

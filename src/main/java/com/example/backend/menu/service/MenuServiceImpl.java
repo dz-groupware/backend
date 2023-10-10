@@ -386,4 +386,28 @@ public class MenuServiceImpl implements MenuService {
   public List<PageDto> getPageList(){
     return menuMapper.getPageList();
   }
+
+  @Override
+  public void insertDefaultMenu(Long compId) {
+    Long tmpPk = menuMapper.getTmpPk();
+    menuMapper.insertDefaultMenu(tmpPk, "", compId);
+
+    for (int i=0; i<10; i++){
+      if(i==0) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+1, String.valueOf(tmpPk + 1));
+      }
+      if (0<i && i <4) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+1, (tmpPk+1)+">"+(tmpPk+1+(i+1)));
+      }
+      if (3<i && i<6) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+2, (tmpPk+2)+">"+(tmpPk+1+(i+1)));
+      }
+      if ( i==5) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+3, (tmpPk+1)+">"+(tmpPk+3)+">"+(tmpPk+1+(i+1)));
+      }
+      if (5<i && i < 10) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+4, (tmpPk+1)+">"+(tmpPk+4)+">"+(tmpPk+1+(i+1)));
+      }
+    }
+  }
 }

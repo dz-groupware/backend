@@ -4,14 +4,11 @@ import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
+import com.example.backend.menu.service.MenuService;
 import java.util.List;
 
-import com.example.backend.config.jwt.PkDto;
 import com.example.backend.config.jwt.SecurityUtil;
 
-import com.example.backend.employeemgmt.dto.EmployeeMgmtCheckSignUpResultResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +19,11 @@ import java.util.Objects;
 public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     private final CompanyMgmtMapper companyMgmtMapper;
-
-    public CompanyMgmtServiceImpl(CompanyMgmtMapper companyMgmtMapper) {
+    private final MenuService menuService;
+    public CompanyMgmtServiceImpl(CompanyMgmtMapper companyMgmtMapper,
+        MenuService menuService) {
         this.companyMgmtMapper = companyMgmtMapper;
+        this.menuService = menuService;
     }
 
     @Override
@@ -90,6 +89,9 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
             String parNameTree = originalIdTreeAndNameTree.get("parNameTree");
             companyMgmtMapper.addIdTreeAndNameTreeWithParIdTree(parIdTree, parNameTree ,companyMgmt.getName());
         }
+        System.out.println("입력되고난뒤" + companyMgmt.getId());
+        menuService.insertDefaultMenu(companyMgmt.getId());
+
     }
 
 
