@@ -62,15 +62,15 @@ public class MenuController {
 
   // setting 에서 이동
   @GetMapping("/lnbs")
-  public ResponseEntity<?> findLnb(@RequestParam String gnbName, @RequestParam String name) {
+  public ResponseEntity<?> findLnb(@RequestParam String gnbName, @RequestParam String name, @RequestParam("pageId") Long pageId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuRes>>(menuService.findLnb(gnbName, name)),
+        new SingleResponseDto<List<MenuRes>>(menuService.findLnb(gnbName, name, pageId)),
         HttpStatus.OK);
   }
 
   @PostMapping("/menu")
   public ResponseEntity<?> saveMenu(@RequestBody MenuRes menu, @RequestParam String type) {
-    return new ResponseEntity<>(menuService.saveMenu( menu, type), HttpStatus.OK);
+    return new ResponseEntity<>(menuService.saveMenu(menu, type), HttpStatus.OK);
   }
 
   @DeleteMapping("/menu")

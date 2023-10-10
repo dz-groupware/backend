@@ -26,6 +26,7 @@ public class PrincipalDetailsService implements UserDetailsService {
       throw new BusinessLogicException(LoginExceptionCode.ID_NOT_FOUND);
 //      throw new UsernameNotFoundException("Employee not found");
     }
+    userMapper.setLastAccess(principalUser.getEmpId());
     return new PrincipalDetails(principalUser);
   }
 
@@ -34,6 +35,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     if (principalUser == null) {
       throw new BusinessLogicException(LoginExceptionCode.ID_NOT_FOUND);
     }
+    userMapper.setLastAccess(principalUser.getEmpId());
     return new PrincipalDetails(principalUser);
   }
 }

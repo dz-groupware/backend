@@ -34,7 +34,7 @@ public class MenuServiceImpl implements MenuService {
     if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getGnbForMaster(compId);
     } else {
-      return menuMapper.getGnbByEmpId(compId, SecurityUtil.getCompanyId(), SecurityUtil.getDepartmentId());
+      return menuMapper.getGnbByEmpId(SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
     }
   }
 
@@ -59,7 +59,7 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public List<MenuDto> getMenuById(Long menuId) {
     Long compId = SecurityUtil.getCompanyId();
-    if(SecurityUtil.getMasterYn()) {
+    if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
       return menuMapper.getMenuById(menuId, SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
@@ -69,7 +69,7 @@ public class MenuServiceImpl implements MenuService {
   // 라우팅 리스트
   @Override
   public List<RouteDto> getMenuList() {
-    if(SecurityUtil.getMasterYn()) {
+    if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getMenuListForMaster(SecurityUtil.getCompanyId());
     }else{
       return menuMapper.getMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
@@ -79,8 +79,12 @@ public class MenuServiceImpl implements MenuService {
   // setting 에서 이동
 
   @Override
-  public List<MenuRes> findLnb(String gnbName, String name) {
-    return menuMapper.findMenuByName(gnbName, name);
+  public List<MenuRes> findLnb(String gnbName, String name, Long pageId) {
+    if (pageId == 0L) {
+      return menuMapper.findMenuByName(gnbName, name);
+    } else {
+      return menuMapper.findMenuByOption(gnbName, name, pageId);
+    }
   }
 
   // 대메뉴/메뉴 저장/수정
@@ -172,6 +176,9 @@ public class MenuServiceImpl implements MenuService {
     return 10;
   }
 
+  private void modifyBatch(List<MenuTrans> batch) {
+
+  }
   // 메뉴 수정 시 트리 수정
   private MenuTrans modifyMenu(MenuTrans menu){
     // menu : 변경될 정보를 담은 메뉴 id: o, par_id: m, name: m, id_tree: o, name_tree: o (origin/modify)
