@@ -16,14 +16,16 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 public class GlobalExceptionAdvice {
   public static final String ACCESS_TOKEN_NAME = "accessToken";
 
-  @ExceptionHandler
+  @ExceptionHandler(BusinessLogicException.class)
   public ResponseEntity handleBusinessLogicException(BusinessLogicException e, HttpServletResponse response) {
+    System.out.println("에러핸들링 처리되는곳");
     if (e.getExceptionCode() instanceof JwtExceptionCode) {
+    System.out.println("JWTExceptionCode 에러핸들러");
       JwtExceptionCode jwtException = (JwtExceptionCode) e.getExceptionCode();
       if (jwtException.getStatus() == 402) {
         // 402 상태 코드에 해당하는 에러의 경우, 쿠키 삭제 로직 수행
         log.info("쿠키지우는 과정이 일어나고있습니다.");
-        Cookie cookie = new Cookie("yourCookieName", null);
+        Cookie cookie = new Cookie("accessToken", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);

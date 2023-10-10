@@ -54,16 +54,9 @@ public class JwtTokenProvider {
     return accessToken;
   }
 
-  public String createRefreshToken(Authentication authentication){
-    Claims claims = generateRefreshClaims(authentication);
-    String refreshToken = generateJwtToken(claims,accessExpirationTime);
-    storeRefreshTokenInRedis(refreshToken, authentication);
-    return refreshToken;
-  }
-
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
-    Claims claims = parseToken(token);
-    Map<String, Object> userInfoMap = getUserInfoFromRedis(token);
+    Claims claims = parseToken(token); //토큰이 해독되면
+    Map<String, Object> userInfoMap = getUserInfoFromRedis(token, request);
 //    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
@@ -71,15 +64,28 @@ public class JwtTokenProvider {
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  private Map<String, Object> getUserInfoFromRedis(String token) {
+  private Map<String, Object> getUserInfoFromRedis(String token, HttpServletRequest request) {
     try {
       String userInfoJson = redisTemplate.opsForValue().get(token);
-      log.info("레디스에 갖고올 데이터가 없으면 옆에 값이 뜨질 않습니다"+userInfoJson);
-      if (userInfoJson == null) { // 4. Null Check
-        throw new BusinessLogicException(JwtExceptionCode.INVALID_REDIS_TOKEN);
+      log.info("레디스에서 읽어온 데이터"+userInfoJson);
+      if (userInfoJson == null) {
+        // 레디스에서 데이터를 찾을 수 없으면 DB에서 사용자 정보 가져오기
+        Claims claims = parseToken(token);
+        Long userId = ((Number) claims.get("userId")).longValue();
+        Long empId = ((Number) claims.get("empId")).longValue();
+        UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
+
+        // DB에서 가져온 사용자 정보를 Authentication 객체로 변환
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+
+        // Authentication 객체를 사용하여 사용자 정보를 JSON 형태로 생성
+        userInfoJson = generateUserInfoJson(authentication, request);
+        // 생성된 사용자 정보를 레디스에 저장
+        redisTemplate.opsForValue().set(token, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
+        log.info("레디스에 사용자 정보 저장: " + userInfoJson);
       }
       return objectMapper.readValue(userInfoJson, Map.class);
-    } catch (RedisException e) { // 1. Redis Connection Error
+    } catch (RedisException e) {
       throw new BusinessLogicException(JwtExceptionCode.NO_REDIS_CONNECTION);
     } catch (JsonProcessingException | ClassCastException e) {
       throw new BusinessLogicException(JwtExceptionCode.TYPE_MISMATCH);
@@ -112,18 +118,7 @@ public class JwtTokenProvider {
     }
     response.addCookie(cookie);
   }
-  private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
-    String incomingIp = request.getRemoteAddr();
-    String incomingUserAgent = request.getHeader("User-Agent");
-    if (incomingIp == null ||incomingUserAgent == null) {
-      throw new BusinessLogicException(JwtExceptionCode.MISSING_USER_AGENT);
-    }
-    String storedIp = (String) userInfoMap.get("clientIp");
-    String storedUserAgent = (String) userInfoMap.get("userAgent");
-    if (!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
-      throw new BusinessLogicException(JwtExceptionCode.MISMATCHED_USER_AGENT);
-    }
-  }
+
 
   public String getAccessTokenFromRequest(HttpServletRequest request) {
     Cookie[] cookies = request.getCookies();
@@ -138,17 +133,6 @@ public class JwtTokenProvider {
       }
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
-
-//  public String getRefreshTokenFromRequest(HttpServletRequest request) {
-//    Cookie[] cookies = request.getCookies();
-//    if (cookies == null) {
-//      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
-//    }
-//    for (Cookie cookie : cookies)
-//      if ("refreshToken".equals(cookie.getName()))
-//        return cookie.getValue();
-//    throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
-//  }
 
   public boolean validateToken(String token,HttpServletResponse response){
     try{
@@ -168,7 +152,81 @@ public class JwtTokenProvider {
     }
   }
 
-//  public void logout(HttpServletRequest request) {
+  private String generateJwtToken(Claims claims, long expirationTime) {
+    Date now = new Date();
+    Date expirationDate = new Date(now.getTime() + expirationTime);
+    return Jwts.builder()
+        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+        .setClaims(claims)
+        .setIssuedAt(now)
+        .setExpiration(expirationDate)
+        .compact();
+  }
+
+  private Claims generateAccessClaims(Authentication authentication) {
+    Claims claims = Jwts.claims().setSubject(authentication.getName());
+    claims.put("empId", ((PrincipalDetails) authentication.getPrincipal()).getEmployeeId());
+    claims.put("userId", ((PrincipalDetails) authentication.getPrincipal()).getUserId());
+    return claims;
+  }
+
+
+  private Claims parseToken(String token) {
+    return Jwts.parserBuilder()
+        .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+        .build()
+        .parseClaimsJws(token)
+        .getBody();
+  }
+
+  private String generateUserInfoJson(Authentication authentication, HttpServletRequest request) {
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
+    System.out.println(principalDetails.toString());
+    String clientIp = request.getRemoteAddr();
+    String userAgent = request.getHeader("User-Agent");
+    Map<String, Object> userInfoMap = new HashMap<>();
+    userInfoMap.put("empId", principalDetails.getEmployeeId());
+    userInfoMap.put("userId", principalDetails.getUserId());
+    userInfoMap.put("compId", principalDetails.getCompanyId());
+    userInfoMap.put("deptId", principalDetails.getDepartmentId());
+    userInfoMap.put("clientIp", clientIp);
+    userInfoMap.put("userAgent", userAgent);
+
+    String userInfoJson = null;
+    try {
+      userInfoJson = objectMapper.writeValueAsString(userInfoMap);
+    } catch (JsonProcessingException e) {
+      throw new BusinessLogicException(JwtExceptionCode.JSON_PROCESSING_ERROR);
+    }
+
+    return userInfoJson;
+  }
+
+  private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
+    log.info("레디스에 토큰 저장중");
+    try {
+      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime/12, TimeUnit.MILLISECONDS);
+      String storedData = redisTemplate.opsForValue().get(accessToken);
+      if (storedData != null) {
+        log.info("성공 후 저장된 데이터: " + storedData);
+      } else {
+        log.warn("레디스에 데이터 저장에 실패했습니다.");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      log.warn("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
+    }
+  }
+
+  //  public String createRefreshToken(Authentication authentication){
+//    Claims claims = generateRefreshClaims(authentication);
+//    String refreshToken = generateJwtToken(claims,accessExpirationTime);
+//    storeRefreshTokenInRedis(refreshToken, authentication);
+//    return refreshToken;
+//  }
+
+  //  public void logout(HttpServletRequest request) {
 //    // 클라이언트로부터 쿠키 혹은 헤더에서 토큰을 가져옵니다.
 //    String accessToken = getAccessTokenFromRequest(request);
 //    String refreshToken = getRefreshTokenFromRequest(request);
@@ -200,85 +258,47 @@ public class JwtTokenProvider {
 //      return false;
 //    }
 //  }
-  private String generateJwtToken(Claims claims, long expirationTime) {
-    Date now = new Date();
-    Date expirationDate = new Date(now.getTime() + expirationTime);
-    return Jwts.builder()
-        .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
-        .setClaims(claims)
-        .setIssuedAt(now)
-        .setExpiration(expirationDate)
-        .compact();
-  }
 
-  private Claims generateAccessClaims(Authentication authentication) {
-    Claims claims = Jwts.claims().setSubject(authentication.getName());
-    claims.put("empId", ((PrincipalDetails) authentication.getPrincipal()).getEmployeeId());
-    return claims;
-  }
+//  private void storeRefreshTokenInRedis(String refreshToken, Authentication authentication) {
+//    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
+//    redisTemplate.opsForValue().set(
+//        refreshToken,
+//        principalDetails.toString(),
+//        refreshExpirationTime,
+//        TimeUnit.MILLISECONDS
+//    );
+//  }
 
-  private Claims generateRefreshClaims(Authentication authentication) {
-    Claims claims = Jwts.claims().setSubject(authentication.getName());
-    return claims;
-  }
 
-  private Claims parseToken(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
-        .build()
-        .parseClaimsJws(token)
-        .getBody();
-  }
+//  public String getRefreshTokenFromRequest(HttpServletRequest request) {
+//    Cookie[] cookies = request.getCookies();
+//    if (cookies == null) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISSING_COOKIE);
+//    }
+//    for (Cookie cookie : cookies)
+//      if ("refreshToken".equals(cookie.getName()))
+//        return cookie.getValue();
+//    throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
+//  }
 
-  private String generateUserInfoJson(Authentication authentication, HttpServletRequest request) {
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
-    String clientIp = request.getRemoteAddr();
-    String userAgent = request.getHeader("User-Agent");
-    Map<String, Object> userInfoMap = new HashMap<>();
-    userInfoMap.put("empId", principalDetails.getEmployeeId());
-    userInfoMap.put("userId", principalDetails.getUserId());
-    userInfoMap.put("compId", principalDetails.getCompanyId());
-    userInfoMap.put("deptId", principalDetails.getDepartmentId());
-    userInfoMap.put("clientIp", clientIp);
-    userInfoMap.put("userAgent", userAgent);
+  //
+//  private Claims generateRefreshClaims(Authentication authentication) {
+//    Claims claims = Jwts.claims().setSubject(authentication.getName());
+//    return claims;
+//  }
 
-    String userInfoJson = null;
-    try {
-      userInfoJson = objectMapper.writeValueAsString(userInfoMap);
-    } catch (JsonProcessingException e) {
-      throw new BusinessLogicException(JwtExceptionCode.JSON_PROCESSING_ERROR);
-    }
-
-    return userInfoJson;
-  }
-
-  private void storeAccessTokenInRedis(String accessToken, String userInfoJson) {
-    log.info("레디스에 토큰 저장중");
-    try {
-      redisTemplate.opsForValue().set(accessToken, userInfoJson, accessExpirationTime, TimeUnit.MILLISECONDS);
-      String storedData = redisTemplate.opsForValue().get(accessToken);
-      if (storedData != null) {
-        log.info("성공 후 저장된 데이터: " + storedData);
-      } else {
-        log.warn("레디스에 데이터 저장에 실패했습니다.");
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      log.warn("레디스에 데이터를 저장하는 중에 문제가 발생했습니다: " + e.getMessage());
-    }
-  }
-
-  private void storeRefreshTokenInRedis(String refreshToken, Authentication authentication) {
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    PrincipalDetails principalDetails = (PrincipalDetails) userDetails;
-    redisTemplate.opsForValue().set(
-        refreshToken,
-        principalDetails.toString(),
-        refreshExpirationTime,
-        TimeUnit.MILLISECONDS
-    );
-  }
-
+//  private void validateIncomingRequest(HttpServletRequest request, Map<String, Object> userInfoMap) {
+//    String incomingIp = request.getRemoteAddr();
+//    String incomingUserAgent = request.getHeader("User-Agent");
+//    if (incomingIp == null ||incomingUserAgent == null) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISSING_USER_AGENT);
+//    }
+//    String storedIp = (String) userInfoMap.get("clientIp");
+//    String storedUserAgent = (String) userInfoMap.get("userAgent");
+//    if (!storedIp.equals(incomingIp) || !storedUserAgent.equals(incomingUserAgent)) {
+//      throw new BusinessLogicException(JwtExceptionCode.MISMATCHED_USER_AGENT);
+//    }
+//  }
 
 }
