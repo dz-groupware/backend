@@ -106,4 +106,39 @@
   <select id="checkEmpIds" resultType="java.lang.Long">
     SELECT id FROM employee WHERE user_id = #{userId} AND account_yn = 1 AND deleted_yn = 0;
   </select>
+
+  <!-- 프로필 총 페이지 수 -->
+  <select id="getPageCount" resultType="java.lang.Long">
+    SELECT COUNT(*) FROM user
+    INNER JOIN employee ON user.id = employee.user_id AND employee.user_id = #{userId}
+    LEFT JOIN employee_department ON employee.id = employee_department.emp_id AND (org = 1 OR org IS NULL)
+    LEFT JOIN employee_company ON employee.id = employee_company.emp_id
+    LEFT JOIN department ON department.id = employee_department.dept_id
+    LEFT JOIN company ON company.id = employee_company.comp_id
+    WHERE (employee_department.deleted_yn = 0 OR employee_department.deleted_yn IS NULL)
+    AND (department.enabled_yn = 1 OR department.enabled_yn IS NULL)
+    AND (employee_department.transferred_yn = 0 OR employee_department.transferred_yn IS NULL)
+    AND employee_company.resigned_yn = 0 AND employee_company.deleted_yn = 0
+    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL);
+  </select>
+
+
+  <!-- 프로필 가져오기 pageNation -->
+  <select id="getProfilePage" resultType="com.example.backend.modal.dto.ProfileRes">
+    SELECT company.id AS comp_id, company.name AS comp_name, department.id AS dept_id,
+    department.name AS dept_name, employee.id AS emp_id, employee.name AS emp_name,
+    last_ip, last_access, employee.position, image_url FROM user
+    INNER JOIN employee ON user.id = employee.user_id AND employee.user_id = #{userId}
+    LEFT JOIN employee_department ON employee.id = employee_department.emp_id AND (org = 1 OR org IS NULL)
+    LEFT JOIN employee_company ON employee.id = employee_company.emp_id
+    LEFT JOIN department ON department.id = employee_department.dept_id
+    LEFT JOIN company ON company.id = employee_company.comp_id
+    WHERE (employee_department.deleted_yn = 0 OR employee_department.deleted_yn IS NULL)
+    AND (department.enabled_yn = 1 OR department.enabled_yn IS NULL)
+    AND (employee_department.transferred_yn = 0 OR employee_department.transferred_yn IS NULL)
+    AND employee_company.resigned_yn = 0 AND employee_company.deleted_yn = 0
+    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL) LIMIT 3 OFFSET #{pageNum};
+  </select>
+
+
 </mapper>

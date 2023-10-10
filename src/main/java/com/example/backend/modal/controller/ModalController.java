@@ -32,21 +32,25 @@ public class ModalController {
   }
 
   @GetMapping("/org/tree")
-  public ResponseEntity<?> getOrgTree(@RequestAttribute PkDto pkDto, @RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
+  public ResponseEntity<?> getOrgTree(@RequestParam String type, @RequestParam(required = false) Long compId, @RequestParam(required = false) Long deptId) {
     return new ResponseEntity<>(new SingleResponseDto<List<TreeItemRes>>(
-        modalService.getOrgTree(pkDto, type, deptId)), HttpStatus.OK);
+        modalService.getOrgTree(type, compId, deptId)), HttpStatus.OK);
   }
 
   @GetMapping("/org/empList")
-  public ResponseEntity<?> findEmpList(@RequestAttribute PkDto pkDto, String type, Long compId, Long deptId) {
+  public ResponseEntity<?> findEmpList(String type, Long compId, Long deptId) {
     return new ResponseEntity<>(
         new SingleResponseDto<List<ProfileRes>>(modalService.findEmpList(type, compId, deptId)),
         HttpStatus.OK);
   }
 
   @GetMapping("/org/search")
-  public ResponseEntity<?> findOrgSearchResult(@RequestAttribute PkDto pkDto, @RequestParam String type, @RequestParam String text) {
-    return new ResponseEntity<>(modalService.findOrgResult(pkDto, type, text), HttpStatus.OK);
+  public ResponseEntity<?> findOrgSearchResult(@RequestParam String type, @RequestParam String text) {
+    return new ResponseEntity<>(modalService.findOrgResult(type, text), HttpStatus.OK);
+  }
 
+  @GetMapping("/profiles")
+  public ResponseEntity<?> getProfiles(@RequestParam int pageNum) {
+    return new ResponseEntity<>(modalService.getProfiles(pageNum), HttpStatus.OK);
   }
 }

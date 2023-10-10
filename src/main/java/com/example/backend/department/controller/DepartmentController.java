@@ -31,9 +31,9 @@ public class DepartmentController {
   }
 
   @GetMapping("dept-list")
-  public ResponseEntity<?> getDepartmentList(@RequestParam Long parId) {
+  public ResponseEntity<?> getDepartmentList(@RequestParam("compId") Long compId, @RequestParam("parId") Long parId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.getDepartmentById(parId)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.getDepartmentById(compId, parId)), HttpStatus.OK);
   }
 
   @GetMapping("detail-basic")

@@ -43,4 +43,8 @@ src/main/resources/application-kimaenzu.yml
 =======
 ### git ignore###
 src/main/resources/application-local.yml
+<<<<<<< HEAD
 >>>>>>> 427102117cae6db2b22b1c5d5435130c564e0366
+=======
+src/main/resources/application-kimaenzu.yml
+>>>>>>> 8596fe04b56bcfc8317826123374bc99bc58155b

@@ -47,13 +47,11 @@
 
   <!-- GNB -> LNB -->
   <select id="getMenuById" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
-    INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu
-    INNER JOIN (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
-    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
-    WHERE auth.auth_id = auth_menu.auth_id)menu_list
-    WHERE menu_list.menu_id = menu.id AND par_id = #{menuId} AND id != par_id AND enabled_yn=1 AND deleted_yn=0 ORDER BY sort_order DESC;
+    SELECT menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM auth_employee
+    LEFT JOIN auth_menu ON auth_employee.auth_id = auth_menu.auth_id AND auth_employee.emp_id= #{empId}
+    INNER JOIN menu ON auth_menu.menu_id = menu.id AND menu.par_id=#{menuId} and menu.par_id != menu.id
+    WHERE auth_employee.deleted_yn = 0 AND menu.enabled_yn=1 AND menu.deleted_yn=0 AND auth_menu.deleted_yn = 0
+    ORDER BY sort_order DESC;
   </select>
 
   <!-- GNB -> LNB : 마스터 -->
