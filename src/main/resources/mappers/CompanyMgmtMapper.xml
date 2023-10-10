@@ -24,13 +24,21 @@
 
   <select id="findAllCompanyMgmtList"
     resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
-    SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and name LIKE #{name} and par_id=#{companyId}
+    SELECT id,code,name,corp_type,rep_name FROM company WHERE deleted_yn=false and name LIKE #{name} AND par_id=#{companyId}
   </select>
 
 
   <select id="getCompanyMgmtList"
           resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
-    SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and par_id=#{companyId}
+    SELECT id, code, name, corp_type, rep_name
+    FROM company
+    WHERE deleted_yn = false AND (id = #{companyId} OR par_id = #{companyId})
+  </select>
+
+  <select id="getCompanyMgmtNameTreeList" resultType="String">
+    SELECT name_tree
+    FROM company
+    WHERE deleted_yn = false AND (id = #{companyId} OR par_id = #{companyId})
   </select>
 
 

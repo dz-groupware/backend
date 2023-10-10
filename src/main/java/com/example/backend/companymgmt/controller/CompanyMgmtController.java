@@ -28,6 +28,12 @@ public class CompanyMgmtController {
     return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtList()),
             HttpStatus.OK);
   }
+
+  @GetMapping("/nametree")
+  public ResponseEntity getCompanyMgmtNameTreeList() {
+    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtNameTreeList()),
+            HttpStatus.OK);
+  }
   @GetMapping("/open")
   public ResponseEntity getOpenedCompanyMgmtList() {
 

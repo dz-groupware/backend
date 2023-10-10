@@ -32,6 +32,12 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Long companyId = SecurityUtil.getCompanyId();
         return companyMgmtMapper.getCompanyMgmtList(companyId);
     }
+
+    @Override
+    public List<String> getCompanyMgmtNameTreeList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return companyMgmtMapper.getCompanyMgmtNameTreeList(companyId);
+    }
     @Override
     public List<CompanyMgmtListResDto> getOpenedCompanyMgmtList() {
         Long companyId = SecurityUtil.getCompanyId();
@@ -142,6 +148,8 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         }
 
     }
+
+
 
 
     @Override

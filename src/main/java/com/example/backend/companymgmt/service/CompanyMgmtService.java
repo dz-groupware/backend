@@ -26,5 +26,5 @@ public interface CompanyMgmtService {
   void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt);
 
 
-
+  List<String> getCompanyMgmtNameTreeList();
 }

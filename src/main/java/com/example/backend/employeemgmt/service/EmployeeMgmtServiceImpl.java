@@ -146,8 +146,8 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
         employeeMgmt.setDeletedYn(false);
         System.out.println("employeeMgmt"+employeeMgmt.toString());
         // departmentId가 null인지 대표인지 확인
-        if (employeeMgmt.getDepartmentId() == null && !employeeMgmt.getPosition().equals("대표")) {
-
+        //부서가 없을때
+        if (employeeMgmt.getDepartmentId() == null) {
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
             // 생성된 ID를 사용하여 직원 추가
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
@@ -158,6 +158,15 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
                 Boolean org = employeeMgmt.getTransferredYn() == true ? false : true;
                 employeeMgmtMapper.addEmployeeMgmtEmployeeDepartment(employeeId, employeeMgmt, org);
             }
+            return; // 이후의 코드를 실행하지 않고 메서드를 종료
+        }
+        if (employeeMgmt.getDepartmentId() == null && employeeMgmt.getPosition().equals("대표")) {
+            Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
+            // 생성된 ID를 사용하여 직원 추가
+            Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
+            employeeMgmtMapper.addEmployeeMgmtEmployeeModify(userId, employeeMgmt, masterYn);
+            Long employeeId = employeeMgmt.getId();
+            employeeMgmtMapper.addEmployeeMgmtEmployeeCompany(employeeId, employeeMgmt, resignedYn);
             return; // 이후의 코드를 실행하지 않고 메서드를 종료
         }
 
@@ -180,6 +189,7 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
         }
 
     }
+
 
     @Override
     @Transactional

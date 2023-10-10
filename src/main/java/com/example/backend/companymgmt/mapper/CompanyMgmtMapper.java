@@ -55,4 +55,6 @@ public interface CompanyMgmtMapper {
   List<CompanyMgmtListResDto> getOpenedCompanyMgmtList(Long companyId);
 
   List<CompanyMgmtListResDto> getClosedCompanyMgmtList(Long companyId);
+
+  List<String> getCompanyMgmtNameTreeList(Long companyId);
 }
