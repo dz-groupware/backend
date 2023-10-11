@@ -36,8 +36,8 @@ public interface MenuMapper {
   int checkMenuInMenu(String id, Long parId);
   List<MenuDto> getUpperMenuGnb(Long compId);
   List<MenuDto> getUpperMenuLnb(Long menuId, Long compId);
-  List<MenuRes> findMenuByName(String gnbName, String name);
-  List<MenuRes> findMenuByOption(String gnbName, String name, Long pageId);
+  List<MenuRes> findMenuByName(String gnbName, String name, Long compId);
+  List<MenuRes> findMenuByOption(String gnbName, String name, Long pageId, Long compId);
   List<MenuTrans> findChildAll(String id);
   void modifyChildNameTree(MenuTrans menuTrans);
   void modifyMenuById(MenuRes menu);

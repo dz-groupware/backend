@@ -120,7 +120,12 @@ public class DepartmentServiceImpl implements DepartmentService {
   // 부서 검색
   @Override
   public List<DeptListDto> getOptionCompList() {
-    return departmentMapper.getOptionCompList(SecurityUtil.getCompanyId());
+    if (Objects.equals(SecurityUtil.getCompanyId(),
+        departmentMapper.isHeadCompany(SecurityUtil.getCompanyId()))) {
+      return departmentMapper.getOptionCompList(SecurityUtil.getCompanyId()+">%", SecurityUtil.getCompanyId());
+    } else {
+      return departmentMapper.getOptionCompList("%>"+SecurityUtil.getCompanyId()+"%>", SecurityUtil.getCompanyId());
+    }
   }
 
   @Override

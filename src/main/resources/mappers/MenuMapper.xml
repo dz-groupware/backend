@@ -91,7 +91,7 @@
     SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
     INNER JOIN menu AS m
     WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id
-    AND menu.deleted_yn = 0 ORDER BY menu.sort_order DESC;
+    AND menu.deleted_yn = 0 AND m.comp_id = #{compId} ORDER BY menu.sort_order DESC ;
   </select>
 
   <!-- 메뉴 검색 : 페이지 옵션-->
@@ -99,7 +99,7 @@
     SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
     INNER JOIN menu AS m
     WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id AND menu.deleted_yn = 0
-    AND menu.page_id = #{pageId} ORDER BY menu.sort_order DESC;
+    AND menu.page_id = #{pageId} AND comp_id = #{compId} ORDER BY menu.sort_order DESC;
   </select>
 
 

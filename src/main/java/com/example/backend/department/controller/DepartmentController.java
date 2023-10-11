@@ -30,19 +30,19 @@ public class DepartmentController {
         new SingleResponseDto<>(departmentService.getDepartmentBasicList()), HttpStatus.OK);
   }
 
-  @GetMapping("dept-list")
+  @GetMapping("/dept-list")
   public ResponseEntity<?> getDepartmentList(@RequestParam("compId") Long compId, @RequestParam("parId") Long parId) {
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getDepartmentById(compId, parId)), HttpStatus.OK);
   }
 
-  @GetMapping("detail-basic")
+  @GetMapping("/detail-basic")
   public ResponseEntity<?> getBasicDetailById(@RequestParam Long id) {
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getBasicDetailById(id)), HttpStatus.OK);
   }
 
-  @GetMapping("detail-emp")
+  @GetMapping("/detail-emp")
   public ResponseEntity<?> getEmpListByDeptId(@RequestParam Long id){
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.getEmpListByDeptId(id)), HttpStatus.OK);
@@ -60,7 +60,7 @@ public class DepartmentController {
         new SingleResponseDto<>(departmentService.modifyDepartment(dept)), HttpStatus.OK);
   }
 
-  @DeleteMapping("dept")
+  @DeleteMapping("/dept")
   public ResponseEntity<?> deleteDepartment(@RequestParam Long id) {
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.deleteDepartment(id)), HttpStatus.OK);

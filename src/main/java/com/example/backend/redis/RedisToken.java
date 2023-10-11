@@ -16,7 +16,7 @@ public class RedisToken {
   @Id
   private String id;
 
-  @Indexed // 필드 값으로 데이터 찾을 수 있게 하는 어노테이션(findByAccessToken)
+  @Indexed
   private String username;
 
   @TimeToLive

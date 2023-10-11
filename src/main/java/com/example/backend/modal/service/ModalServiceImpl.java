@@ -10,6 +10,7 @@ import com.example.backend.modal.dto.TreeItemRes;
 import com.example.backend.modal.mapper.ModalMapper;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +75,7 @@ public class ModalServiceImpl implements ModalService {
     }
     if (type.equals("emp")) {
       return new SingleResponseDto<List<ProfileRes>>(
-          modalMapper.findResultOfEmp(text, text, text, text));
+          modalMapper.findResultOfEmp(text));
     }
     return new SingleResponseDto<>("");
   }
@@ -82,8 +83,8 @@ public class ModalServiceImpl implements ModalService {
   @Override
   public boolean checkEmpIds(Long empId){
     List<Long> result = modalMapper.checkEmpIds(SecurityUtil.getUserId());
-    for (int i=0; i<result.size(); i++){
-      if (result.get(i) == empId) {
+    for (Long aLong : result) {
+      if (Objects.equals(aLong, empId)) {
         return true;
       }
     }
