@@ -7,10 +7,15 @@
 
   <select id="getCompanyDetailsById"
     resultType="com.example.backend.companymgmt.dto.CompanyMgmtResDto">
-    SELECT id,par_id,code, enabled_yn, name, abbr, business_type,
-    rep_name, rep_id_num,
-    rep_tel, business_num, corp_type, corp_num, establishment_date,
-    opening_date, closing_date, address, deleted_yn FROM company WHERE id=#{id} AND par_id=#{companyId}
+    SELECT c.id,c.par_id,c.code, c.enabled_yn, c.name, c.abbr, c.business_type,
+    c.rep_name, c.rep_id_num, u.priv_email,
+    c.rep_tel,e.gender,u.login_id,u.login_pw, c.business_num, c.corp_type, c.corp_num, c.establishment_date,
+    c.opening_date, c.closing_date, c.address, u.deleted_yn, e.id
+    FROM company c
+    JOIN employee_company ec ON ec.comp_id = c.id
+    JOIN employee e ON ec.emp_id = e.id
+    JOIN user u ON u.id = e.user_id
+    WHERE e.emp_id_num = (SELECT rep_id_num FROM company WHERE id = #{id});
   </select>
 
   <select id="getAllCompanyMgmtParList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
@@ -24,13 +29,21 @@
 
   <select id="findAllCompanyMgmtList"
     resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
-    SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and name LIKE #{name} and par_id=#{companyId}
+    SELECT id,code,name,corp_type,rep_name FROM company WHERE deleted_yn=false and name LIKE #{name} AND par_id=#{companyId}
   </select>
 
 
   <select id="getCompanyMgmtList"
           resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
-    SELECT id,code,name,corp_type,rep_name FROM company where deleted_yn=false and par_id=#{companyId}
+    SELECT id, code, name, corp_type, rep_name
+    FROM company
+    WHERE deleted_yn = false AND (id = #{companyId} OR par_id = #{companyId})
+  </select>
+
+  <select id="getCompanyMgmtNameTreeList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtTreeListResDto">
+    SELECT id, par_id, name_tree
+    FROM company
+    WHERE deleted_yn = false AND (id = #{companyId} OR par_id = #{companyId})
   </select>
 
 
@@ -46,6 +59,10 @@
 
 
 <!--post-->
+
+  <select id="getUserId" resultType="Long">
+    SELECT user_id FROM employee WHERE id=#{dto.employeeId}
+  </select>
 <select id ="getInfoDuplicated" resultType ="Boolean">
   SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
   FROM company WHERE code=#{code} OR corp_num=#{corpNum} OR business_num=#{businessNum}
@@ -60,6 +77,26 @@
     (#{parId}, #{code}, #{enabledYn}, #{name}, #{abbr}, #{businessType}, #{repName}, #{repIdNum}, #{repTel},
     #{businessNum}, #{corpType}, #{corpNum}, #{establishmentDate}, #{openingDate}, #{closingDate}, #{address},1 )
   </insert>
+
+  <insert id="addCompanyMgmtUser" useGeneratedKeys="true" keyProperty="dto.id">
+    INSERT INTO `user` (`name`, `gender`, `priv_email`, `mobile_number`, `home_number`, `address`, `login_id`, `login_pw`, `user_id_num`,`deleted_yn`)
+    VALUES (#{dto.repName}, #{dto.gender}, #{dto.privEmail}, #{dto.repTel}, null, null, #{dto.loginId},
+    #{dto.loginPw}, #{dto.repIdNum},0)
+  </insert>
+
+
+<insert id="addCompanyMgmtEmployee" useGeneratedKeys="true" keyProperty="dto.id">
+  INSERT INTO employee (`user_id`, `name`, `gender`,  `account_yn`,
+  `mobile_number`, `home_number`, `address`, `emp_id_num`, `last_access`, `position`,`master_yn`,`deleted_yn`)
+  VALUES (#{userId}, #{dto.repName}, #{dto.gender},  1 , #{dto.repTel},
+  "", "", #{dto.repIdNum}, NOW(),"대표",1,0)
+</insert>
+
+  <insert id="addCompanyMgmtEmployeeCompany">
+INSERT INTO  employee_company (`comp_id`,`emp_id`,`resigned_yn`,`join_date`,`resignation_date`, `deleted_yn`)
+    VALUES(#{companyId}, #{employeeId}, 0, NOW(), null, 0)
+  </insert>
+
 
   <update id="addIdTreeAndNameTreeWithLastInsertId">
     UPDATE company
@@ -179,5 +216,31 @@
     UPDATE company SET deleted_yn=1
     WHERE id=#{removeId}
   </update>
+
+
+  <select id="checkSignUp"
+          resultType="com.example.backend.companymgmt.dto.CompanyMgmtCeoResDto">
+    SELECT
+    id, gender, login_id, login_pw, priv_email
+    FROM (
+      SELECT e.id,u.gender, u.login_id, u.login_pw, u.priv_email,
+      ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
+      FROM employee e
+      INNER JOIN user u ON e.user_id = u.id
+      INNER JOIN employee_company ec ON e.id = ec.emp_id
+      LEFT JOIN employee_department ed ON e.id = ed.emp_id
+      WHERE e.name = #{dto.repName} AND e.emp_id_num=#{dto.repIdNum}
+      AND u.priv_email=#{dto.privEmail}
+      AND u.mobile_number=#{dto.repTel}
+    ) AS RankedEmployees
+    WHERE rn = 1;
+  </select>
+
+  <select id="checkDuplicates" resultType="Boolean">
+    SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+    FROM user WHERE user_id_num=#{dto.repIdNum} or
+    priv_email=#{dto.privEmail} or mobile_number=#{dto.repTel}
+  </select>
+
 
 </mapper>
