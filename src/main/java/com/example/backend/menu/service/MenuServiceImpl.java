@@ -80,10 +80,11 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public List<MenuRes> findLnb(String gnbName, String name, Long pageId) {
+    Long compId = SecurityUtil.getCompanyId();
     if (pageId == 0L) {
-      return menuMapper.findMenuByName(gnbName, name);
+      return menuMapper.findMenuByName(gnbName, name, compId);
     } else {
-      return menuMapper.findMenuByOption(gnbName, name, pageId);
+      return menuMapper.findMenuByOption(gnbName, name, pageId, compId);
     }
   }
 
@@ -179,29 +180,12 @@ public class MenuServiceImpl implements MenuService {
   private void modifyBatch(List<MenuTrans> batch) {
 
   }
-  // 메뉴 수정 시 트리 수정
   private MenuTrans modifyMenu(MenuTrans menu){
-    // menu : 변경될 정보를 담은 메뉴 id: o, par_id: m, name: m, id_tree: o, name_tree: o (origin/modify)
-    log.info(menu.getName());
-
-    //부모 노드 child_node_yn update : parMenu, preMenu로 불러와진 메뉴
-    //updateChildNodeYnOfParMenu
-
-    // menu: 입력 정보 / parMenu : menu의 상위 메뉴 / preMenu : menu의 상위가 될 메뉴(menu의 하위 메뉴 중) / originMenu : 수정 전 menu 정보
-    // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
 
     if (menuMapper.checkMenuInMenu("%" + menu.getId().toString() + "%", menu.getParId()) != 0) {
-      // 상위가 될 메뉴를 자신 보다 상위로 옮기는 과정 필요
-
-      // preMenu를 이동시키는 과정 먼저 실행 preMenu childNodeYn 변경 필요. 만약 preMenu가 없다면 null 반환
-      // 수정 전 메뉴 정보 가져오기
       MenuTrans originMenu = menuMapper.getMenuByMenuId(menu.getId());
       if(Objects.equals(originMenu.getId(), originMenu.getParId())){
-        // 상위 메뉴가 없어. 어떤 메뉴의 하위 메뉴로 만들 수 없음. 메뉴 묶음을 이동 시키고, 루트 메뉴를 대메뉴로 만든다.
-        // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu를 대메뉴 처럼 만든다.
         List<MenuTrans> preMenuList = menuMapper.getMoveMenuList("%" + menu.getParId().toString() + "%");
-
-        // preMenu 묶음 중 root 메뉴 (상위로 선택 된 메뉴를 깊은복사로 가져온다)
         Optional<MenuTrans> preMenuStream = preMenuList.stream()
             .filter(pre -> Objects.equals(pre.getId(), menu.getParId()))
             .findFirst();
@@ -402,10 +386,10 @@ public class MenuServiceImpl implements MenuService {
       if (3<i && i<6) {
         menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+2, (tmpPk+2)+">"+(tmpPk+1+(i+1)));
       }
-      if ( i==5) {
+      if ( i==6) {
         menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+3, (tmpPk+1)+">"+(tmpPk+3)+">"+(tmpPk+1+(i+1)));
       }
-      if (5<i && i < 10) {
+      if (6<i) {
         menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+4, (tmpPk+1)+">"+(tmpPk+4)+">"+(tmpPk+1+(i+1)));
       }
     }

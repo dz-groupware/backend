@@ -22,15 +22,14 @@
 
   <!-- 조직도 트리 : 회사 리스트-->
   <select id="getCompToGnb" resultType="com.example.backend.modal.dto.TreeItemRes">
-    SELECT id, company.par_id, name, sort_order, id as comp_id, 'comp' AS type FROM company
-    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId})comp
-    WHERE enabled_yn = 1 AND deleted_yn = 0 AND company.par_id = comp.par_id;
+    SELECT id, par_id, name, sort_order, 'comp' AS type FROM company
+    WHERE enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC;
   </select>
 
   <!-- 조직도 트리 : 회사 선택 시 부서 -->
   <select id="getGnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
     SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
-    WHERE comp_id = #{compId} AND id = par_id AND enabled_yn = 1 AND deleted_yn = 0;
+    WHERE comp_id = #{compId} AND id = par_id AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC;
   </select>
 
   <!-- 조직도 트리 : 부서 선택 시 부서 -->
@@ -93,13 +92,24 @@
 
   <!-- 조직도 검색 (부서 옵션) -->
   <select id="findResultOfDept" resultType="com.example.backend.modal.dto.TreeItemRes">
-    SELECT id, code, name FROM department WHERE name_tree LIKE #{text} AND enabled_yn = 1 AND deleted_yn = 0;
+    SELECT id, comp_id, department.par_id, name, sort_order, 'dept' AS type FROM department
+    WHERE name_tree LIKE #{text} AND enabled_yn = 1 AND deleted_yn = 0;
   </select>
 
   <!-- 조직도 검색 (사원 옵션) -->
-  <select id="findResultOfEmp" resultType="com.example.backend.modal.dto.ProfileRes">
-    SELECT id, name, mobile_number AS number, image_url, email, position FROM employee
-    WHERE name LIKE #{text1} AND deleted_yn = 0;
+  <select id="findResultOfEmp" resultType="com.example.backend.modal.dto.EmpList">
+    SELECT employee.name AS emp_name, company.name AS comp_name, department.name AS dept_name,
+    employee.position, login_id, employee.mobile_number AS number, priv_email AS email, image_url FROM employee
+    INNER JOIN employee_company ON employee_company.emp_id = employee.id
+    LEFT JOIN employee_department ON employee_department.emp_id = employee.id AND (org = 1 OR org IS NULL)
+    LEFT JOIN company ON employee_company.comp_id = company.id
+    LEFT JOIN department ON department.id = employee_department.dept_id
+    INNER JOIN user ON employee.user_id = user.id
+    WHERE employee_company.deleted_yn = 0 AND employee_company.resigned_yn = 0 AND employee_company.comp_id = 1
+    AND company.enabled_yn = 1 AND company.deleted_yn = 0 AND employee.account_yn = 1 AND employee.deleted_yn = 0
+    AND (employee_department.transferred_yn = 0 OR employee_department.transferred_yn IS NULL)
+    AND (department.deleted_yn = 0 OR department.deleted_yn IS NULL) AND user.deleted_yn = 0
+    AND employee.name LIKE #{text};
   </select>
 
   <!-- 유저의 모든 사원id 가져오기-->

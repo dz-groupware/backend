@@ -7,7 +7,7 @@
   <select id="getDepartmentBasicList" resultType="com.example.backend.department.dto.DeptListDto">
     SELECT id, comp_id, par_id, name, code, sort_order, managing_dept_yn AS management_yn,
     child_node_yn, enabled_yn, included_yn FROM department
-    WHERE id = par_id AND deleted_yn = 0 AND comp_id = #{compId} ORDER BY sort_order ASC;
+    WHERE id = par_id AND deleted_yn = 0 AND comp_id = #{compId} ORDER BY sort_order DESC;
   </select>
 
   <!-- 부서 리스트 : 하위 -->
@@ -58,15 +58,15 @@
   </update>
 
   <!-- 부서 페이지 회사 옵션 리스트 -->
-  <select id="getOptionCompList" resultType="com.example.backend.department.dto.DeptListDto">
-    SELECT id AS comp_id, company.par_id, code ,name, sort_order FROM company
-    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId})comp ON comp.par_id = company.par_id
-    WHERE deleted_yn = 0 AND enabled_yn = 1;
-  </select>
+<!--  <select id="getOptionCompList" resultType="com.example.backend.department.dto.DeptListDto">-->
+<!--    SELECT id AS comp_id, company.par_id, code ,name, sort_order FROM company-->
+<!--    INNER JOIN (SELECT par_id FROM company WHERE id = #{compId})comp ON comp.par_id = company.par_id-->
+<!--    WHERE deleted_yn = 0 AND enabled_yn = 1;-->
+<!--  </select>-->
 
   <!-- 부서 검색 -->
   <select id="findDeptNameAndCode" resultType="com.example.backend.department.dto.DeptListDto">
-    SELECT id, par_id, name, code, sort_order FROM department
+    SELECT id, par_id, comp_id, name, code, sort_order FROM department
     WHERE deleted_yn = 0 AND enabled_yn = 1 AND comp_id = #{compId} AND (name LIKE #{text1} OR code LIKE #{text2});
   </select>
 
@@ -103,5 +103,16 @@
   <update id="modifyUpperDeptCNY" parameterType="java.lang.Long">
     UPDATE department SET child_node_yn = 0 WHERE id = #{parId};
   </update>
+
+  <!-- 상위 회사 인지 확인 -->
+  <select id="isHeadCompany">
+    SELECT par_id FROM company WHERE id = #{compId};
+  </select>
+
+  <!-- HeadComp -->
+  <select id="getOptionCompList" resultType="com.example.backend.department.dto.DeptListDto">
+    SELECT id AS comp_id, company.par_id, code ,name, sort_order FROM company
+    WHERE ID_TREE LIKE #{text} OR ID = #{id} AND enabled_yn = 1;
+  </select>
 
 </mapper>
