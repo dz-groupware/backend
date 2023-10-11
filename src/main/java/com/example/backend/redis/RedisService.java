@@ -26,4 +26,9 @@ public class RedisService {
   public void saveMenuSetToRedis (String key, String... value){
     redisForMenu.opsForSet().add(key, value);
   }
+
+  // Delete Redis MenuSet
+  public void deleteMenuSet (String key) {
+    redisForMenu.delete(key);
+  }
 }
