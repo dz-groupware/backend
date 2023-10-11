@@ -1,13 +1,13 @@
 package com.example.backend.companymgmt.mapper;
 
 
-import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
-import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
-import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
+import com.example.backend.companymgmt.dto.*;
+
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface CompanyMgmtMapper {
@@ -15,7 +15,7 @@ public interface CompanyMgmtMapper {
 
 
   List<CompanyMgmtListResDto> getCompanyMgmtList(Long companyId);
-  CompanyMgmtResDto getCompanyDetailsById(Long id,Long companyId);
+  CompanyMgmtResDto getCompanyDetailsById(Long id);
 
   List<CompanyMgmtListResDto> findAllCompanyMgmtList(Long companyId,String name);
 
@@ -56,5 +56,18 @@ public interface CompanyMgmtMapper {
 
   List<CompanyMgmtListResDto> getClosedCompanyMgmtList(Long companyId);
 
-  List<String> getCompanyMgmtNameTreeList(Long companyId);
+  List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList(Long companyId);
+
+  Boolean checkDuplicates(@Param("dto")CompanyMgmtSignUpReqDto companyMgmt);
+
+  List<CompanyMgmtCeoResDto> checkSignUp(@Param("dto") CompanyMgmtSignUpReqDto companymgmt);
+
+  Long getUserId(@Param("dto")CompanyMgmtReqDto companymgmt);
+
+  void addCompanyMgmtEmployee(@Param("dto")CompanyMgmtReqDto companymgmt, @Param("userId")Long userId);
+
+
+  void addCompanyMgmtEmployeeCompany( @Param("companyId")Long companyId, @Param("employeeId")Long employeeId);
+
+  void addCompanyMgmtUser(@Param("dto")CompanyMgmtReqDto companymgmt);
 }

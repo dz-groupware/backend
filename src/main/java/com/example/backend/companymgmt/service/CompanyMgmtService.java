@@ -1,9 +1,9 @@
 package com.example.backend.companymgmt.service;
 
-import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
-import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
-import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
-import com.example.backend.config.jwt.PkDto;
+import com.example.backend.companymgmt.dto.*;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtCheckSignUpResultResDto;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -15,7 +15,11 @@ public interface CompanyMgmtService {
   List<CompanyMgmtListResDto>  getClosedCompanyMgmtList();
     List<CompanyMgmtListResDto> getCompanyMgmtList();
 
-    CompanyMgmtResDto getCompanyDetailsById(Long id);
+
+  @Transactional
+  CompanyMgmtCheckSignUpResDto checkSignUp(CompanyMgmtSignUpReqDto companymgmt);
+
+  CompanyMgmtResDto getCompanyDetailsById(Long id);
 
   List<CompanyMgmtListResDto> findCompanyMgmtList(String name, int enabledType);
 
@@ -26,5 +30,7 @@ public interface CompanyMgmtService {
   void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt);
 
 
-  List<String> getCompanyMgmtNameTreeList();
+  List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList();
+
+//  EmployeeMgmtCheckSignUpResultResDto getCEODetailsById(Long id);
 }

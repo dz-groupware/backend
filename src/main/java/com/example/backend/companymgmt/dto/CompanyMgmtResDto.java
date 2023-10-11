@@ -11,7 +11,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CompanyMgmtResDto {
-
   private Long id;
   private Long parId;
   private String code;
@@ -21,7 +20,11 @@ public class CompanyMgmtResDto {
   private String businessType;
   private String repName;
   private String repIdNum;
+  private String privEmail;
   private String repTel;
+  private String gender;
+  private String loginId;
+  private String loginPw;
   private String businessNum;
   private Integer corpType;
   private String corpNum;
@@ -33,5 +36,6 @@ public class CompanyMgmtResDto {
   private Date closingDate;
   private String address;
   private Boolean deletedYn;
+  private Long employeeId;
 
 }
