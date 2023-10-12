@@ -24,8 +24,8 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       FilterChain chain) throws IOException, ServletException {
 
     String requestURI = request.getRequestURI();
-    if(requestURI.startsWith("/api/v1/auth/login")) {
-      logger.info("### AuthorizationMenuFilter : skip ###");
+    if(requestURI.startsWith("/api/v1/auth/login") || requestURI.startsWith("/api/v1/auth/logout")) {
+      logger.info("### AuthorizationMenuFilter : skip ### URI : " + requestURI);
       chain.doFilter(request, response);
       return;
     }
