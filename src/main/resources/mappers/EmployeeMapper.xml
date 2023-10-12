@@ -24,10 +24,11 @@
 
   <select id="getEmployeeAfterUpdateMaster" resultType="com.example.backend.employee.dto.EmployeeMDto">
     SELECT
-    e.id as emp_id,
-    e.name as emp_name,
-    e.position as emp_position,
-    e.master_yn as emp_master_yn
+    e.id AS emp_id,
+    ec.comp_id AS comp_id,
+    e.name AS emp_name,
+    e.position AS emp_position,
+    e.master_yn AS emp_master_yn
     FROM employee e JOIN employee_company ec ON ec.emp_id = e.id
     WHERE e.id = #{employeeId} AND ec.comp_id = #{companyId}
   </select>
