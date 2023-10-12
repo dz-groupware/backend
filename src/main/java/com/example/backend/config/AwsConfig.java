@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AwsConfig {
 
-  @Value("AKIAUYIFBFKNLD3LQW7B")
+  @Value("AKIAUYIFBFKNE6HJV2UQ")
   private String accessKey;
 
-  @Value("8qfkc2jNcNgsTMkeVKPrHtO1geLv5DwB5HKawXwz")
+  @Value("dtS5R3AOXyE+tGd4O8QsycQ8nSSnQS+ye4CAt8LE")
   private String secretKey;
 
   @Value("ap-northeast-2")
