@@ -2,9 +2,12 @@ package com.example.backend.common.error;
 
 import com.example.backend.common.error.code.ExceptionCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,7 +58,17 @@ public class ErrorResponse {
   public static ErrorResponse of(HttpStatus httpStatus, String message) {
     return new ErrorResponse(httpStatus.value(), message);
   }
+  public static void setToResponse(HttpServletResponse response, HttpStatus httpStatus, String message) throws IOException {
+    ErrorResponse errorResponse = ErrorResponse.of(httpStatus);
 
+    response.setStatus(httpStatus.value());
+    response.setContentType("application/json;charset=UTF-8");
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String json = objectMapper.writeValueAsString(errorResponse);
+
+    response.getWriter().write(json);
+  }
   /* 잘못된 필드가 넘어 왔을 때*/
   @Getter
   @AllArgsConstructor
