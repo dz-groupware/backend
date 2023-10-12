@@ -3,12 +3,10 @@ package com.example.backend.menu.service;
 import com.example.backend.common.mapper.CheckMapper;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.menu.dto.GnbDetailDto;
-import com.example.backend.menu.dto.Menu;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.dto.PageDto;
 import com.example.backend.menu.dto.RouteDto;
 import com.example.backend.menu.mapper.MenuMapper;
-import com.example.backend.config.jwt.PkDto;
 import com.example.backend.menu.dto.MenuRes;
 import com.example.backend.menu.dto.MenuTrans;
 import java.util.List;
@@ -36,7 +34,7 @@ public class MenuServiceImpl implements MenuService {
     if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getGnbForMaster(compId);
     } else {
-      return menuMapper.getGnbByEmpId(compId, SecurityUtil.getCompanyId(), SecurityUtil.getDepartmentId());
+      return menuMapper.getGnbByEmpId(SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
     }
   }
 
@@ -61,7 +59,7 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public List<MenuDto> getMenuById(Long menuId) {
     Long compId = SecurityUtil.getCompanyId();
-    if(SecurityUtil.getMasterYn()) {
+    if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getMenuForMaster(menuId, compId);
     } else {
       return menuMapper.getMenuById(menuId, SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
@@ -71,7 +69,7 @@ public class MenuServiceImpl implements MenuService {
   // 라우팅 리스트
   @Override
   public List<RouteDto> getMenuList() {
-    if(SecurityUtil.getMasterYn()) {
+    if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
       return menuMapper.getMenuListForMaster(SecurityUtil.getCompanyId());
     }else{
       return menuMapper.getMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
@@ -81,8 +79,13 @@ public class MenuServiceImpl implements MenuService {
   // setting 에서 이동
 
   @Override
-  public List<MenuRes> findLnb(String gnbName, String name) {
-    return menuMapper.findMenuByName(gnbName, name);
+  public List<MenuRes> findLnb(String gnbName, String name, Long pageId) {
+    Long compId = SecurityUtil.getCompanyId();
+    if (pageId == 0L) {
+      return menuMapper.findMenuByName(gnbName, name, compId);
+    } else {
+      return menuMapper.findMenuByOption(gnbName, name, pageId, compId);
+    }
   }
 
   // 대메뉴/메뉴 저장/수정
@@ -174,29 +177,15 @@ public class MenuServiceImpl implements MenuService {
     return 10;
   }
 
-  // 메뉴 수정 시 트리 수정
+  private void modifyBatch(List<MenuTrans> batch) {
+
+  }
   private MenuTrans modifyMenu(MenuTrans menu){
-    // menu : 변경될 정보를 담은 메뉴 id: o, par_id: m, name: m, id_tree: o, name_tree: o (origin/modify)
-    log.info(menu.getName());
-
-    //부모 노드 child_node_yn update : parMenu, preMenu로 불러와진 메뉴
-    //updateChildNodeYnOfParMenu
-
-    // menu: 입력 정보 / parMenu : menu의 상위 메뉴 / preMenu : menu의 상위가 될 메뉴(menu의 하위 메뉴 중) / originMenu : 수정 전 menu 정보
-    // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
 
     if (menuMapper.checkMenuInMenu("%" + menu.getId().toString() + "%", menu.getParId()) != 0) {
-      // 상위가 될 메뉴를 자신 보다 상위로 옮기는 과정 필요
-
-      // preMenu를 이동시키는 과정 먼저 실행 preMenu childNodeYn 변경 필요. 만약 preMenu가 없다면 null 반환
-      // 수정 전 메뉴 정보 가져오기
       MenuTrans originMenu = menuMapper.getMenuByMenuId(menu.getId());
       if(Objects.equals(originMenu.getId(), originMenu.getParId())){
-        // 상위 메뉴가 없어. 어떤 메뉴의 하위 메뉴로 만들 수 없음. 메뉴 묶음을 이동 시키고, 루트 메뉴를 대메뉴로 만든다.
-        // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu를 대메뉴 처럼 만든다.
         List<MenuTrans> preMenuList = menuMapper.getMoveMenuList("%" + menu.getParId().toString() + "%");
-
-        // preMenu 묶음 중 root 메뉴 (상위로 선택 된 메뉴를 깊은복사로 가져온다)
         Optional<MenuTrans> preMenuStream = preMenuList.stream()
             .filter(pre -> Objects.equals(pre.getId(), menu.getParId()))
             .findFirst();
@@ -380,5 +369,29 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public List<PageDto> getPageList(){
     return menuMapper.getPageList();
+  }
+
+  @Override
+  public void insertDefaultMenu(Long compId) {
+    Long tmpPk = menuMapper.getTmpPk();
+    menuMapper.insertDefaultMenu(tmpPk, "", compId);
+
+    for (int i=0; i<10; i++){
+      if(i==0) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+1, String.valueOf(tmpPk + 1));
+      }
+      if (0<i && i <4) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+1, (tmpPk+1)+">"+(tmpPk+1+(i+1)));
+      }
+      if (3<i && i<6) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+2, (tmpPk+2)+">"+(tmpPk+1+(i+1)));
+      }
+      if ( i==6) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+3, (tmpPk+1)+">"+(tmpPk+3)+">"+(tmpPk+1+(i+1)));
+      }
+      if (6<i) {
+        menuMapper.updateDefaultMenu(tmpPk+i+1, tmpPk+4, (tmpPk+1)+">"+(tmpPk+4)+">"+(tmpPk+1+(i+1)));
+      }
+    }
   }
 }

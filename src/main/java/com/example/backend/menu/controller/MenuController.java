@@ -1,7 +1,6 @@
 package com.example.backend.menu.controller;
 
 import com.example.backend.common.dto.SingleResponseDto;
-import com.example.backend.menu.dto.GnbDetailDto;
 import com.example.backend.menu.dto.MenuDto;
 import com.example.backend.menu.dto.PageDto;
 import com.example.backend.menu.dto.RouteDto;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,15 +62,15 @@ public class MenuController {
 
   // setting 에서 이동
   @GetMapping("/lnbs")
-  public ResponseEntity<?> findLnb(@RequestParam String gnbName, @RequestParam String name) {
+  public ResponseEntity<?> findLnb(@RequestParam String gnbName, @RequestParam String name, @RequestParam("pageId") Long pageId) {
     return new ResponseEntity<>(
-        new SingleResponseDto<List<MenuRes>>(menuService.findLnb(gnbName, name)),
+        new SingleResponseDto<List<MenuRes>>(menuService.findLnb(gnbName, name, pageId)),
         HttpStatus.OK);
   }
 
   @PostMapping("/menu")
   public ResponseEntity<?> saveMenu(@RequestBody MenuRes menu, @RequestParam String type) {
-    return new ResponseEntity<>(menuService.saveMenu( menu, type), HttpStatus.OK);
+    return new ResponseEntity<>(menuService.saveMenu(menu, type), HttpStatus.OK);
   }
 
   @DeleteMapping("/menu")
@@ -113,4 +111,12 @@ public class MenuController {
   public ResponseEntity<?> getPageList() {
     return new ResponseEntity<>(new SingleResponseDto<List<PageDto>>(menuService.getPageList()), HttpStatus.OK);
   }
+
+  // 쨋든 이거임
+  @GetMapping("/defaultMenu")
+  public void insertDefaultMenu(Long compId) {
+    menuService.insertDefaultMenu(compId);
+  }
+
+
 }

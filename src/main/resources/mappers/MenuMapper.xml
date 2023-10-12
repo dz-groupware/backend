@@ -8,7 +8,9 @@
     SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu
     INNER JOIN (SELECT DISTINCT menu_id FROM auth_menu
     INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId} AND deleted_yn = 0
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department
+    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
+    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
     UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0)admin
     WHERE auth_menu.deleted_yn = 0 AND auth_menu.auth_id = admin.auth_id)menu_list
     WHERE enabled_yn = 1 AND deleted_yn = 0 AND menu.id = menu_list.menu_id AND id = par_id ORDER BY sort_order DESC;
@@ -25,7 +27,9 @@
     (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
     INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
     (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
+    UNION SELECT auth_id FROM auth_department
+    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
+    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
     UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
     WHERE auth.auth_id = auth_menu.auth_id)menu_list
     WHERE menu_list.menu_id = menu.id)menu
@@ -47,13 +51,11 @@
 
   <!-- GNB -> LNB -->
   <select id="getMenuById" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
-    INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu
-    INNER JOIN (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
-    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
-    WHERE auth.auth_id = auth_menu.auth_id)menu_list
-    WHERE menu_list.menu_id = menu.id AND par_id = #{menuId} AND id != par_id AND enabled_yn=1 AND deleted_yn=0 ORDER BY sort_order DESC;
+    SELECT menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM auth_employee
+    LEFT JOIN auth_menu ON auth_employee.auth_id = auth_menu.auth_id AND auth_employee.emp_id= #{empId}
+    INNER JOIN menu ON auth_menu.menu_id = menu.id AND menu.par_id=#{menuId} and menu.par_id != menu.id
+    WHERE auth_employee.deleted_yn = 0 AND menu.enabled_yn=1 AND menu.deleted_yn=0 AND auth_menu.deleted_yn = 0
+    ORDER BY sort_order DESC;
   </select>
 
   <!-- GNB -> LNB : 마스터 -->
@@ -64,31 +66,55 @@
 
   <!-- 라우팅 리스트 -->
   <select id="getMenuList" resultType="com.example.backend.menu.dto.RouteDto">
-    SELECT m.id as menu_id, par.name AS gnb_name, m.name_tree, par.id AS gnb_id, p.page FROM menu AS m
-    INNER JOIN page AS p ON m.page_id = p.id
-    LEFT JOIN menu AS par ON m.name_tree LIKE CONCAT(par.name, '%')
-    INNER JOIN (SELECT menu_id FROM auth_menu
-    INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId}
-    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId}
-    UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId})admin
-    ON auth_menu.auth_id = admin.auth_id)menuList
-    ON menuList.menu_id = m.id WHERE m.enabled_yn = 1 AND m.deleted_yn = 0;
+    SELECT origin.id AS menu_id, par.id AS gnb_id, origin.name_tree, par.name AS gnb_name, page.page FROM
+    (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn, comp_id, page_id FROM menu
+    INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
+    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
+    UNION SELECT auth_id FROM auth_department
+    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
+    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
+    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    WHERE menu_list.menu_id = menu.id)origin
+    JOIN
+    (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn, comp_id, page_id FROM menu
+    INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
+    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
+    UNION SELECT auth_id FROM auth_department
+    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
+    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
+    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    WHERE menu_list.menu_id = menu.id)par
+    ON origin.comp_id = #{compId} AND par.comp_id = #{compId} AND origin.name_tree LIKE concat(par.name, '%')
+    JOIN page ON origin.page_id = page.id WHERE origin.comp_id = #{compId};
   </select>
 
   <!-- 라우팅 리스트 : 마스터 -->
   <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
-    SELECT m.id AS menu_id, par.name AS gnb_name, m.name_tree, par.id AS gnb_id, p.page FROM menu AS m
-    INNER JOIN page AS p ON m.page_id = p.id
-    LEFT JOIN menu AS par ON m.name_tree LIKE CONCAT(par.name, '%')
-    WHERE m.enabled_yn = 1 AND m.deleted_yn = 0 AND m.comp_id = #{compId};
+    SELECT m.id AS menu_id, par.id AS gnb_id, m.name_tree, par.name AS gnb_name, page.page
+    FROM menu AS m
+    JOIN menu AS par ON m.comp_id = #{compId} AND par.comp_id = #{compId} AND m.name_tree LIKE concat(par.name, '%')
+    JOIN page ON m.page_id = page.id
+    WHERE m.comp_id = #{compId};
   </select>
 
-  <!-- 메뉴 검색 -->
+  <!-- 메뉴 검색 : 전체 -->
   <select id="findMenuByName" resultType="com.example.backend.menu.dto.MenuRes">
     SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
     INNER JOIN menu AS m
-    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id AND menu.deleted_yn = 0 ORDER BY menu.sort_order DESC;
+    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id
+    AND menu.deleted_yn = 0 AND m.comp_id = #{compId} ORDER BY menu.sort_order DESC ;
   </select>
+
+  <!-- 메뉴 검색 : 페이지 옵션-->
+  <select id="findMenuByOption" resultType="com.example.backend.menu.dto.MenuRes">
+    SELECT menu.id, menu.name, menu.par_id, m.name AS par_name, menu.name_tree, menu.enabled_yn, menu.sort_order FROM menu
+    INNER JOIN menu AS m
+    WHERE menu.name_tree LIKE #{gnbName} AND menu.name LIKE #{name} AND m.id = menu.par_id AND menu.deleted_yn = 0
+    AND menu.page_id = #{pageId} AND comp_id = #{compId} ORDER BY menu.sort_order DESC;
+  </select>
+
 
   <!-- 메뉴 설정 페이지 : 메뉴 추가 -->
   <insert id="addMenu" parameterType="com.example.backend.menu.dto.MenuRes" useGeneratedKeys="true" keyProperty="id">
@@ -156,21 +182,15 @@
 
   <!-- 메뉴설정 : 상위메뉴 GNB 리스트 (권한 확인) -->
   <select id="getUpperMenuGnb" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT DISTINCT menu.id, par_id, name, sort_order FROM auth_dashboard
-    INNER JOIN auth_menu ON auth_menu.auth_id = auth_dashboard.auth_id AND comp_id = #{compId}
-    INNER JOIN menu ON menu.id = auth_menu.menu_id
-    WHERE auth_menu.deleted_yn = 0 AND auth_dashboard.deleted_yn = 0
-    AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND menu.id = par_id ORDER BY sort_order DESC;
+    SELECT menu.id, par_id, name, sort_order FROM menu
+    WHERE comp_id = #{compId} AND deleted_yn = 0 AND id = par_id ORDER BY sort_order DESC;
   </select>
 
   <!-- 메뉴설정 : 상위메뉴 LNB 리스트 (권한 확인) -->
   <select id="getUpperMenuLnb" resultType="com.example.backend.menu.dto.MenuDto">
-    SELECT DISTINCT menu.id, par_id, name, sort_order FROM auth_dashboard
-    INNER JOIN auth_menu on auth_menu.auth_id = auth_dashboard.auth_id AND comp_id = #{compId}
-    INNER JOIN menu ON menu.id = auth_menu.menu_id
-    WHERE auth_menu.deleted_yn = 0 AND auth_dashboard.deleted_yn = 0
-    AND menu.enabled_yn = 1 AND menu.deleted_yn = 0 AND par_id = #{menuId} AND menu.id != menu.par_id
-    ORDER BY sort_order;
+    SELECT menu.id, par_id, name, sort_order FROM menu
+    where comp_id = #{compId} AND deleted_yn = 0 AND par_id = #{menuId} AND menu.id != menu.par_id
+    ORDER BY sort_order DESC;
   </select>
 
   <select id="getGnbList" resultType="com.example.backend.menu.dto.GnbDetailDto">
@@ -208,5 +228,28 @@
     SELECT id, name FROM page;
   </select>
   <!--################-->
+
+  <!-- 최근 추가된 pk 가져오기 -->
+  <select id="getTmpPk" resultType="java.lang.Long">
+    SELECT MAX(id) FROM menu;
+  </select>
+
+  <insert id="insertDefaultMenu" >
+    INSERT INTO `menu` (`par_id`, `name`, `enabled_yn`, `icon_url`, `sort_order`, `name_tree`, `id_tree`, `child_node_yn`, `admin_yn`, `comp_id`, `page_id`) VALUES
+    (#{parId}, '시스템설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정', #{idTree}, 0, 1, #{compId}, 1),
+    (#{parId}, '조직관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/조직관리', #{idTree}, 0, 0, #{compId}, 1),
+    (#{parId}, '사원관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/사원관리', #{idTree}, 0, 0, #{compId}, 1),
+    (#{parId}, '권한관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리', #{idTree}, 0, 0, #{compId}, 1),
+    (#{parId}, '회사관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/조직관리/회사관리', #{idTree}, 1, 1, #{compId}, 2),
+    (#{parId}, '부서관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/조직관리/부서관리', #{idTree}, 1, 1, #{compId}, 3),
+    (#{parId}, '사원관리', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/사원관리/사원관리', #{idTree}, 1, 1, #{compId}, 4),
+    (#{parId}, '메뉴설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리/메뉴설정', #{idTree}, 1, 1, #{compId}, 5),
+    (#{parId}, '권한Role설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리/권한Role설정', #{idTree}, 1, 1, #{compId}, 6),
+    (#{parId}, '권한설정', 1, 'https://dz-test-image.s3.ap-northeast-2.amazonaws.com/icon/default.png', 0, '시스템설정/권한관리/권한설정', #{idTree}, 1, 1, #{compId}, 7);
+  </insert>
+
+  <update id="updateDefaultMenu">
+    update menu set par_id = #{parId}, id_tree = #{idTree} where id = #{id};
+  </update>
 
 </mapper>

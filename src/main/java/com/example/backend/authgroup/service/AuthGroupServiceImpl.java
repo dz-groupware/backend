@@ -14,6 +14,7 @@ import com.example.backend.authgroup.dto.MenuAuthStatusDto;
 import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.employee.mapper.EmployeeMapper;
+import com.example.backend.redis.RedisService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,10 +26,12 @@ public class AuthGroupServiceImpl implements AuthGroupService{
 
   private final AuthGroupMapper authGroupMapper;
   private final EmployeeMapper employeeMapper;
+  private final RedisService redisService;
   public AuthGroupServiceImpl(AuthGroupMapper authGroupMapper,
-      EmployeeMapper employeeMapper) {
+      EmployeeMapper employeeMapper, RedisService redisService) {
     this.authGroupMapper = authGroupMapper;
     this.employeeMapper = employeeMapper;
+    this.redisService = redisService;
   }
 
 
@@ -194,5 +197,6 @@ public class AuthGroupServiceImpl implements AuthGroupService{
     if(!checkedAuthIds.isEmpty()) { // 리스트가 비어있지 않을 경우에만 추가
       authGroupMapper.addAuthEmployee(empId, checkedAuthIds);
     }
+    redisService.deleteMenuSet(empId.toString());
   }
 }

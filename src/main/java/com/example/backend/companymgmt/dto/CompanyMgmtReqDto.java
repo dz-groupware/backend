@@ -6,11 +6,13 @@ import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class CompanyMgmtReqDto {
 
   private Long id;
@@ -22,7 +24,11 @@ public class CompanyMgmtReqDto {
   private String businessType;
   private String repName;
   private String repIdNum;
+  private String privEmail;
   private String repTel;
+  private String gender;
+  private String loginId;
+  private String loginPw;
   private String businessNum;
   private Integer corpType;
   private String corpNum;
@@ -34,11 +40,6 @@ public class CompanyMgmtReqDto {
   private Date closingDate;
   private String address;
   private Boolean deletedYn;
-  private Long companyId;
-
-  public void setCompanyId(Long id){
-    this.companyId=id;
-  }
-
+  private Long employeeId;
 
 }

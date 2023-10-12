@@ -17,10 +17,10 @@ public interface DepartmentMapper {
   void addDepartment(DeptDto dept);
   void modifyDepartment(DeptDto dept);
   void deleteDepartment(Long compId, Long id, String StringId);
-  List<DeptListDto> getOptionCompList(Long id);
   List<DeptListDto> findDeptNameAndCode(Long compId, String text1, String text2);
   int checkDeptCode(String text, Long id);
-
+  Long isHeadCompany(Long compId);
+  List<DeptListDto> getOptionCompList (String text, Long id);
 
   int checkDeptInDept(String id1, String id2, Long parId);
   DeptTrans getOriginDept (Long id);

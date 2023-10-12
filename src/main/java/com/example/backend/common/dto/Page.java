@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class Page<T> {
-
   private List<T> data;
   private PageDto pageInfo;
 

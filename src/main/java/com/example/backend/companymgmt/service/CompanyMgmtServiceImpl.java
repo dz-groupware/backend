@@ -1,17 +1,12 @@
 package com.example.backend.companymgmt.service;
 
-import com.example.backend.companymgmt.dto.CompanyMgmtListResDto;
-import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
-import com.example.backend.companymgmt.dto.CompanyMgmtResDto;
+import com.example.backend.companymgmt.dto.*;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
+import com.example.backend.menu.service.MenuService;
 import java.util.List;
 
-import com.example.backend.config.jwt.PkDto;
 import com.example.backend.config.jwt.SecurityUtil;
 
-import com.example.backend.employeemgmt.dto.EmployeeMgmtCheckSignUpResultResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +17,11 @@ import java.util.Objects;
 public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     private final CompanyMgmtMapper companyMgmtMapper;
-
-    public CompanyMgmtServiceImpl(CompanyMgmtMapper companyMgmtMapper) {
+    private final MenuService menuService;
+    public CompanyMgmtServiceImpl(CompanyMgmtMapper companyMgmtMapper,
+        MenuService menuService) {
         this.companyMgmtMapper = companyMgmtMapper;
+        this.menuService = menuService;
     }
 
     @Override
@@ -32,6 +29,14 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Long companyId = SecurityUtil.getCompanyId();
         return companyMgmtMapper.getCompanyMgmtList(companyId);
     }
+
+    @Override
+    public List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return companyMgmtMapper.getCompanyMgmtNameTreeList(companyId);
+    }
+
+
     @Override
     public List<CompanyMgmtListResDto> getOpenedCompanyMgmtList() {
         Long companyId = SecurityUtil.getCompanyId();
@@ -42,18 +47,22 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Long companyId = SecurityUtil.getCompanyId();
         return companyMgmtMapper.getClosedCompanyMgmtList(companyId);
     }
+    @Override
+    @Transactional
+    public CompanyMgmtCheckSignUpResDto checkSignUp(CompanyMgmtSignUpReqDto companymgmt) {
+
+        if (companyMgmtMapper.checkDuplicates(companymgmt)) {
+            List<CompanyMgmtCeoResDto> result = companyMgmtMapper.checkSignUp(companymgmt);
+            return new CompanyMgmtCheckSignUpResDto(result, true);
+        }
+        return new CompanyMgmtCheckSignUpResDto(null, false);
+    }
 
 
     @Override
     public CompanyMgmtResDto getCompanyDetailsById(Long id) {
-        Long companyId = SecurityUtil.getCompanyId();
-        return companyMgmtMapper.getCompanyDetailsById(id, companyId);
-    }
 
-    @Override
-    public List<CompanyMgmtListResDto> getAllCompanyMgmtParList() {
-        Long companyId = SecurityUtil.getCompanyId();
-        return companyMgmtMapper.getAllCompanyMgmtParList(companyId);
+        return companyMgmtMapper.getCompanyDetailsById(id);
     }
 
     @Override
@@ -71,24 +80,54 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     @Override
     @Transactional
-    public void addCompanyMgmt(CompanyMgmtReqDto companyMgmt) {
-        Long companyId = SecurityUtil.getCompanyId();
-        Boolean isDuplicated = companyMgmtMapper.getInfoDuplicated(companyMgmt);
+    public void addCompanyMgmt(CompanyMgmtReqDto companymgmt) {
+
+
+        Boolean isDuplicated = companyMgmtMapper.getInfoDuplicated(companymgmt);
 
         if (isDuplicated) {
             throw new RuntimeException("Data is duplicated");
         }
+        Long companyId = null;
 
-        if (companyMgmt.getParId() == null || companyMgmt.getParId().equals("")) {
-            companyMgmtMapper.addCompanyMgmt(companyMgmt);
-            companyMgmtMapper.addIdTreeAndNameTreeWithLastInsertId(companyMgmt.getName());
+        if (companymgmt.getParId() == null || companymgmt.getParId().equals("")) {
+            companyMgmtMapper.addCompanyMgmt(companymgmt);
+            companyId = companymgmt.getId();
+            System.out.println("idcheck Company"+ companymgmt.getId());
+            companyMgmtMapper.addIdTreeAndNameTreeWithLastInsertId(companymgmt.getName());
         } else {
-            companyMgmtMapper.addCompanyMgmt(companyMgmt);
-            Map<String, String> originalIdTreeAndNameTree = companyMgmtMapper.findParIdTreeAndNameTreeWithParId(companyMgmt.getParId());
+            companyMgmtMapper.addCompanyMgmt(companymgmt);
+            companyId = companymgmt.getId();
+            System.out.println("idcheck Company2"+ companymgmt.getId());
+
+            Map<String, String> originalIdTreeAndNameTree = companyMgmtMapper.findParIdTreeAndNameTreeWithParId(companymgmt.getParId());
             String parIdTree = originalIdTreeAndNameTree.get("parIdTree");
             String parNameTree = originalIdTreeAndNameTree.get("parNameTree");
-            companyMgmtMapper.addIdTreeAndNameTreeWithParIdTree(parIdTree, parNameTree ,companyMgmt.getName());
+            companyMgmtMapper.addIdTreeAndNameTreeWithParIdTree(parIdTree, parNameTree ,companymgmt.getName());
         }
+
+
+        if(companymgmt.getEmployeeId() != null){
+            Long userId = companyMgmtMapper.getUserId(companymgmt);
+            System.out.println("idcheck userId1"+ companymgmt.getId());
+            companyMgmtMapper.addCompanyMgmtEmployee(companymgmt, userId);
+            Long employeeId=companymgmt.getId();
+            System.out.println("idcheck employee1"+ companymgmt.getId());
+            companyMgmtMapper.addCompanyMgmtEmployeeCompany(companyId,employeeId);
+        }
+        else{
+            companyMgmtMapper.addCompanyMgmtUser(companymgmt);
+            System.out.println("idcheck userid2"+ companymgmt.getId());
+            Long userId= companymgmt.getId();
+            companyMgmtMapper.addCompanyMgmtEmployee(companymgmt, userId);
+            System.out.println("idcheck employee2"+ companymgmt.getId());
+            Long employeeId=companymgmt.getId();
+            companyMgmtMapper.addCompanyMgmtEmployeeCompany(companyId,employeeId);
+        }
+        //사원회사테이블 추가
+        System.out.println("입력되고난뒤" + companymgmt.getId());
+        menuService.insertDefaultMenu(companyId);
+
     }
 
 
@@ -104,10 +143,11 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 //            companyMgmtMapper.modifyCompanyMgmtWithClosingDate(companyMgmt);
 //            return; // exit the method since we have removed the company
 //        }
-
-        int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
-        if (circularCount > 0) {
-            throw new IllegalArgumentException("Circular reference detected! Cannot move company under its own subtree.");
+        if (!Objects.equals(companyMgmt.getId(), companyMgmt.getParId())) {
+            int circularCount = companyMgmtMapper.checkCircularReference(companyMgmt.getId(), companyMgmt.getParId());
+            if (circularCount > 0) {
+                throw new IllegalArgumentException("Circular reference detected! Cannot move company under its own subtree.");
+            }
         }
 
 
@@ -146,6 +186,8 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         }
 
     }
+
+
 
 
     @Override

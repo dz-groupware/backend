@@ -36,7 +36,8 @@ public interface MenuMapper {
   int checkMenuInMenu(String id, Long parId);
   List<MenuDto> getUpperMenuGnb(Long compId);
   List<MenuDto> getUpperMenuLnb(Long menuId, Long compId);
-  List<MenuRes> findMenuByName(String gnbName, String name);
+  List<MenuRes> findMenuByName(String gnbName, String name, Long compId);
+  List<MenuRes> findMenuByOption(String gnbName, String name, Long pageId, Long compId);
   List<MenuTrans> findChildAll(String id);
   void modifyChildNameTree(MenuTrans menuTrans);
   void modifyMenuById(MenuRes menu);
@@ -45,12 +46,14 @@ public interface MenuMapper {
   void modifyMenuParId(Long parId, Long id, String idTree);
   List<PageDto> getPageList();
 
+  Long getTmpPk();
+  void insertDefaultMenu(Long parId, String idTree, Long compId);
 
+  void updateDefaultMenu(Long id, Long parId, String idTree);
 //  void modifyMenuParId(Long parId, Long id, String idTree);
 
 //  MenuTrans getParIdOfUpperMenu(Long id);
 //  void modifyPreMoveMenu(MenuTrans menu);
 //  MenuTrans getParMenu(Long id);
-//  List<MenuDto> getUpperMenuGnbForMaster(Long compId);
 //  List<MenuDto> getUpperMenuLnbForMaster(Long menuId, Long compId);
 }

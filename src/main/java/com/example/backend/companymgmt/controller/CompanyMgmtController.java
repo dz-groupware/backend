@@ -2,9 +2,13 @@ package com.example.backend.companymgmt.controller;
 
 
 import com.example.backend.common.dto.SingleResponseDto;
+import com.example.backend.companymgmt.dto.CompanyMgmtCheckSignUpResDto;
 import com.example.backend.companymgmt.dto.CompanyMgmtReqDto;
+import com.example.backend.companymgmt.dto.CompanyMgmtSignUpReqDto;
 import com.example.backend.companymgmt.service.CompanyMgmtService;
-import com.example.backend.config.jwt.PkDto;
+
+import com.example.backend.employeemgmt.dto.EmployeeMgmtCheckSignUpResultResDto;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +28,13 @@ public class CompanyMgmtController {
 
   @GetMapping
   public ResponseEntity getCompanyMgmtList() {
-
     return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtList()),
+            HttpStatus.OK);
+  }
+
+  @GetMapping("/nametree")
+  public ResponseEntity getCompanyMgmtNameTreeList() {
+    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtNameTreeList()),
             HttpStatus.OK);
   }
   @GetMapping("/open")
@@ -45,6 +54,7 @@ public class CompanyMgmtController {
 
   @PostMapping
   public ResponseEntity<?> addCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
+    System.out.println(company.toString());
     try {
       companyMgmtService.addCompanyMgmt(company);
       return new ResponseEntity<>(new SingleResponseDto("성공"), HttpStatus.CREATED);
@@ -56,6 +66,8 @@ public class CompanyMgmtController {
     }
   }
 
+
+
   @GetMapping("/{id}")
   public ResponseEntity getCompanyDetailsById(@PathVariable Long id) {
     return new ResponseEntity<>(
@@ -64,12 +76,7 @@ public class CompanyMgmtController {
   }
 
 
-  @GetMapping("/par")
-  public ResponseEntity getAllCompanyMgmtParList() {
-    return new ResponseEntity<>(
-            new SingleResponseDto<>(companyMgmtService.getAllCompanyMgmtParList()),
-            HttpStatus.OK);
-  }
+
   @GetMapping("/company-list")
   public ResponseEntity findCompanyMgmtList(@RequestParam String name, int enabledType) {
     return new ResponseEntity<>(
@@ -79,15 +86,32 @@ public class CompanyMgmtController {
 
   @PutMapping
   public ResponseEntity modifyCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
-    companyMgmtService.modifyCompanyMgmt(company);
-    return new ResponseEntity<>(new SingleResponseDto("성공"),
-        HttpStatus.OK);
+    try {
+      companyMgmtService.modifyCompanyMgmt(company);
+      return new ResponseEntity<>(new SingleResponseDto("성공"), HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
   }
 
   @DeleteMapping("/del/{id}")
   public ResponseEntity removeCompanyMgmt(@PathVariable Long id) {
     companyMgmtService.removeCompanyMgmt(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+  @PostMapping("/signupcheck")
+  public ResponseEntity checkSignUp(@RequestBody CompanyMgmtSignUpReqDto companymgmt) {
+    CompanyMgmtCheckSignUpResDto result = companyMgmtService.checkSignUp(companymgmt);
+
+    if (result.isFromCheck() && (result.getData() == null || result.getData().isEmpty())) {
+      // if 문에서 결과가 나왔지만 데이터가 없는 경우
+      return new ResponseEntity<>("No data found from check", HttpStatus.NOT_FOUND);
+    } else if (!result.isFromCheck()) {
+      // if 문에 들어가지 않은 경우
+      return new ResponseEntity<>("No data found", HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(new SingleResponseDto<>(result.getData()), HttpStatus.OK);
   }
 
 }

@@ -26,7 +26,7 @@ public class RedisConfig {
   private String host;
 
   @Bean(name = "redisTemplate")
-  public RedisTemplate<String, String> redisTemplate(@Qualifier("factoryForMenu")RedisConnectionFactory redisConnectionFactory) {
+  public RedisTemplate<String, String> redisTemplate(@Qualifier("redisConnectionFactory")RedisConnectionFactory redisConnectionFactory) {
     RedisTemplate<String, String> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());
@@ -34,28 +34,26 @@ public class RedisConfig {
     return template;
   }
 
-  @Bean(name = "redisForPayload")
-  public RedisTemplate<String, PkDto> redisForPayload(@Qualifier("factoryForPayload")RedisConnectionFactory redisConnectionFactory) {
-    RedisTemplate<String, PkDto> template = new RedisTemplate<>();
+  @Bean(name = "redisForMenu")
+  public RedisTemplate<String, String> redisForMenu(@Qualifier("factoryForMenu")RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, String> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());
-    Jackson2JsonRedisSerializer<PkDto> jsonSerializer = new Jackson2JsonRedisSerializer<>(PkDto.class);
-    template.setValueSerializer(jsonSerializer);
-    template.setHashValueSerializer(jsonSerializer);
+    template.setValueSerializer(new StringRedisSerializer());
     return template;
+  }
+
+  @Bean(name = "redisConnectionFactory")
+  public RedisConnectionFactory redisConnectionFactory(){
+    LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(host, port);
+    lettuceConnectionFactory.setDatabase(1);
+    return lettuceConnectionFactory;
   }
 
   @Bean(name = "factoryForMenu")
   public RedisConnectionFactory factoryForMenu(){
     LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(host, port);
-    lettuceConnectionFactory.setDatabase(1); // menuId Set 조회용
-    return lettuceConnectionFactory;
-  }
-
-  @Bean(name = "factoryForPayload")
-  public RedisConnectionFactory factoryForPayload(){
-    LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(host, port);
-    lettuceConnectionFactory.setDatabase(2); // payload 조회용
+    lettuceConnectionFactory.setDatabase(3); // menuId Set 조회용
     return lettuceConnectionFactory;
   }
 }

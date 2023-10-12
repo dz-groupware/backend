@@ -1,4 +1,5 @@
 package com.example.backend.config;
+import com.example.backend.config.jwt.FilterChainExceptionHandler;
 import com.example.backend.config.jwt.JwtFilter;
 import com.example.backend.config.jwt.JwtTokenProvider;
 import com.example.backend.config.jwt.UserMapper;
@@ -21,14 +22,14 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity(debug = true) // 스프링 시큐리티 필터(SecurityConfig)가 스프링 필터 체인에 등록
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+//@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
   private final CorsFilter corsFilter;
   private final UserMapper userMapper;
   private final ObjectMapper objectMapper;
   private final JwtTokenProvider jwtTokenProvider;
-
+  private final FilterChainExceptionHandler filterChainExceptionHandler;
   @Bean
   public AuthenticationManager authenticationManager(
       AuthenticationConfiguration authenticationConfiguration
@@ -50,13 +51,11 @@ public class SecurityConfig {
         .and()
           .authorizeRequests()    // 다음 리퀘스트에 대한 사용권한 체크
           .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-          .antMatchers("/auth/login").permitAll() // 허용된 주소
+          .antMatchers("/auth/login", "/auth/logout").permitAll() // 허용된 주소
           .anyRequest().authenticated()
         .and()
-        .exceptionHandling()
-        .and()
         .apply(new JwtSecurityConfig(jwtTokenProvider));
-
+    http.addFilterAfter(filterChainExceptionHandler, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
