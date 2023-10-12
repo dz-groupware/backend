@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,13 +28,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @Log4j2
 public class JwtTokenProvider {
   public static final String ACCESS_TOKEN_NAME = "accessToken";
   public static final String REFRESH_TOKEN_NAME = "refreshToken";
   private final RedisTemplate<String, String> redisTemplate;
-
+  private final RedisTemplate<String, String> redisTemplateForUpdateEmp;
   @Value("${spring.jwt.secret.key}")
   private String secretKey;
   @Value("${spring.jwt.token.access-expiration-time}")
@@ -47,6 +46,17 @@ public class JwtTokenProvider {
   private final PrincipalDetailsService userDetailsService;
   private final ObjectMapper objectMapper;
 
+  public JwtTokenProvider(
+      @Qualifier("redisTemplate") RedisTemplate<String, String> redisTemplate,
+      @Qualifier("redisTemplateForUpdateEmp") RedisTemplate<String, String> redisTemplateForUpdateEmp,
+      PrincipalDetailsService userDetailsService,
+      ObjectMapper objectMapper) {
+    this.redisTemplate = redisTemplate;
+    this.redisTemplateForUpdateEmp = redisTemplateForUpdateEmp;
+    this.userDetailsService = userDetailsService;
+    this.objectMapper = objectMapper;
+  }
+
   public String createAccessToken(Authentication authentication, HttpServletRequest request)  {
     Claims claims = generateAccessClaims(authentication);
     String accessToken = generateJwtToken(claims,accessExpirationTime); //4320000
@@ -57,14 +67,30 @@ public class JwtTokenProvider {
 
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
     Claims claims = parseToken(token); //토큰이 해독되면
-    Map<String, Object> userInfoMap = getUserInfoFromRedis(token, request);
+    Long tokenEmpId = ((Number) claims.get("empId")).longValue();
+    Map<String, Object> userInfoMap = getUserInfoFromRedisByEmpTemplate(tokenEmpId);//유저가 바뀐적이 있는경우에가져오는기
+    if (userInfoMap == null) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
+      userInfoMap = getUserInfoFromRedis(token, request);
+    }
 //    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
     UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
-
+  private Map<String, Object> getUserInfoFromRedisByEmpTemplate(Long empId) {
+    try{
+      String userInfoJson = redisTemplateForUpdateEmp.opsForValue().get(String.valueOf(empId));
+      if (userInfoJson == null) { //값잉 없는거니까 accessToken에서 갖고오게하기
+        return null;
+      }
+      return objectMapper.readValue(userInfoJson, Map.class);
+    } catch (RedisException e) {
+      throw new BusinessLogicException(JwtExceptionCode.NO_REDIS_CONNECTION);
+    } catch (JsonProcessingException | ClassCastException e) {
+      throw new BusinessLogicException(JwtExceptionCode.TYPE_MISMATCH);
+    }
+  }
   private Map<String, Object> getUserInfoFromRedis(String token, HttpServletRequest request) {
     try {
       String userInfoJson = redisTemplate.opsForValue().get(token);
