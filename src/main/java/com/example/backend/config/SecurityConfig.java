@@ -51,7 +51,7 @@ public class SecurityConfig {
         .and()
           .authorizeRequests()    // 다음 리퀘스트에 대한 사용권한 체크
           .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-          .antMatchers("/auth/login").permitAll() // 허용된 주소
+          .antMatchers("/auth/login", "/auth/logout").permitAll() // 허용된 주소
           .anyRequest().authenticated()
         .and()
         .apply(new JwtSecurityConfig(jwtTokenProvider));
