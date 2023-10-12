@@ -3,8 +3,11 @@ package com.example.backend.department.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
 @Getter
 @Setter
+@ToString
 public class DeptTrans {
   private Long id = 0L;
   private Long parId = 0L;

@@ -57,7 +57,7 @@ public class DepartmentController {
   @PostMapping("/dept-modify")
   public ResponseEntity<?> modifyDepartment(@RequestBody DeptDto dept) {
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.modifyDepartment(dept)), HttpStatus.OK);
+        new SingleResponseDto<>(departmentService.modifyDepartmentAndParId(dept)), HttpStatus.OK);
   }
 
   @DeleteMapping("/dept")
@@ -82,10 +82,5 @@ public class DepartmentController {
   public ResponseEntity<?> checkDeptCode(@RequestParam Long id, @RequestParam String text){
     return new ResponseEntity<>(
         new SingleResponseDto<>(departmentService.checkDeptCode(text, id)), HttpStatus.OK);
-  }
-  @PostMapping("/dept-all")
-  public ResponseEntity<?> modifyAllDepartment(@RequestBody List<DeptDto> dept) {
-    return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.modifyAllDepartment(dept)), HttpStatus.OK);
   }
 }

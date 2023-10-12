@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AwsConfig {
 
-  @Value("AKIAUYIFBFKNLD3LQW7B")
+  @Value("${cloud.aws.credentials.accessKey}")
   private String accessKey;
 
-  @Value("8qfkc2jNcNgsTMkeVKPrHtO1geLv5DwB5HKawXwz")
+  @Value("${cloud.aws.credentials.secretKey}")
   private String secretKey;
 
-  @Value("ap-northeast-2")
+  @Value("${cloud.aws.region.static}")
   private String region;
 
   @Bean

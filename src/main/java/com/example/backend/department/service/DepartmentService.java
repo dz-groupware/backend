@@ -12,10 +12,10 @@ public interface DepartmentService {
   DeptDto getBasicDetailById(Long id);
   List<EmpListDto> getEmpListByDeptId(Long id);
   int addDepartment(DeptDto dept);
-  int modifyDepartment(DeptDto dept);
+  int modifyDepartmentAndParId(DeptDto dept);
+
   int deleteDepartment(Long id);
   List<DeptListDto> getOptionCompList();
   List<DeptListDto> findDeptNameAndCode(Long compId, String text);
   boolean checkDeptCode(String text, Long id);
-  int modifyAllDepartment(List<DeptDto> dept);
 }
