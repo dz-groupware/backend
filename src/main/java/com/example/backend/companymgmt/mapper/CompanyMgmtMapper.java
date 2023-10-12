@@ -45,7 +45,7 @@ public interface CompanyMgmtMapper {
 
   List<Long> findIdAtIdTree(Long id);
 
-  void removeCompanyMgmt(Long id);
+
 
 
   void modifyCompanyMgmtWithClosingDate(CompanyMgmtReqDto companyMgmt);
@@ -70,4 +70,12 @@ public interface CompanyMgmtMapper {
   void addCompanyMgmtEmployeeCompany( @Param("companyId")Long companyId, @Param("employeeId")Long employeeId);
 
   void addCompanyMgmtUser(@Param("dto")CompanyMgmtReqDto companymgmt);
+
+  void removeCompanyMgmtCompany(Long removeId);
+
+  List<Long> findEmployeeIdsByCompId(Long removeId);
+
+  void removeCompanyMgmtEmployee(Long empId);
+
+  void removeCompanyMgmtEmployeeCompany(Long removeId);
 }

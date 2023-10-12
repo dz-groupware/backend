@@ -61,7 +61,6 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     @Override
     public CompanyMgmtResDto getCompanyDetailsById(Long id) {
-
         return companyMgmtMapper.getCompanyDetailsById(id);
     }
 
@@ -192,10 +191,22 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     @Override
     public void removeCompanyMgmt(Long id) {
-        List<Long> idsToRemove = companyMgmtMapper.findIdAtIdTree(id);
+        List<Long> companyIdsToRemove = companyMgmtMapper.findIdAtIdTree(id);
 
-        for(Long removeId : idsToRemove) {
-            companyMgmtMapper.removeCompanyMgmt(removeId);
+        for(Long removeId : companyIdsToRemove) {
+            // 회사를 삭제
+            companyMgmtMapper.removeCompanyMgmtCompany(removeId);
+
+            // 삭제될 emp_id 목록 가져오기
+            List<Long> employeeIdsToRemove = companyMgmtMapper.findEmployeeIdsByCompId(removeId);
+
+            // 각 emp_id에 대해 삭제 처리
+            for(Long empId : employeeIdsToRemove) {
+                companyMgmtMapper.removeCompanyMgmtEmployee(empId);
+            }
+
+            // 마지막으로 해당 회사의 직원 관계를 삭제
+            companyMgmtMapper.removeCompanyMgmtEmployeeCompany(removeId);
         }
     }
 }

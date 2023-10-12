@@ -15,7 +15,7 @@
     JOIN employee_company ec ON ec.comp_id = c.id
     JOIN employee e ON ec.emp_id = e.id
     JOIN user u ON u.id = e.user_id
-    WHERE e.emp_id_num = (SELECT rep_id_num FROM company WHERE id = #{id});
+    WHERE e.emp_id_num = (SELECT rep_id_num FROM company WHERE id = #{id}) AND c.id=#{id};
   </select>
 
   <select id="getAllCompanyMgmtParList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
@@ -212,10 +212,28 @@ INSERT INTO  employee_company (`comp_id`,`emp_id`,`resigned_yn`,`join_date`,`res
     SELECT id FROM company WHERE id_tree LIKE CONCAT('%', #{id}, '%')
   </select>
 
-  <update id="removeCompanyMgmt">
+  <update id="removeCompanyMgmtCompany">
     UPDATE company SET deleted_yn=1
     WHERE id=#{removeId}
   </update>
+  <select id="findEmployeeIdsByCompId" resultType="java.lang.Long">
+    SELECT emp_id
+    FROM employee_company
+    WHERE comp_id=#{removeId}
+  </select>
+
+  <update id="removeCompanyMgmtEmployee">
+    UPDATE employee SET deleted_yn=1
+    WHERE id=#{empId}
+  </update>
+
+  <update id="removeCompanyMgmtEmployeeCompany">
+    UPDATE employee_company SET deleted_yn=1
+    WHERE comp_id=#{removeId}
+  </update>
+
+
+
 
 
   <select id="checkSignUp"
