@@ -54,6 +54,7 @@ public class CompanyMgmtController {
 
   @PostMapping
   public ResponseEntity<?> addCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {
+    System.out.println(company.toString());
     try {
       companyMgmtService.addCompanyMgmt(company);
       return new ResponseEntity<>(new SingleResponseDto("성공"), HttpStatus.CREATED);

@@ -126,7 +126,7 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         }
         //사원회사테이블 추가
         System.out.println("입력되고난뒤" + companymgmt.getId());
-        menuService.insertDefaultMenu(companymgmt.getId());
+        menuService.insertDefaultMenu(companyId);
 
     }
 
