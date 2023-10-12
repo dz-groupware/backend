@@ -68,27 +68,25 @@ public class JwtTokenProvider {
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
     Claims claims = parseToken(token); //토큰이 해독되면
     Long tokenEmpId = ((Number) claims.get("empId")).longValue();
-    Map<String, Object> userInfoMap = getUserInfoFromRedisByEmpTemplate(tokenEmpId);//유저가 바뀐적이 있는경우에가져오는기
-    if (userInfoMap == null) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
-      userInfoMap = getUserInfoFromRedis(token, request);
+    if (isUserRequiredToLogout(tokenEmpId)) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
+      throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
     }
+    Map<String, Object> userInfoMap = getUserInfoFromRedis(token, request);
 //    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
     Long empId = ((Number) userInfoMap.get("empId")).longValue();
     UserDetails userDetails = userDetailsService.loadUserByUserIdAndEmpId(userId, empId);
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
-  private Map<String, Object> getUserInfoFromRedisByEmpTemplate(Long empId) {
+  private boolean isUserRequiredToLogout(Long empId) {
     try{
       String userInfoJson = redisTemplateForUpdateEmp.opsForValue().get(String.valueOf(empId));
       if (userInfoJson == null) { //값잉 없는거니까 accessToken에서 갖고오게하기
-        return null;
+        return true;
       }
-      return objectMapper.readValue(userInfoJson, Map.class);
+      return false;
     } catch (RedisException e) {
       throw new BusinessLogicException(JwtExceptionCode.NO_REDIS_CONNECTION);
-    } catch (JsonProcessingException | ClassCastException e) {
-      throw new BusinessLogicException(JwtExceptionCode.TYPE_MISMATCH);
     }
   }
   private Map<String, Object> getUserInfoFromRedis(String token, HttpServletRequest request) {
