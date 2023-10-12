@@ -14,7 +14,8 @@ public enum JwtExceptionCode implements ExceptionCode {
   JSON_PROCESSING_ERROR(500, "JSON 처리 중 에러 발생하였습니다."),
   MISMATCHED_USER_AGENT(402, "유저의 기기 정보가 일치하지 않습니다."),
   TOKEN_NOT_FOUND_IN_REDIS(402, "레디스에 해당하는 토큰이 없습니다."),
-  TYPE_MISMATCH(500, "레디스에서 타입과 일치하지 않습니다.");
+  TYPE_MISMATCH(500, "레디스에서 타입과 일치하지 않습니다."),
+  REQUIRED_LOGOUT(402,"로그아웃해야하는 유저입니다,");
 
   @Getter
   private int status;
