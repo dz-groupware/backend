@@ -34,6 +34,15 @@ public class RedisConfig {
     return template;
   }
 
+  @Bean(name = "redisTempTemplate")
+  public RedisTemplate<String, String> redisTempTemplate(@Qualifier("redisTempConnectionFactory")RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, String> template = new RedisTemplate<>();
+    template.setConnectionFactory(redisConnectionFactory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new StringRedisSerializer());
+    return template;
+  }
+
   @Bean(name = "redisForMenu")
   public RedisTemplate<String, String> redisForMenu(@Qualifier("factoryForMenu")RedisConnectionFactory redisConnectionFactory) {
     RedisTemplate<String, String> template = new RedisTemplate<>();
@@ -49,7 +58,12 @@ public class RedisConfig {
     lettuceConnectionFactory.setDatabase(1);
     return lettuceConnectionFactory;
   }
-
+  @Bean(name = "redisTempConnectionFactory")
+  public RedisConnectionFactory redisTempConnectionFactory(){
+    LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(host, port);
+    lettuceConnectionFactory.setDatabase(9); // empId set 용
+    return lettuceConnectionFactory;
+  }
   @Bean(name = "factoryForMenu")
   public RedisConnectionFactory factoryForMenu(){
     LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(host, port);

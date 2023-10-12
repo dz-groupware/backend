@@ -50,11 +50,10 @@ public class JwtFilter extends OncePerRequestFilter {
       } catch (RedisConnectionFailureException e) {
         SecurityContextHolder.clearContext();
         ErrorResponse.setToResponse(response, HttpStatus.PAYMENT_REQUIRED, e.getMessage());
-        throw new Error("레디스 에러");
+        return;
       } catch (JwtException e) {
         ErrorResponse.setToResponse(response, HttpStatus.PAYMENT_REQUIRED, e.getMessage());
-        throw new Error("유효하지 않은 JWT");
-
+        return;
       }
     }
 
