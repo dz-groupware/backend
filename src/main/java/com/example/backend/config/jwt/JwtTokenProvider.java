@@ -108,7 +108,9 @@ public class JwtTokenProvider {
 
   // 쿠키에서 토큰을 삭제하는 메서드
   public void deleteCookie(HttpServletResponse response, String name) {
-    log.info(name + "를 지우는 중입니다. 기다려주세요");
+    if (name == null || name.isEmpty()) {
+      return; // 쿠키 이름이 null 또는 빈 문자열이면 메소드 종료
+    }
     Cookie cookie = new Cookie(name, null);
     cookie.setMaxAge(0);
     cookie.setHttpOnly(true);

@@ -1,5 +1,4 @@
 package com.example.backend.config;
-import com.example.backend.config.jwt.FilterChainExceptionHandler;
 import com.example.backend.config.jwt.JwtFilter;
 import com.example.backend.config.jwt.JwtTokenProvider;
 import com.example.backend.config.jwt.UserMapper;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,7 +27,6 @@ public class SecurityConfig {
   private final UserMapper userMapper;
   private final ObjectMapper objectMapper;
   private final JwtTokenProvider jwtTokenProvider;
-  private final FilterChainExceptionHandler filterChainExceptionHandler;
   @Bean
   public AuthenticationManager authenticationManager(
       AuthenticationConfiguration authenticationConfiguration
@@ -55,7 +52,6 @@ public class SecurityConfig {
           .anyRequest().authenticated()
         .and()
         .apply(new JwtSecurityConfig(jwtTokenProvider));
-    http.addFilterAfter(filterChainExceptionHandler, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
