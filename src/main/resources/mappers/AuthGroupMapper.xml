@@ -580,4 +580,8 @@
     SET enabled_yn = #{enabledYn} , name = #{authName}
     WHERE id = #{id}
   </update>
+
+  <select id="getEmpIdFromAuthEmployee">
+    SELECT emp_id FROM auth_employee WHERE auth_id = #{authId}
+  </select>
 </mapper>
