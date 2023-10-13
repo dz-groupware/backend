@@ -69,9 +69,7 @@ public class JwtTokenProvider {
     Claims claims = parseToken(token); //토큰이 해독되면
 
     Long tokenEmpId = ((Number) claims.get("empId")).longValue();
-    System.out.println("tokenEmpId" + tokenEmpId);
     if (isUserRequiredToLogout(tokenEmpId)) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
-      System.out.println("여기값이있나");
       throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
     }
     System.out.println("여기까지는들어오나");
@@ -84,10 +82,11 @@ public class JwtTokenProvider {
   }
   private boolean isUserRequiredToLogout(Long empId) {
     try{
-      String userInfoJson = redisTemplateForUpdateEmp.opsForValue().get(String.valueOf(empId));
+      String userInfoJson = redisTemplateForUpdateEmp.opsForValue().get(String.valueOf(empId)); //유저가 로그아웃리스트에 올라가 있는가
       if (userInfoJson == null) { //값잉 없는거니까 accessToken에서 갖고오게하기
         return false;
       }
+      redisTemplateForUpdateEmp.delete(String.valueOf(empId)); //그리고 그 유저는 레디스에서 지우기
       return true;
     } catch (RedisException e) {
       throw new BusinessLogicException(JwtExceptionCode.NO_REDIS_CONNECTION);
