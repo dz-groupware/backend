@@ -61,13 +61,15 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     @Override
     public CompanyMgmtResDto getCompanyDetailsById(Long id) {
-
         return companyMgmtMapper.getCompanyDetailsById(id);
     }
-
     @Override
     public List<CompanyMgmtListResDto> findCompanyMgmtList(String name, int enabledType) {
         Long companyId = SecurityUtil.getCompanyId();
+        System.out.println("Did u come here?1"+companyId);
+        System.out.println("name"+name);
+        System.out.println("enabledType"+enabledType);
+
         if (enabledType == 2) {
             return companyMgmtMapper.findAllCompanyMgmtList(companyId, name);
         }
@@ -75,6 +77,29 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Boolean enabled = enabledType == 1 ? true : false;
 
         return companyMgmtMapper.findCompanyMgmtList(companyId, name, enabled);
+    }
+
+
+    @Override
+    public List<CompanyMgmtListResDto> findOpenCompanyMgmtList(String name, int enabledType) {
+        Long companyId = SecurityUtil.getCompanyId();
+        if (enabledType == 2) {
+            return companyMgmtMapper.findOpenAllCompanyMgmtList(companyId, name);
+        }
+
+        Boolean enabled = enabledType == 1 ? true : false;
+
+        return companyMgmtMapper.findOpenCompanyMgmtList(companyId, name, enabled);
+    }    @Override
+    public List<CompanyMgmtListResDto> findCloseCompanyMgmtList(String name, int enabledType) {
+        Long companyId = SecurityUtil.getCompanyId();
+        if (enabledType == 2) {
+            return companyMgmtMapper.findCloseAllCompanyMgmtList(companyId, name);
+        }
+
+        Boolean enabled = enabledType == 1 ? true : false;
+
+        return companyMgmtMapper.findCloseCompanyMgmtList(companyId, name, enabled);
     }
 
 
@@ -192,10 +217,22 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     @Override
     public void removeCompanyMgmt(Long id) {
-        List<Long> idsToRemove = companyMgmtMapper.findIdAtIdTree(id);
+        List<Long> companyIdsToRemove = companyMgmtMapper.findIdAtIdTree(id);
 
-        for(Long removeId : idsToRemove) {
-            companyMgmtMapper.removeCompanyMgmt(removeId);
+        for(Long removeId : companyIdsToRemove) {
+            // 회사를 삭제
+            companyMgmtMapper.removeCompanyMgmtCompany(removeId);
+
+            // 삭제될 emp_id 목록 가져오기
+            List<Long> employeeIdsToRemove = companyMgmtMapper.findEmployeeIdsByCompId(removeId);
+
+            // 각 emp_id에 대해 삭제 처리
+            for(Long empId : employeeIdsToRemove) {
+                companyMgmtMapper.removeCompanyMgmtEmployee(empId);
+            }
+
+            // 마지막으로 해당 회사의 직원 관계를 삭제
+            companyMgmtMapper.removeCompanyMgmtEmployeeCompany(removeId);
         }
     }
 }
