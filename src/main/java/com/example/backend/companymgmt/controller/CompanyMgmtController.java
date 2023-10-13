@@ -83,6 +83,20 @@ public class CompanyMgmtController {
         new SingleResponseDto<>(companyMgmtService.findCompanyMgmtList(name, enabledType)),
         HttpStatus.OK);
   }
+  @GetMapping("/company-list/open")
+  public ResponseEntity findOpenCompanyMgmtList(@RequestParam String name, int enabledType) {
+    return new ResponseEntity<>(
+            new SingleResponseDto<>(companyMgmtService.findOpenCompanyMgmtList(name, enabledType)),
+            HttpStatus.OK);
+  }
+
+  @GetMapping("/company-list/close")
+  public ResponseEntity findCloseCompanyMgmtList(@RequestParam String name, int enabledType) {
+    return new ResponseEntity<>(
+            new SingleResponseDto<>(companyMgmtService.findCloseCompanyMgmtList(name, enabledType)),
+            HttpStatus.OK);
+  }
+
 
   @PutMapping
   public ResponseEntity modifyCompanyMgmt(@RequestBody CompanyMgmtReqDto company) {

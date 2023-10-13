@@ -21,6 +21,7 @@ public class EmployeeMgmtController {
         return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getEmployeeMgmtList()),
                 HttpStatus.OK);
     }
+
     @GetMapping("/incumbent")
     public ResponseEntity getIncumbentEmployeeMgmtList(){
         return new ResponseEntity<>(new SingleResponseDto<>(employeeMgmtService.getIncumbentEmployeeMgmtList()),
@@ -37,6 +38,13 @@ public class EmployeeMgmtController {
     public ResponseEntity getAllDepartmentMgmtList(@PathVariable Long companyId) {
         return new ResponseEntity<>(
                 new SingleResponseDto<>(employeeMgmtService.getAllDepartmentMgmtList(companyId)),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/departmentlist")
+    public ResponseEntity getDepartmentList() {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.getDepartmentList()),
                 HttpStatus.OK);
     }
     @GetMapping("/{companyId}/hasCEO")
@@ -61,9 +69,23 @@ public class EmployeeMgmtController {
                 HttpStatus.CREATED);
     }
     @GetMapping("/employee-list")
-    public ResponseEntity findEmployeeMgmtList(@RequestParam Long compId, String text) {
+    public ResponseEntity findEmployeeMgmtList(@RequestParam Long deptId, String text) {
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMgmtService.findEmployeeMgmtList(compId, text)),
+                new SingleResponseDto<>(employeeMgmtService.findEmployeeMgmtList(deptId, text)),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/employee-list/open")
+    public ResponseEntity findOpenEmployeeMgmtList(@RequestParam Long deptId, String text) {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.findOpenEmployeeMgmtList(deptId, text)),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/employee-list/close")
+    public ResponseEntity findCloseEmployeeMgmtList(@RequestParam Long deptId, String text) {
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMgmtService.findCloseEmployeeMgmtList(deptId, text)),
                 HttpStatus.OK);
     }
 

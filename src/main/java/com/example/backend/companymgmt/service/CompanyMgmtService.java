@@ -32,5 +32,9 @@ public interface CompanyMgmtService {
 
   List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList();
 
+  List<CompanyMgmtListResDto> findOpenCompanyMgmtList(String name, int enabledType);
+
+  List<CompanyMgmtListResDto> findCloseCompanyMgmtList(String name, int enabledType);
+
 //  EmployeeMgmtCheckSignUpResultResDto getCEODetailsById(Long id);
 }
