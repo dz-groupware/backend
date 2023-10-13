@@ -50,49 +50,29 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   @Transactional
   public int addDepartment(DeptDto dept) {
-    System.out.println("in addDepartment"+dept.getAbbr());
-    System.out.println("getStatus"+dept.getStatus());
     Long compId = SecurityUtil.getCompanyId();
 //    try{
       dept.setCompId(compId);
       // 메뉴 추가
       if (dept.getStatus().equals("add")){
-
-        DeptTrans updateTree =  new DeptTrans();
+        System.out.println("request: add");
+        departmentMapper.addDepartment(dept);
         if (dept.getParId().toString().equals("0")){
           // 상위부서 없음 == 상위메뉴 (id == parId로 저장하기엔 parId가 존재하지 않아서 안됨)
-          dept.setParId(1L);
-          departmentMapper.addDepartment(dept);
-          System.out.println(dept.getId().toString());
-          updateTree.setId(dept.getId());
-          updateTree.setParId(dept.getId());
-          updateTree.setIdTree(dept.getId().toString());
-          updateTree.setNameTree(dept.getName());
+          modifyBatch(dept.getId(), dept.getParId(), true, false);
         } else {
-          // 상위부서 찾기
-          departmentMapper.addDepartment(dept);
-          DeptTrans parDept = departmentMapper.getParDept(dept.getParId());
-          departmentMapper.modifyUpperDeptCNY(parDept.getId());
-          System.out.println(dept.getId().toString());
-          updateTree.setId(dept.getId());
-          updateTree.setParId(dept.getParId());
-          updateTree.setIdTree(parDept.getIdTree()+">"+dept.getId().toString());
-          updateTree.setNameTree(parDept.getNameTree()+">"+dept.getName());
+          modifyBatch(dept.getId(), dept.getParId(), false, false);
         }
-        departmentMapper.modifyDeptTree(updateTree);
       }
       // 메뉴 수정
       if (dept.getStatus().equals("modify")){
-        System.out.println("modify start"+dept.getStatus());
-
-        // 수정 로직 수행 (트리 수정)
-        DeptTrans updateDept = new DeptTrans(dept);
-        DeptTrans preUpdateDept = modifyTree(updateDept);
-        dept.setParId(preUpdateDept.getParId());
-        dept.setIdTree(preUpdateDept.getIdTree());
-        dept.setNameTree(preUpdateDept.getNameTree());
-        System.out.println("? :"+dept.getAbbr());
         departmentMapper.modifyDepartment(dept);
+        System.out.println("request: modify");
+        if (dept.getParId().toString().equals("0")){
+          modifyBatch(dept.getId(), dept.getParId(), true, false);
+        } else {
+          modifyTree(new DeptTrans(dept));
+        }
       }
       return 1;
 //    } catch (Exception e) {
@@ -103,8 +83,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   // 부서 수정
   @Override
   @Transactional
-  public int modifyDepartment(DeptDto dept){
-    departmentMapper.modifyDepartment(dept);
+  public int modifyDepartmentAndParId(DeptDto dept){
+    departmentMapper.modifyDepartmentAndParId(dept);
     return 1;
   }
 
@@ -146,196 +126,84 @@ public class DepartmentServiceImpl implements DepartmentService {
     return false;
   }
 
-  // 일괄 등록 (보류)
-  @Override
-  public int modifyAllDepartment(List<DeptDto> dept) {
-    for (DeptDto deptDto : dept) {
-      if (deptDto.getStatus().equals("modify")) {
-        // modify 로직 수행
-        DeptTrans updateDept = new DeptTrans(deptDto);
-        DeptTrans preUpdateDept = modifyTree(updateDept);
-        deptDto.setParId(preUpdateDept.getParId());
-        deptDto.setIdTree(preUpdateDept.getIdTree());
-        deptDto.setNameTree(preUpdateDept.getNameTree());
-        departmentMapper.modifyDepartment(deptDto);
+  // 부서 추가/수정 시 수행 될 로직
+  private void modifyTree(DeptTrans dept) {
+    if (checkDeptInDept(dept.getId(), dept.getParId())) {
+      System.out.println("PAR_DEPT IN DEPT");
+      DeptTrans originMenu = departmentMapper.getParDept(dept.getId());
+      if (Objects.equals(originMenu.getId(), originMenu.getParId())) {
+        System.out.println("m 1 - head");
+        modifyBatch(dept.getParId(), originMenu.getParId(), true, true);
+        modifyBatch(dept.getId(), dept.getParId(), false, true);
+      } else {
+        System.out.println("m 1 - general");
+        modifyBatch(dept.getParId(), originMenu.getParId(), false, true);
+        modifyBatch(dept.getId(), dept.getParId(), false, true);
       }
-      if (deptDto.getStatus().equals("add")) {
-        // add 로직 수행
-        departmentMapper.addDepartment(deptDto);
+    } else {
+      System.out.println("PAR_DEPT NOT IN DEPT");
+      if (Objects.equals(dept.getId(), dept.getParId())) {
+        System.out.println("m 2 - head");
+        modifyBatch(dept.getId(), dept.getParId(), true, true);
+      } else {
+        System.out.println("m 3 - general");
+        modifyBatch(dept.getId(), dept.getParId(), false, true);
       }
     }
-    return 1;
   }
 
-  // 부서 추가/수정 시 수행 될 로직
-  public DeptTrans modifyTree(DeptTrans dept) {
-    //departmentMapper.modifyDepartment(dept);
-    // 상위로 지정한 메뉴가 자신의 하위에 있는지 확인
-    if (checkDeptInDept(dept.getId(), dept.getParId())) {
-      System.out.println("not in here");
-      DeptTrans originMenu = departmentMapper.getOriginDept(dept.getId());
-      if(originMenu == null){
-        // 만약 상위 메뉴가 없어 상위메뉴의 정보를 사용할 수 없다 -> preMenu 를 대메뉴 처럼 만든다.
-        List<DeptTrans> preMenuList = departmentMapper.getMoveDeptList("%" + dept.getParId().toString() + "%");
-
-        // preMenu 묶음 중 root 메뉴 (상위로 선택 된 메뉴를 깊은복사로 가져온다)
-        Optional<DeptTrans> preMenuStream = preMenuList.stream()
-            .filter(pre -> Objects.equals(pre.getId(), dept.getParId()))
-            .findFirst();
-
-        DeptTrans preMenu = new DeptTrans(preMenuStream.get());
-        String originPreIdTree = preMenu.getIdTree();
-        String originPreNameTree = preMenu.getNameTree();
-
-        preMenu.setParId(preMenu.getId());
-        preMenu.setIdTree(preMenu.getId().toString());
-        preMenu.setNameTree(preMenu.getName());
-
-        departmentMapper.modifyDeptTree(preMenu);
-
-        // preMenuList
-        for (DeptTrans deptTrans : preMenuList) {
-          if (Objects.equals(deptTrans.getId(), preMenu.getId())) {
-            continue;
-          }
-          String tmp = deptTrans.getIdTree().substring(originPreIdTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setIdTree(preMenu.getIdTree() + ">" + tmp);
-          tmp = deptTrans.getNameTree().substring(originPreNameTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setNameTree(preMenu.getNameTree() + ">" + tmp);
-          departmentMapper.modifyDeptTree(deptTrans);
-        }
-
-        // menu 이동
-        List<DeptTrans> MenuList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
-        // MenuList
-        for (DeptTrans deptTrans : MenuList) {
-          deptTrans.setIdTree(preMenu.getIdTree() + ">" + deptTrans.getIdTree());
-          deptTrans.setNameTree(preMenu.getNameTree() + ">" + deptTrans.getNameTree());
-          departmentMapper.modifyDeptTree(deptTrans);
-        }
-      } else {
-        DeptTrans parMenu = departmentMapper.getParDept(originMenu.getParId());
-
-        List<DeptTrans> preMenuList = departmentMapper.getMoveDeptList("%" + dept.getParId().toString() + "%");
-        Optional<DeptTrans> preMenuStream = preMenuList.stream()
-            .filter(pre -> Objects.equals(pre.getId(), dept.getParId()))
-            .findFirst();
-
-        DeptTrans preDept = new DeptTrans(preMenuStream.get());
-        String originPreIdTree = preDept.getIdTree();
-        String originPreNameTree = preDept.getNameTree();
-        // 상위 메뉴는 parMenu
-        preDept.setParId(parMenu.getId());
-        preDept.setIdTree(parMenu.getIdTree()+">"+preDept.getId().toString());
-        preDept.setNameTree(parMenu.getNameTree()+">"+preDept.getName());
-
-        departmentMapper.modifyDeptTree(preDept);
-
-        for (DeptTrans deptTrans : preMenuList) {
-          if (Objects.equals(deptTrans.getId(), preDept.getId())) {
-            continue;
-          }
-          String tmp = deptTrans.getIdTree().substring(originPreIdTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setIdTree(preDept.getIdTree() + ">" + tmp);
-          tmp = deptTrans.getNameTree().substring(originPreNameTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setNameTree(preDept.getNameTree() + ">" + tmp);
-          departmentMapper.modifyDeptTree(deptTrans);
-        }
-
-        // menu 이동
-        List<DeptTrans> DeptList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
-
-        String originIdTree = originMenu.getIdTree();
-        String originNameTree = originMenu.getNameTree();
-
-        originMenu.setParId(preDept.getId());
-        originMenu.setIdTree(preDept.getIdTree()+">"+originMenu.getId().toString());
-        originMenu.setNameTree(preDept.getNameTree()+">"+originMenu.getName());
-
-        departmentMapper.modifyDeptTree(originMenu);
-        departmentMapper.modifyUpperDeptCNY(parMenu.getId());
-        departmentMapper.modifyUpperDeptCNY(preDept.getId());
-        for (DeptTrans deptTrans : DeptList) {
-          if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
-            continue;
-          }
-          String tmp = deptTrans.getIdTree().substring(originIdTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
-          tmp = deptTrans.getNameTree().substring(originNameTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
-          departmentMapper.modifyDeptTree(deptTrans);
-        }
-      }
-      return originMenu;
+  private void modifyBatch (Long id, Long parId, boolean head, boolean batch) {
+    DeptTrans originMenu = departmentMapper.getParDept(id);
+    Long originParId = originMenu.getParId();
+    String originIdTree = originMenu.getIdTree();
+    String originNameTree = originMenu.getNameTree();
+    if (head || Objects.equals(originMenu.getId(), originMenu.getParId())) {
+      originMenu.setParId(originMenu.getId());
+      originMenu.setIdTree(originMenu.getId().toString());
+      originMenu.setNameTree(originMenu.getName());
     } else {
-      // 일반적인 수정 로직
-      List<DeptTrans> DeptList = departmentMapper.getMoveDeptList("%" + dept.getId().toString() + "%");
+      DeptTrans parDept = departmentMapper.getParDept(parId);
+      originMenu.setParId(parId);
+      originMenu.setIdTree(parDept.getIdTree() + ">" + originMenu.getId());
+      originMenu.setNameTree(parDept.getNameTree() + ">" + originMenu.getName());
+      departmentMapper.modifyUpperDeptCNY(parDept.getId());
+    }
+    departmentMapper.modifyDeptTree(originMenu);
 
-      DeptTrans originMenu = departmentMapper.getParDept(dept.getId());
-      System.out.println("have to in here : "+ dept.getId()+" :: "+ dept.getParId());
-      if (Objects.equals(dept.getId(), dept.getParId())) {
-        originMenu.setParId(originMenu.getId());
-
-        originMenu.setIdTree(originMenu.getId().toString());
-        originMenu.setNameTree(originMenu.getName());
-
-        return originMenu;
-      } else {
-        System.out.println("move directly");
-        DeptTrans preDept = departmentMapper.getParDept(dept.getParId());
-
-        String originIdTree = originMenu.getIdTree();
-        String originNameTree = originMenu.getNameTree();
-
-        originMenu.setParId(preDept.getId());
-
-        originMenu.setIdTree(preDept.getIdTree()+">"+originMenu.getId().toString());
-        originMenu.setNameTree(preDept.getNameTree()+">"+originMenu.getName());
-
-        departmentMapper.modifyDeptTree(originMenu);
-        departmentMapper.modifyUpperDeptCNY(preDept.getId());
-        for (DeptTrans deptTrans : DeptList) {
-          if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
-            continue;
-          }
-          String tmp = deptTrans.getIdTree().substring(originIdTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
-          tmp = deptTrans.getNameTree().substring(originNameTree.length());
-          if (tmp.startsWith(">")) {
-            tmp = tmp.substring(1);
-          }
-          deptTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
-          departmentMapper.modifyDeptTree(deptTrans);
+    int batchLength = 0;
+    if (batch) {
+      List<DeptTrans> DeptList = departmentMapper.getMoveDeptList(id + ">%", "%>" + id+ ">%", "%>" + id);
+      batchLength = DeptList.size();
+      System.out.println(batchLength);
+      for (DeptTrans deptTrans : DeptList) {
+        if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
+          continue;
         }
-        System.out.println("null ? " +originMenu.getParId());
-        return originMenu;
+        String tmp = deptTrans.getIdTree().substring(originIdTree.length());
+        if (tmp.startsWith(">")) {
+          tmp = tmp.substring(1);
+        }
+        deptTrans.setIdTree(originMenu.getIdTree() + ">" + tmp);
+
+        tmp = deptTrans.getNameTree().substring(originNameTree.length());
+        if (tmp.startsWith(">")) {
+          tmp = tmp.substring(1);
+        }
+        deptTrans.setNameTree(originMenu.getNameTree() + ">" + tmp);
+        departmentMapper.modifyDeptTree(deptTrans);
       }
     }
+    if (( departmentMapper.getIsChildNodeYn(originParId+">%", "%>"+originParId+">%") - batchLength ) == 1) {
+      System.out.println("modify CYN true : " + originParId);
+      departmentMapper.modifyUpperDeptCNN(originParId);
+    } else {
+      System.out.println("not modify CYN" + departmentMapper.getIsChildNodeYn(originParId+">%", "&>"+originParId+">%"));
+    }
+    System.out.println(batchLength);
   }
 
   public boolean checkDeptInDept(Long id, Long parId){
-    return departmentMapper.checkDeptInDept(id.toString()+">%",">%" + id.toString() + ">%", parId) != 0;
+    System.out.println("id: "+id+" || parId : "+parId);
+    return departmentMapper.checkDeptInDept(parId, id+">%","%>" + id + ">%","%>" + id) != 0;
   }
-
 }

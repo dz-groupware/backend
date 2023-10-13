@@ -46,8 +46,15 @@
   </insert>
 
   <!-- 수정 -->
-  <update id="modifyDepartment" parameterType="com.example.backend.department.dto.DeptDto">
+  <update id="modifyDepartmentAndParId" parameterType="com.example.backend.department.dto.DeptDto">
     UPDATE department SET par_id = #{parId}, code = #{code}, name = #{name}, abbr = #{abbr},
+    enabled_yn = #{enabledYn}, managing_dept_yn = #{managementYn}, included_yn = #{includedYn}, sort_order = #{sortOrder}
+    WHERE id = #{id};
+  </update>
+
+  <!-- 수정 parId 빼고 -->
+  <update id="modifyDepartment" parameterType="com.example.backend.department.dto.DeptDto">
+    UPDATE department SET code = #{code}, name = #{name}, abbr = #{abbr},
     enabled_yn = #{enabledYn}, managing_dept_yn = #{managementYn}, included_yn = #{includedYn}, sort_order = #{sortOrder}
     WHERE id = #{id};
   </update>
@@ -79,16 +86,14 @@
 
   <!-- 부서 추가/수정 시 수행 될 로직 -->
   <select id="checkDeptInDept" resultType="java.lang.Integer">
-    SELECT COUNT(*) FROM department WHERE id_tree LIKE #{id1} OR id_tree LIKE #{id2} AND id != #{parId};
+    SELECT COUNT(*) FROM department WHERE id_tree LIKE #{id1} or id_tree LIKE #{id2} or id_tree LIKE #{id3} and id = #{parId};
   </select>
 
   <select id="getOriginDept" resultType="com.example.backend.department.dto.DeptTrans">
     SELECT id, par_id, name, name_tree, id_tree FROM department WHERE id = #{id} AND id != par_id;
   </select>
 
-  <select id="getMoveDeptList" resultType="com.example.backend.department.dto.DeptTrans">
-    SELECT id, par_id, name, id_tree, name_tree FROM department WHERE id_tree LIKE #{id};
-  </select>
+
 
   <update id="modifyDeptTree" parameterType="com.example.backend.department.dto.DeptTrans">
     UPDATE department SET id_tree = #{idTree}, name_tree = #{nameTree}, par_id = #{parId} WHERE id = #{id};
@@ -104,6 +109,11 @@
     UPDATE department SET child_node_yn = 0 WHERE id = #{parId};
   </update>
 
+  <!-- 상위 부서 childNodeYn 변경 -->
+  <update id="modifyUpperDeptCNN" parameterType="java.lang.Long">
+    UPDATE department SET child_node_yn = 1 WHERE id = #{parId};
+  </update>
+
   <!-- 상위 회사 인지 확인 -->
   <select id="isHeadCompany">
     SELECT par_id FROM company WHERE id = #{compId};
@@ -113,6 +123,17 @@
   <select id="getOptionCompList" resultType="com.example.backend.department.dto.DeptListDto">
     SELECT id AS comp_id, company.par_id, code ,name, sort_order FROM company
     WHERE ID_TREE LIKE #{text} OR ID = #{id} AND enabled_yn = 1;
+  </select>
+
+
+  <!-- Tree 수정 : 묶음 하위 찾기-->
+  <select id="getMoveDeptList" resultType="com.example.backend.department.dto.DeptTrans">
+    SELECT id, par_id, name, id_tree, name_tree FROM department WHERE id_tree LIKE #{id1} or id_tree LIKE #{id2} or id_tree LIKE #{id3} ;
+  </select>
+
+  <!-- 부모 부서의 childNodeYn을 수정해야 하는지 확인 -->
+  <select id="getIsChildNodeYn" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM department WHERE id_tree LIKE #{id1} or id_tree LIKE #{id2} ;
   </select>
 
 </mapper>
