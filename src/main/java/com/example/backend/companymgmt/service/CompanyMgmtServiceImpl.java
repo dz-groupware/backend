@@ -63,10 +63,13 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     public CompanyMgmtResDto getCompanyDetailsById(Long id) {
         return companyMgmtMapper.getCompanyDetailsById(id);
     }
-
     @Override
     public List<CompanyMgmtListResDto> findCompanyMgmtList(String name, int enabledType) {
         Long companyId = SecurityUtil.getCompanyId();
+        System.out.println("Did u come here?1"+companyId);
+        System.out.println("name"+name);
+        System.out.println("enabledType"+enabledType);
+
         if (enabledType == 2) {
             return companyMgmtMapper.findAllCompanyMgmtList(companyId, name);
         }
@@ -74,6 +77,29 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         Boolean enabled = enabledType == 1 ? true : false;
 
         return companyMgmtMapper.findCompanyMgmtList(companyId, name, enabled);
+    }
+
+
+    @Override
+    public List<CompanyMgmtListResDto> findOpenCompanyMgmtList(String name, int enabledType) {
+        Long companyId = SecurityUtil.getCompanyId();
+        if (enabledType == 2) {
+            return companyMgmtMapper.findOpenAllCompanyMgmtList(companyId, name);
+        }
+
+        Boolean enabled = enabledType == 1 ? true : false;
+
+        return companyMgmtMapper.findOpenCompanyMgmtList(companyId, name, enabled);
+    }    @Override
+    public List<CompanyMgmtListResDto> findCloseCompanyMgmtList(String name, int enabledType) {
+        Long companyId = SecurityUtil.getCompanyId();
+        if (enabledType == 2) {
+            return companyMgmtMapper.findCloseAllCompanyMgmtList(companyId, name);
+        }
+
+        Boolean enabled = enabledType == 1 ? true : false;
+
+        return companyMgmtMapper.findCloseCompanyMgmtList(companyId, name, enabled);
     }
 
 

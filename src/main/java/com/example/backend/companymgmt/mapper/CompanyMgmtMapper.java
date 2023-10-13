@@ -78,4 +78,12 @@ public interface CompanyMgmtMapper {
   void removeCompanyMgmtEmployee(Long empId);
 
   void removeCompanyMgmtEmployeeCompany(Long removeId);
+
+  List<CompanyMgmtListResDto> findOpenAllCompanyMgmtList(Long companyId, String name);
+
+  List<CompanyMgmtListResDto> findOpenCompanyMgmtList(Long companyId, String name, Boolean enabled);
+
+  List<CompanyMgmtListResDto> findCloseCompanyMgmtList(Long companyId, String name, Boolean enabled);
+
+  List<CompanyMgmtListResDto> findCloseAllCompanyMgmtList(Long companyId, String name);
 }
