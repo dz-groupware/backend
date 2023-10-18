@@ -21,9 +21,19 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     }
 
     @Override
-    public List<EmployeeMgmtListResDto> getEmployeeMgmtList() {
+    public List<EmployeeMgmtListWithCompanyIdResDto> getEmployeeMgmtList() {
         Long companyId = SecurityUtil.getCompanyId();
-        return employeeMgmtMapper.getEmployeeMgmtList(companyId);
+
+        List<EmployeeMgmtListResDto> result = employeeMgmtMapper.getEmployeeMgmtList(companyId);
+        List<EmployeeMgmtListWithCompanyIdResDto> result2 = new ArrayList<>();
+
+
+
+        for(EmployeeMgmtListResDto data : result) {
+
+            result2.add(new EmployeeMgmtListWithCompanyIdResDto(data,companyId));
+        }
+        return result2;
     }
 
 
@@ -45,30 +55,29 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
         Long companyId = SecurityUtil.getCompanyId();
 
         Long userId = employeeMgmtMapper.getUserIdById(id);
-        List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
+
+        List<Long> companyIds = employeeMgmtMapper.getSubsidiaryCompany(companyId);
 
         List<EmployeeMgmtResDto> results = new ArrayList<>();
-
-        for (Long empId : employeeIds) {
-            System.out.println("empId ??"+empId);
-            Long masteryn= employeeMgmtMapper.getMasterYn(empId);
-            System.out.println("what is masteryn"+masteryn);
-            List<EmployeeMgmtResDto> detailList = employeeMgmtMapper.getEmployeeMgmtDetailsById(empId, companyId);
-
-            if ((detailList == null || detailList.isEmpty())&& masteryn != null && masteryn==1   ) {
-                // If detailList is null or empty, fetch basic details.
-                EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetailsById(empId, companyId);
-                if (basicDetails != null) {
-                    results.add(basicDetails);
-                }
-            } else {
-                results.addAll(detailList);
-            }
+        List<EmployeeMgmtResDto> detailList = new ArrayList<>();
+        for (Long company : companyIds) {
+            // 상세 정보를 가져옵니다.
+            detailList.addAll(employeeMgmtMapper.getEmployeeMgmtDetailsById(userId, company));
         }
 
+        // 마스터 여부를 체크합니다.
+        for (EmployeeMgmtResDto data : detailList){
+            if (data.getDeptId() == null  ||  (data.getMasterYn() != null && data.getMasterYn())) {
+                EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetailsById(data.getId(), companyId);
+                if (basicDetails != null) {
+                    results.add(basicDetails);
+                    continue;
+                }
+            }
+            results.add(data);
+        }
         return results;
     }
-
     @Override
     public List<Map<Long, String>> getAllDepartmentMgmtList(Long companyId) {
         return employeeMgmtMapper.getAllDepartmentMgmtList(companyId);

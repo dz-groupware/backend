@@ -54,16 +54,17 @@ public class DepartmentServiceImpl implements DepartmentService {
 //    try{
       dept.setCompId(compId);
       // 메뉴 추가
-      if (dept.getStatus().equals("add")){
-        System.out.println("request: add");
+    if (dept.getStatus().equals("add")){
+      if (dept.getParId().toString().equals("0")){
+        // 상위부서 없음 == 상위메뉴 (id == parId로 저장하기엔 parId가 존재하지 않아서 안됨)
+        dept.setParId(1L);
         departmentMapper.addDepartment(dept);
-        if (dept.getParId().toString().equals("0")){
-          // 상위부서 없음 == 상위메뉴 (id == parId로 저장하기엔 parId가 존재하지 않아서 안됨)
-          modifyBatch(dept.getId(), dept.getParId(), true, false);
-        } else {
-          modifyBatch(dept.getId(), dept.getParId(), false, false);
-        }
+        modifyBatch(dept.getId(), dept.getParId(), true, false);
+      } else {
+        departmentMapper.addDepartment(dept);
+        modifyBatch(dept.getId(), dept.getParId(), false, false);
       }
+    }
       // 메뉴 수정
       if (dept.getStatus().equals("modify")){
         departmentMapper.modifyDepartment(dept);

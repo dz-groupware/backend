@@ -2,7 +2,11 @@ package com.example.backend.companymgmt.service;
 
 import com.example.backend.companymgmt.dto.*;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
+import com.example.backend.employeemgmt.dto.EmployeeMgmtListWithCompanyIdResDto;
 import com.example.backend.menu.service.MenuService;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.backend.config.jwt.SecurityUtil;
@@ -25,10 +29,20 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     }
 
     @Override
-    public List<CompanyMgmtListResDto> getCompanyMgmtList() {
+    public List<CompanyMgmtListWithCompanyIdResDto> getCompanyMgmtList() {
         Long companyId = SecurityUtil.getCompanyId();
-        return companyMgmtMapper.getCompanyMgmtList(companyId);
+
+        List<CompanyMgmtListResDto> result = companyMgmtMapper.getCompanyMgmtList(companyId);
+        List<CompanyMgmtListWithCompanyIdResDto> result2 = new ArrayList<>();
+        for(CompanyMgmtListResDto data : result){
+            result2.add(new CompanyMgmtListWithCompanyIdResDto(data,companyId));
+        }
+        return result2;
+
+
     }
+
+
 
     @Override
     public List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList() {
