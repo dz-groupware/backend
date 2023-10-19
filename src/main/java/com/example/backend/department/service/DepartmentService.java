@@ -17,5 +17,6 @@ public interface DepartmentService {
   int deleteDepartment(Long id);
   List<DeptListDto> getOptionCompList();
   List<DeptListDto> findDeptNameAndCode(Long compId, String text);
+  int getCountSearchDept(Long compId, String text);
   boolean checkDeptCode(String text, Long id);
 }

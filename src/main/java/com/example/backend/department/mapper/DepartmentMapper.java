@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface DepartmentMapper {
 
   List<DeptListDto> getDepartmentBasicList(Long compId);
-  List<DeptListDto> getDepartmentById(Long compId, Long parId);
+  List<DeptListDto> getDepartmentById(Long compId, Long id, Long parId);
   DeptDto getBasicDetailById(Long id);
   List<EmpListDto> getEmpListByDeptId(Long id);
   void addDepartment(DeptDto dept);
@@ -19,6 +19,7 @@ public interface DepartmentMapper {
   void modifyDepartmentAndParId(DeptDto dept);
   void deleteDepartment(Long compId, Long id, String StringId);
   List<DeptListDto> findDeptNameAndCode(Long compId, String text1, String text2);
+  int getCountSearchDept(Long compId, String text1, String text2);
   int checkDeptCode(String text, Long id);
   Long isHeadCompany(Long compId);
   List<DeptListDto> getOptionCompList (String text, Long id);

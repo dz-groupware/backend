@@ -70,7 +70,7 @@ public class JwtTokenProvider {
 
     Long tokenEmpId = ((Number) claims.get("empId")).longValue();
     if (isUserRequiredToLogout(tokenEmpId)) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
-      throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
+//      throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
     }
     System.out.println("여기까지는들어오나");
     Map<String, Object> userInfoMap = getUserInfoFromRedis(token, request);
