@@ -65,6 +65,7 @@ public class DepartmentServiceImpl implements DepartmentService {
           modifyBatch(dept.getId(), dept.getParId(), false, false);
         }
       }
+    }
       // 메뉴 수정
       if (dept.getStatus().equals("modify")){
         departmentMapper.modifyDepartment(dept);

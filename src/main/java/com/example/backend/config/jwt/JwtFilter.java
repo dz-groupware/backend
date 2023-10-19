@@ -37,13 +37,11 @@ public class JwtFilter extends OncePerRequestFilter {
       try {
         accessToken = jwtTokenProvider.getAccessTokenFromRequest(request);
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken, response)) {
-          log.info("JWTFILTER access" + accessToken);
           Authentication auth = jwtTokenProvider.getAuthentication(accessToken, request);
           SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
         }
       }
       catch (BusinessLogicException | ExpiredJwtException e) {
-          System.out.println("JwtFilter 걸러짐");
           jwtTokenProvider.deleteCookie(response, "accessToken");
 
           ErrorResponse.setToResponse(response, HttpStatus.PAYMENT_REQUIRED, e.getMessage());

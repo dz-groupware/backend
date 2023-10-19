@@ -67,10 +67,12 @@ public class JwtTokenProvider {
 
   public Authentication getAuthentication(String token,  HttpServletRequest request) {
     Claims claims = parseToken(token); //토큰이 해독되면
+
     Long tokenEmpId = ((Number) claims.get("empId")).longValue();
     if (isUserRequiredToLogout(tokenEmpId)) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
 //      throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
     }
+    System.out.println("여기까지는들어오나");
     Map<String, Object> userInfoMap = getUserInfoFromRedis(token, request);
 //    validateIncomingRequest(request, userInfoMap);
     Long userId = ((Number) userInfoMap.get("userId")).longValue();
@@ -80,11 +82,12 @@ public class JwtTokenProvider {
   }
   private boolean isUserRequiredToLogout(Long empId) {
     try{
-      String userInfoJson = redisTemplateForUpdateEmp.opsForValue().get(String.valueOf(empId));
+      String userInfoJson = redisTemplateForUpdateEmp.opsForValue().get(String.valueOf(empId)); //유저가 로그아웃리스트에 올라가 있는가
       if (userInfoJson == null) { //값잉 없는거니까 accessToken에서 갖고오게하기
-        return true;
+        return false;
       }
-      return false;
+      redisTemplateForUpdateEmp.delete(String.valueOf(empId)); //그리고 그 유저는 레디스에서 지우기
+      return true;
     } catch (RedisException e) {
       throw new BusinessLogicException(JwtExceptionCode.NO_REDIS_CONNECTION);
     }
@@ -157,16 +160,16 @@ public class JwtTokenProvider {
     log.info(Arrays.toString(cookies));
     for (Cookie cookie : cookies)
       if ("accessToken".equals(cookie.getName())){
-        log.info("find accessToken");
+        log.info("해당하는 토큰이 있습니다.");
         return cookie.getValue();
       }
-    log.info("now Throw Error : INVALID_COOKIE ");
+    log.info("유효하지 않은 쿠키입니다. ");
     throw new BusinessLogicException(JwtExceptionCode.INVALID_COOKIE);
   }
 
   public boolean validateToken(String token,HttpServletResponse response){
     try{
-      log.info("validate token "+ token);
+      log.info("토큰 유효성검사 "+ token);
       Jwts.parserBuilder()
           .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
           .build()

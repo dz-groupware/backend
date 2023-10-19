@@ -13,7 +13,7 @@ public interface CompanyMgmtService {
   List<CompanyMgmtListResDto> getOpenedCompanyMgmtList();
 
   List<CompanyMgmtListResDto>  getClosedCompanyMgmtList();
-    List<CompanyMgmtListResDto> getCompanyMgmtList();
+    List<CompanyMgmtListWithCompanyIdResDto> getCompanyMgmtList();
 
 
   @Transactional
@@ -31,6 +31,10 @@ public interface CompanyMgmtService {
 
 
   List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList();
+
+  List<CompanyMgmtListResDto> findOpenCompanyMgmtList(String name, int enabledType);
+
+  List<CompanyMgmtListResDto> findCloseCompanyMgmtList(String name, int enabledType);
 
 //  EmployeeMgmtCheckSignUpResultResDto getCEODetailsById(Long id);
 }
