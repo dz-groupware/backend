@@ -31,8 +31,8 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<ProfileRes> getAllProfile() {
-    return modalMapper.getProfileByUserId(SecurityUtil.getUserId());
+  public ProfileRes getAllProfile() {
+    return modalMapper.getProfileByUserId(SecurityUtil.getEmployeeId());
   }
 
   @Override

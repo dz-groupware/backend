@@ -11,6 +11,7 @@ public class DeptListDto {
   private Long parId;
   private String name;
   private String code;
+  private String idTree;
   private int sortOrder;
   private boolean managementYn = false;
   private boolean enabledYn = false;

@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface ModalMapper {
-  List<ProfileRes> getProfileByUserId(Long userId);
+  ProfileRes getProfileByUserId(Long empId);
   List<TreeItemRes> getCompToGnb(Long compId);
   List<TreeItemRes> getGnbToLnb(Long compId);
   List<TreeItemRes> getLnbToLnb(Long compId, Long deptId);

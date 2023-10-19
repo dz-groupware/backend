@@ -69,7 +69,7 @@ public class JwtTokenProvider {
     Claims claims = parseToken(token); //토큰이 해독되면
     Long tokenEmpId = ((Number) claims.get("empId")).longValue();
     if (isUserRequiredToLogout(tokenEmpId)) { // 유저가 업데이트된적이 없으면 엑세스토큰이 키값으로 되어있는 레디스에서 가져오기
-      throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
+//      throw new BusinessLogicException(JwtExceptionCode.REQUIRED_LOGOUT);
     }
     Map<String, Object> userInfoMap = getUserInfoFromRedis(token, request);
 //    validateIncomingRequest(request, userInfoMap);
