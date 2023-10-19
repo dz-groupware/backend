@@ -38,5 +38,6 @@ public class EmployeeMgmtResDto {
     private Date leftDate;
     private Boolean deletedYn;
     private Boolean masterYn;
+    private Long empId;
 
 }

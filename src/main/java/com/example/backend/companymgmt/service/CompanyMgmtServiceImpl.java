@@ -47,7 +47,8 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
     @Override
     public List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList() {
         Long companyId = SecurityUtil.getCompanyId();
-        return companyMgmtMapper.getCompanyMgmtNameTreeList(companyId);
+        Long parId = companyMgmtMapper.getCompanyMgmtNameTreeListForParId(companyId);
+        return companyMgmtMapper.getCompanyMgmtNameTreeList(companyId, parId);
     }
 
 

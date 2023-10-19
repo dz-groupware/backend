@@ -14,7 +14,7 @@ import java.util.Map;
 public interface EmployeeMgmtMapper {
     List<EmployeeMgmtListResDto> getEmployeeMgmtList(@Param("companyId") Long companyId);
 
-    List<EmployeeMgmtResDto> getEmployeeMgmtDetailsById(@Param("empId")Long empId,@Param("company") Long company);
+    List<EmployeeMgmtResDto> getEmployeeMgmtDetailsById(@Param("userId")Long userId,@Param("company") Long company);
     List<Map<Long, String>> getAllDepartmentMgmtList(@Param("companyId")Long comanyId);
 
     List<EmployeeMgmtListResDto> findEmployeeMgmtList(@Param("deptId")Long deptId,@Param("text") String text);
@@ -90,4 +90,10 @@ public interface EmployeeMgmtMapper {
 
 
     List<Long> getSubsidiaryCompany(Long companyId);
+
+    EmployeeMgmtResDto getEmployeeMgmtOnlyBasicDetails(Long userId);
+
+    void modifyEmployeeMgmtUserNotDelete(Long userId);
+
+    List<Long> getEmployeeByUserId(Long userId);
 }

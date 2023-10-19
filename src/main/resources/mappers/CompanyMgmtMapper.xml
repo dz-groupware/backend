@@ -62,13 +62,17 @@
           resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
     SELECT id, code, name, corp_type, rep_name
     FROM company
-    WHERE deleted_yn = false AND (id = #{companyId} OR id_tree LIKE CONCAT('%', #{id}, '%'))
+    WHERE deleted_yn = false AND (id = #{companyId} OR id_tree LIKE CONCAT('%', #{companyId}, '%'))
+  </select>
+
+  <select id="getCompanyMgmtNameTreeListForParId" resultType="Long">
+    SELECT par_id FROM company WHERE deleted_yn=false AND id=#{companyId}
   </select>
 
   <select id="getCompanyMgmtNameTreeList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtTreeListResDto">
     SELECT id, par_id, name_tree
     FROM company
-    WHERE deleted_yn = false AND (id = #{companyId} OR id_tree LIKE CONCAT('%', #{id}, '%'))
+    WHERE deleted_yn = false AND (id = #{companyId} OR id_tree LIKE CONCAT('%', #{parId}, '%'))
   </select>
 
 
