@@ -13,7 +13,7 @@ public interface CompanyMgmtService {
   List<CompanyMgmtListResDto> getOpenedCompanyMgmtList();
 
   List<CompanyMgmtListResDto>  getClosedCompanyMgmtList();
-    List<CompanyMgmtListResDto> getCompanyMgmtList();
+    List<CompanyMgmtListWithCompanyIdResDto> getCompanyMgmtList();
 
 
   @Transactional

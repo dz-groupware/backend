@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface EmployeeMgmtService {
 
-    List<EmployeeMgmtListResDto> getEmployeeMgmtList();
+    List<EmployeeMgmtListWithCompanyIdResDto> getEmployeeMgmtList();
 
     List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList();
 
