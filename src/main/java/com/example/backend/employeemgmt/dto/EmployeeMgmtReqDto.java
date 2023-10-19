@@ -38,6 +38,7 @@ public class EmployeeMgmtReqDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date leftDate;
     private Boolean deletedYn;
+    private Long empId;
 
 }
 

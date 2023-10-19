@@ -8,7 +8,7 @@
     SELECT company.id AS comp_id, company.name AS comp_name, department.id AS dept_id,
     department.name AS dept_name, employee.id AS emp_id, employee.name AS emp_name,
     last_ip, last_access, employee.position, image_url FROM user
-    INNER JOIN employee ON user.id = employee.user_id AND employee.user_id = #{userId}
+    INNER JOIN employee ON user.id = employee.user_id AND employee.id = #{empId}
     LEFT JOIN employee_department ON employee.id = employee_department.emp_id AND (org = 1 OR org IS NULL)
     LEFT JOIN employee_company ON employee.id = employee_company.emp_id
     LEFT JOIN department ON department.id = employee_department.dept_id

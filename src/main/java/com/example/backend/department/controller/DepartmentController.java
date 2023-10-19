@@ -3,7 +3,9 @@ package com.example.backend.department.controller;
 import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.department.dto.DeptDto;
 import com.example.backend.department.service.DepartmentService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -72,10 +74,19 @@ public class DepartmentController {
         new SingleResponseDto<>(departmentService.getOptionCompList()), HttpStatus.OK);
   }
 
+//  @GetMapping("/dept")
+//  public ResponseEntity<?> findDeptNameAndCode(@RequestParam Long compId, @RequestParam String text){
+//    return new ResponseEntity<>(
+//        new SingleResponseDto<>(departmentService.findDeptNameAndCode(compId, text)), HttpStatus.OK);
+//  }
+
   @GetMapping("/dept")
   public ResponseEntity<?> findDeptNameAndCode(@RequestParam Long compId, @RequestParam String text){
+    Map<String, Object> result = new HashMap();
+    result.put("count", departmentService.getCountSearchDept(compId, text));
+    result.put("searchList", departmentService.findDeptNameAndCode(compId, text));
     return new ResponseEntity<>(
-        new SingleResponseDto<>(departmentService.findDeptNameAndCode(compId, text)), HttpStatus.OK);
+        new SingleResponseDto<>(result), HttpStatus.OK);
   }
 
   @GetMapping("/duplicate-test")

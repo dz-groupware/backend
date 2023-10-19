@@ -42,7 +42,8 @@ public class JwtFilter extends OncePerRequestFilter {
         }
       }
       catch (BusinessLogicException | ExpiredJwtException e) {
-          jwtTokenProvider.deleteCookie(response,accessToken);
+          jwtTokenProvider.deleteCookie(response, "accessToken");
+
           ErrorResponse.setToResponse(response, HttpStatus.PAYMENT_REQUIRED, e.getMessage());
         return;
       } catch (RedisConnectionFailureException e) {

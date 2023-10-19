@@ -3,11 +3,13 @@ package com.example.backend.employeemgmt.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Date;
 
 @Getter
 @AllArgsConstructor
+@ToString
 public class EmployeeMgmtResDto {
     private Long id;
     private String imageUrl;
@@ -35,5 +37,7 @@ public class EmployeeMgmtResDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date leftDate;
     private Boolean deletedYn;
+    private Boolean masterYn;
+    private Long empId;
 
 }

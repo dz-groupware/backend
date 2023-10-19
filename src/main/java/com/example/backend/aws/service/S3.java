@@ -1,8 +1,11 @@
 package com.example.backend.aws.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.example.backend.config.jwt.SecurityUtil;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +24,8 @@ public class S3 {
   private String bucket;
 
   public String upload(MultipartFile multipartFile) throws IOException {
-    String s3FileName = "icon/"+multipartFile.getOriginalFilename();
+
+    String s3FileName = SecurityUtil.getCompanyId()+"/"+multipartFile.getOriginalFilename();
 
     ObjectMetadata objMeta = new ObjectMetadata();
     objMeta.setContentType("image/png");
@@ -49,5 +53,10 @@ public class S3 {
 
   public List<S3ObjectSummary> getImageList(){
     return amazonS3.listObjects(bucket, "icon/").getObjectSummaries();
+  }
+
+  public void createNewPrefix(Long compId) {
+    AmazonS3 s3 = AmazonS3Client.builder().build();
+    s3.putObject(bucket, compId+"/", new File("readme.txt"));
   }
 }

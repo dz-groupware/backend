@@ -40,7 +40,12 @@ public class S3Controller {
       return new ResponseEntity<String>("Error while uploading: " + e.getMessage(), HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<String>(uploadedUrl, HttpStatus.OK);
+  }
 
+  @GetMapping("/test")
+  public ResponseEntity<?> test(@RequestParam("compId") Long compId) {
+    s3.createNewPrefix(compId);
+    return new ResponseEntity<Long>(compId, HttpStatus.OK);
   }
 
 
