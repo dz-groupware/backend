@@ -1,5 +1,6 @@
 package com.example.backend.layout.controller;
 
+import com.example.backend.common.dto.SingleResponseDto;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.layout.dto.BasicResponseDto;
 import com.example.backend.menu.service.MenuService;
@@ -30,6 +31,10 @@ public class gnbController {
         modalService.getAllProfile(), SecurityUtil.getEmployeeId(), SecurityUtil.getCompanyId()), HttpStatus.OK);
   }
 
+  @GetMapping("/favor")
+  public ResponseEntity<?> getFavor() {
+    return new ResponseEntity<>(new SingleResponseDto<>(menuService.getFavorByEmpId()), HttpStatus.OK);
+  }
   // *
 
 //  @GetMapping("/profile")

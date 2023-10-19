@@ -109,7 +109,7 @@ public class MenuServiceImpl implements MenuService {
         menuMapper.modifyParId(id, id.toString());
         return 1;
       } catch (Exception e) {
-        log.info(e.getMessage());
+        log.error(e.getMessage());
         return -1;
       }
     }

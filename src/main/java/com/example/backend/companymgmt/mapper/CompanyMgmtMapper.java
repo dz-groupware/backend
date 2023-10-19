@@ -56,7 +56,7 @@ public interface CompanyMgmtMapper {
 
   List<CompanyMgmtListResDto> getClosedCompanyMgmtList(Long companyId);
 
-  List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList(Long companyId);
+  List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList(Long companyId, Long parId);
 
   Boolean checkDuplicates(@Param("dto")CompanyMgmtSignUpReqDto companyMgmt);
 
@@ -86,4 +86,6 @@ public interface CompanyMgmtMapper {
   List<CompanyMgmtListResDto> findCloseCompanyMgmtList(Long companyId, String name, Boolean enabled);
 
   List<CompanyMgmtListResDto> findCloseAllCompanyMgmtList(Long companyId, String name);
+
+  Long getCompanyMgmtNameTreeListForParId(Long companyId);
 }
