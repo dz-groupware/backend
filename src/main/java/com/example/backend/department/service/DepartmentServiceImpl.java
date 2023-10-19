@@ -8,7 +8,6 @@ import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
