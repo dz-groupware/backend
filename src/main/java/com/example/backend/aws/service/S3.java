@@ -31,7 +31,7 @@ public class S3 {
 
   public String upload(MultipartFile multipartFile) throws IOException {
 
-    String s3FileName = SecurityUtil.getCompanyId()+"/"+multipartFile.getOriginalFilename();
+    String s3FileName = "icon/"+multipartFile.getOriginalFilename();
 
     ObjectMetadata objMeta = new ObjectMetadata();
     objMeta.setContentType("image/png");

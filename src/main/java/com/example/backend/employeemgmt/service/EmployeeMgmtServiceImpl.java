@@ -21,9 +21,19 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     }
 
     @Override
-    public List<EmployeeMgmtListResDto> getEmployeeMgmtList() {
+    public List<EmployeeMgmtListWithCompanyIdResDto> getEmployeeMgmtList() {
         Long companyId = SecurityUtil.getCompanyId();
-        return employeeMgmtMapper.getEmployeeMgmtList(companyId);
+
+        List<EmployeeMgmtListResDto> result = employeeMgmtMapper.getEmployeeMgmtList(companyId);
+        List<EmployeeMgmtListWithCompanyIdResDto> result2 = new ArrayList<>();
+
+
+
+        for(EmployeeMgmtListResDto data : result) {
+
+            result2.add(new EmployeeMgmtListWithCompanyIdResDto(data,companyId));
+        }
+        return result2;
     }
 
 
@@ -40,27 +50,40 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     }
 
 
+
     @Override
     public List<EmployeeMgmtResDto> getEmployeeDetailsById(Long id) {
         Long companyId = SecurityUtil.getCompanyId();
-
         Long userId = employeeMgmtMapper.getUserIdById(id);
-        List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
+
+        List<Long> companyIds = employeeMgmtMapper.getSubsidiaryCompany(companyId);
 
         List<EmployeeMgmtResDto> results = new ArrayList<>();
+        List<EmployeeMgmtResDto> detailList = new ArrayList<>();
 
-        for (Long empId : employeeIds) {
-            List<EmployeeMgmtResDto> detailList = employeeMgmtMapper.getEmployeeMgmtDetailsById(empId, companyId);
+        for (Long company : companyIds) {
+            // 상세 정보를 가져옵니다.
+            detailList.addAll(employeeMgmtMapper.getEmployeeMgmtDetailsById(userId, company));
+        }
 
-            if (detailList == null || detailList.isEmpty()) {
-                // If detailList is null or empty, fetch basic details.
-                EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetailsById(empId, companyId);
-                if (basicDetails != null) {
-                    results.add(basicDetails);
+        // detailList가 비어 있지 않은 경우 기존 로직을 그대로 수행합니다.
+        if (!detailList.isEmpty()) {
+            // 마스터 여부를 체크합니다.
+            for (EmployeeMgmtResDto data : detailList) {
+                if (data.getDeptId() == null || (data.getMasterYn() != null && data.getMasterYn())) {
+                    EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetailsById(data.getId(), companyId);
+                    if (basicDetails != null) {
+                        results.add(basicDetails);
+                        continue;
+                    }
                 }
-            } else {
-                // If detailList is not null and not empty, add its elements to results.
-                results.addAll(detailList);
+                results.add(data);
+            }
+        } else if (userId != null) { // detailList가 비어 있고, userId가 존재하는 경우
+            // 이 경우에 다른 dto 로 보내고싶다면?
+            EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetails(userId);
+            if (basicDetails != null) {
+                results.add(basicDetails);
             }
         }
 
@@ -73,19 +96,64 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     }
 
     @Override
-    public List<EmployeeMgmtListResDto> findEmployeeMgmtList(Long compId, String text) {
+    public List<EmployeeMgmtListResDto> findEmployeeMgmtList(Long deptId, String text) {
         Long companyId = SecurityUtil.getCompanyId();
-        if ((compId == null || compId <= 0) && (text == null || text.trim().isEmpty())) {
+        System.out.println("Did u come here?1"+companyId);
+        System.out.println("deptId"+deptId);
+        System.out.println("text"+text);
+
+
+
+        if ((deptId == null || deptId <= 0) && (text == null || text.trim().isEmpty() || "%%".equals(text))) {
+
+                System.out.println("Did u come here?2");
             return employeeMgmtMapper.getEmployeeMgmtList(companyId);
         }
-        if (compId == null || compId <= 0) {
+        if (deptId == null || deptId <= 0) {
             return employeeMgmtMapper.findEmployeeMgmtListByText(companyId, text);
         } else if (text == null || text.trim().isEmpty()) {
-            return employeeMgmtMapper.findEmployeeMgmtListById(compId);
+            return employeeMgmtMapper.findEmployeeMgmtListById(deptId);
         } else {
             // id와 text 둘 다 사용하는 경우
-            return employeeMgmtMapper.findEmployeeMgmtList(compId, text);
+            return employeeMgmtMapper.findEmployeeMgmtList(deptId, text);
         }
+    }
+    @Override
+    public List<EmployeeMgmtListResDto> findOpenEmployeeMgmtList(Long deptId, String text) {
+        Long companyId = SecurityUtil.getCompanyId();
+        if ((deptId == null || deptId <= 0) && (text == null || text.trim().isEmpty() || "%%".equals(text))) {
+
+                return employeeMgmtMapper.getEmployeeMgmtList(companyId);
+        }
+        if (deptId == null || deptId <= 0) {
+            return employeeMgmtMapper.findOpenEmployeeMgmtListByText(companyId, text);
+        } else if (text == null || text.trim().isEmpty()) {
+            return employeeMgmtMapper.findOpenEmployeeMgmtListById(deptId);
+        } else {
+            // id와 text 둘 다 사용하는 경우
+            return employeeMgmtMapper.findOpenEmployeeMgmtList(deptId, text);
+        }
+    }
+    @Override
+    public List<EmployeeMgmtListResDto> findCloseEmployeeMgmtList(Long deptId, String text) {
+        Long companyId = SecurityUtil.getCompanyId();
+        if ((deptId == null || deptId <= 0) && (text == null || text.trim().isEmpty())) {
+            return employeeMgmtMapper.getEmployeeMgmtList(companyId);
+        }
+        if (deptId == null || deptId <= 0) {
+            return employeeMgmtMapper.findCloseEmployeeMgmtListByText(companyId, text);
+        } else if (text == null || text.trim().isEmpty()) {
+            return employeeMgmtMapper.findCloseEmployeeMgmtListById(deptId);
+        } else {
+            // id와 text 둘 다 사용하는 경우
+            return employeeMgmtMapper.findCloseEmployeeMgmtList(deptId, text);
+        }
+    }
+
+    @Override
+    public List<Map<Long, String>> getDepartmentList() {
+        Long companyId = SecurityUtil.getCompanyId();
+        return employeeMgmtMapper.getAllDepartmentMgmtList(companyId);
     }
 
 
@@ -143,11 +211,25 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
         }
 
         Long userId = employeeMgmtMapper.getUserIdById(employeeMgmt.getId());
-        employeeMgmt.setDeletedYn(false);
+
+        System.out.println("deletedyn what?"+employeeMgmt.getDeletedYn());
         System.out.println("employeeMgmt"+employeeMgmt.toString());
         // departmentId가 null인지 대표인지 확인
+
+
+
+        if (employeeMgmt.getPosition().equals("대표")) {
+            Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
+            // 생성된 ID를 사용하여 직원 추가
+            Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
+            employeeMgmtMapper.addEmployeeMgmtEmployeeModify(userId, employeeMgmt, masterYn);
+            Long employeeId = employeeMgmt.getId();
+            employeeMgmtMapper.addEmployeeMgmtEmployeeCompany(employeeId, employeeMgmt, resignedYn);
+            return; // 이후의 코드를 실행하지 않고 메서드를 종료
+        }
+
         //부서가 없을때
-        if (employeeMgmt.getDepartmentId() == null) {
+        if (employeeMgmt.getDepartmentId() == null ) {
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
             // 생성된 ID를 사용하여 직원 추가
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
@@ -160,21 +242,15 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             }
             return; // 이후의 코드를 실행하지 않고 메서드를 종료
         }
-        if (employeeMgmt.getDepartmentId() == null && employeeMgmt.getPosition().equals("대표")) {
-            Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
-            // 생성된 ID를 사용하여 직원 추가
-            Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
-            employeeMgmtMapper.addEmployeeMgmtEmployeeModify(userId, employeeMgmt, masterYn);
-            Long employeeId = employeeMgmt.getId();
-            employeeMgmtMapper.addEmployeeMgmtEmployeeCompany(employeeId, employeeMgmt, resignedYn);
-            return; // 이후의 코드를 실행하지 않고 메서드를 종료
-        }
 
 
-        List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
 
 
-        for (Long empId : employeeIds) {
+//        List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
+
+
+//        for (Long empId : employeeIds) {
+            Long empId = employeeMgmt.getEmpId();
 
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
             if (masterYn == false) {
@@ -182,11 +258,31 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
                 employeeMgmtMapper.modifyEmployeeMgmtEmployeeDepartment(empId, org, employeeMgmt);
             }
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
-            employeeMgmt.setLeftDate(employeeMgmt.getResignationDate());
+
+
             employeeMgmtMapper.modifyEmployeeMgmtUser(empId, employeeMgmt);
             employeeMgmtMapper.modifyEmployeeMgmtEmployee(empId, employeeMgmt);
             employeeMgmtMapper.modifyEmployeeMgmtEmployeeCompany(empId, resignedYn, employeeMgmt);
+//        }
+        List<Long> employeeIds = employeeMgmtMapper.getEmployeeByUserId(userId);
+
+        if (employeeIds.size() == 1) {
+            Long singleEmpId = employeeIds.get(0); // 하나뿐인 empId를 가져옵니다.
+
+            Boolean isDeleted = employeeMgmt.getEmpId()==singleEmpId;
+
+            if (isDeleted) {
+                // 직원이 삭제된 상태이므로, 이후 로직을 건너뛰고 메서드를 종료합니다.
+                return;
+            }
         }
+
+// 삭제되지 않았거나, employeeIds에 여러 개의 ID가 있는 경우, 정상적인 처리를 계속합니다.
+        if (employeeIds != null && !employeeIds.isEmpty()) {
+            employeeMgmtMapper.modifyEmployeeMgmtUserNotDelete(userId);
+        }
+
+
 
     }
 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface EmployeeMgmtService {
 
-    List<EmployeeMgmtListResDto> getEmployeeMgmtList();
+    List<EmployeeMgmtListWithCompanyIdResDto> getEmployeeMgmtList();
 
     List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList();
 
@@ -18,7 +18,7 @@ public interface EmployeeMgmtService {
 
 
     List<Map<Long, String>> getAllDepartmentMgmtList(Long companyId);
-    List<EmployeeMgmtListResDto> findEmployeeMgmtList(Long compId, String text);
+    List<EmployeeMgmtListResDto> findEmployeeMgmtList(Long deptId, String text);
     @Transactional
     void addEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt);
 
@@ -32,4 +32,10 @@ public interface EmployeeMgmtService {
     EmployeeMgmtCheckSignUpResultResDto checkSignUp(EmployeeMgmtSignUpReqDto employeeMgmt);
 
     Boolean checkIfCompanyHasCEO(Long companyId);
+
+    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtList(Long deptId, String text);
+
+    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtList(Long deptId, String text);
+
+    List<Map<Long, String>> getDepartmentList();
 }

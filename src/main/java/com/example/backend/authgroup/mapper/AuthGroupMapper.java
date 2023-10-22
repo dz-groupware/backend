@@ -50,5 +50,7 @@ public interface AuthGroupMapper {
 
   void updateAuth(UpdateAuthDto updateAuthDto);
 
+  List<Long> getEmpIdFromAuthEmployee(Long authId);
+
 
 }

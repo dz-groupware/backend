@@ -10,7 +10,7 @@
         SELECT
         id, login_id, image_url, name, join_date
         FROM (
-        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
         FROM employee e
         INNER JOIN user u ON e.user_id = u.id
@@ -54,33 +54,53 @@
         WHERE rn = 1;
     </select>
 
+    <select id="getSubsidiaryCompany" resultType="Long">
+        SELECT id FROM company WHERE id_tree LIKE CONCAT('%', #{companyId}, '%')
+    </select>
+
     <select id="getEmployeeMgmtDetailsById"
             resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
-        SELECT e.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
+        SELECT u.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
         u.login_id, u.login_pw, u.priv_email,
-        u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
+        u.mobile_number, u.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
         ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
-        ,e.deleted_yn
+        ,e.deleted_yn, e.master_yn, e.id AS empId
         FROM employee e
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND (ed.org=1 OR ed.org IS NULL)
+        WHERE e.user_id=#{userId} AND ec.comp_id=#{company} AND (ed.org=1 OR ed.org IS NULL) AND (ed.transferred_yn=false OR ed.transferred_yn IS NULL) AND e.deleted_yn=false AND ec.deleted_yn=false
     </select>
+
 
 
     <select id="getEmployeeMgmtOnlyBasicDetailsById"
             resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
-        SELECT e.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
+        SELECT u.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
         u.login_id, u.login_pw, u.priv_email,
-        u.mobile_number, e.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
+        u.mobile_number, u.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
         ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
-        ,e.deleted_yn
+        ,e.deleted_yn, e.master_yn,e.id AS empId
         FROM employee e
         INNER JOIN user u ON e.user_id=u.id
         INNER JOIN employee_company ec ON e.id=ec.emp_id
         LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.id=#{empId} AND ec.comp_id=#{companyId}
+        WHERE e.id=#{empId} AND ec.comp_id=#{companyId} AND e.deleted_yn=false AND ec.deleted_yn=false
+    </select>
+
+
+    <select id="getEmployeeMgmtOnlyBasicDetails"
+            resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
+        SELECT e.id=null,e.image_url=null,u.name, u.user_id_num, u.gender, e.account_yn=null,
+        u.login_id, u.login_pw, u.priv_email,
+        u.mobile_number, u.home_number, u.address, ec.join_date=null AS ec_join_date , ec.resignation_date=null,
+        ed.id=null AS departmentId , ec.comp_id=null,e.position=null,ed.dept_id=null,ed.transferred_yn=null,ed.join_date=null AS ed_join_date,ed.left_date=null
+        ,u.deleted_yn, e.master_yn=null, e.id = null AS empId
+        FROM employee e
+        INNER JOIN user u ON e.user_id=u.id
+        INNER JOIN employee_company ec ON e.id=ec.emp_id
+        LEFT JOIN employee_department ed ON e.id=ed.emp_id
+        WHERE u.deleted_yn=false AND u.id=#{usrId} LIMIT 1;
     </select>
 
 
@@ -111,7 +131,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId}
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -133,7 +153,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}
         AND (
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
@@ -154,7 +174,135 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{compId}
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+
+
+
+
+
+
+
+
+
+<!--    재직자-->
+    <!-- text 랑 id 둘다로 찾는거 -->
+    <select id="findOpenEmployeeMgmtList" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL
+        AND (
+        u.name LIKE CONCAT('%', #{text}, '%')
+        OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
+        OR u.login_id  LIKE CONCAT('%', #{text}, '%')
+        )
+        ) AS RankedEmployees
+        WHERE rn = 1 ;
+    </select>
+
+
+    <!-- text로만 찾는거 -->
+    <select id="findOpenEmployeeMgmtListByText" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL
+        AND (
+        u.name LIKE CONCAT('%', #{text}, '%')
+        OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
+        OR u.login_id  LIKE CONCAT('%', #{text}, '%')
+        )
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+    <!-- 회사 id 로만 찾는거 -->
+    <select id="findOpenEmployeeMgmtListById" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+<!--    퇴사자-->
+    <!-- text 랑 id 둘다로 찾는거 -->
+    <select id="findCloseEmployeeMgmtList" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NOT NULL
+        AND (
+        u.name LIKE CONCAT('%', #{text}, '%')
+        OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
+        OR u.login_id  LIKE CONCAT('%', #{text}, '%')
+        )
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+
+    <!-- text로만 찾는거 -->
+    <select id="findCloseEmployeeMgmtListByText" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.resignation_date IS NOT NULL
+        AND (
+        u.name LIKE CONCAT('%', #{text}, '%')
+        OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
+        OR u.login_id  LIKE CONCAT('%', #{text}, '%')
+        )
+        ) AS RankedEmployees
+        WHERE rn = 1;
+    </select>
+
+    <!-- 회사 id 로만 찾는거 -->
+    <select id="findCloseEmployeeMgmtListById" resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
+        SELECT
+        id, login_id, image_url, name, join_date
+        FROM (
+        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY ed.id DESC) AS rn
+        FROM user u
+        INNER JOIN employee e ON u.id = e.user_id
+        INNER JOIN employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN employee_department ed ON e.id = ed.emp_id
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.resignation_date IS NOT NULL
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -277,6 +425,17 @@
 
 <!--    수정-->
 
+    <select id="getEmployeeByUserId" resultType="Long">
+        SELECT id FROM employee WHERE user_id=#{userId}
+    </select>
+
+    <update id="modifyEmployeeMgmtUserNotDelete">
+        UPDATE user
+        SET
+        deleted_yn=0
+        WHERE id=#{userId}
+    </update>
+
     <update id="modifyEmployeeMgmtUser">
         UPDATE user u
         JOIN employee e ON e.user_id = u.id
@@ -293,6 +452,8 @@
         u.deleted_yn = #{dto.deletedYn}
         WHERE e.id = #{empId}
     </update>
+
+
     <update id="modifyEmployeeMgmtEmployee">
         UPDATE employee e
         SET

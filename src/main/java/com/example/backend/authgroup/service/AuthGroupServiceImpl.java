@@ -126,6 +126,11 @@ public class AuthGroupServiceImpl implements AuthGroupService{
     if(!checkedMenuIds.isEmpty()) {
       authGroupMapper.modifyMappedMenuOfAuth(authId, checkedMenuIds);
     }
+    //권한에 해당하는 emp들을 다찾고 그걸 for문 돌아서 메뉴리스트 지우게 하기
+    List<Long> redisEmpIds = authGroupMapper.getEmpIdFromAuthEmployee(authId);
+    for (Long empId : redisEmpIds) {
+      redisService.deleteMenuSet(String.valueOf(empId));
+    }
   }
 
   @Transactional
