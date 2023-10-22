@@ -70,9 +70,13 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public List<RouteDto> getMenuList() {
     if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
-      return menuMapper.getMenuListForMaster(SecurityUtil.getCompanyId());
+      List<RouteDto> result = menuMapper.getMenuListForMaster(SecurityUtil.getCompanyId());
+      System.out.println("getMenuList쪽(MASTER): " + result);
+      return result;
     }else{
-      return menuMapper.getMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
+      List<RouteDto> result = menuMapper.getMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
+      System.out.println("getMenuList쪽(NORMAL): " + result);
+      return result;
     }
   }
 
