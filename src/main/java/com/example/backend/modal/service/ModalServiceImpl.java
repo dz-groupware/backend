@@ -64,18 +64,19 @@ public class ModalServiceImpl implements ModalService {
   @Override
   public SingleResponseDto<?> findOrgResult(String type, String text) {
     if (type.equals("all")) {
-      Map<String, List<?>> result = new HashMap<>();
-      result.put("Tree", modalMapper.findDeptAllByText(SecurityUtil.getCompanyId(), text, SecurityUtil.getCompanyId(), text));
-      result.put("List", modalMapper.findEmpAllByText(SecurityUtil.getCompanyId(), text, text, text, text, text, text, text));
-      return new SingleResponseDto<Map>(result);
+//      Map<String, List<?>> result = new HashMap<>();
+//      result.put("Tree", modalMapper.findDeptAllByText(SecurityUtil.getCompanyId(), text, SecurityUtil.getCompanyId(), text));
+//      result.put("List", modalMapper.findEmpAllByText(SecurityUtil.getCompanyId(), text, text, text, text, text, text, text));
+      return new SingleResponseDto<>(modalMapper.findEmpAllByText(SecurityUtil.getCompanyId(), text, text, text, text, text, text, text));
     }
 
     if (type.equals("dept")) {
-      return new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfDept(text));
+      return new SingleResponseDto<>(modalMapper.findResultOfDept(text));
+
+//      return new SingleResponseDto<List<TreeItemRes>>(modalMapper.findResultOfDept(text));
     }
     if (type.equals("emp")) {
-      return new SingleResponseDto<List<ProfileRes>>(
-          modalMapper.findResultOfEmp(text));
+      return new SingleResponseDto<>(modalMapper.findResultOfEmp(text));
     }
     return new SingleResponseDto<>("");
   }

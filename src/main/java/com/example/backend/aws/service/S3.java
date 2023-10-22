@@ -1,13 +1,10 @@
 package com.example.backend.aws.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.example.backend.config.jwt.SecurityUtil;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,10 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
@@ -31,7 +25,7 @@ public class S3 {
 
   public String upload(MultipartFile multipartFile) throws IOException {
 
-    String s3FileName = "icon/"+multipartFile.getOriginalFilename();
+    String s3FileName = SecurityUtil.getCompanyId()+"/"+multipartFile.getOriginalFilename();
 
     ObjectMetadata objMeta = new ObjectMetadata();
     objMeta.setContentType("image/png");
