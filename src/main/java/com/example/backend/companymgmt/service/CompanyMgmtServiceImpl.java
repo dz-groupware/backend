@@ -6,16 +6,12 @@ import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
 import com.example.backend.employeemgmt.dto.EmployeeMgmtListWithCompanyIdResDto;
 import com.example.backend.menu.service.MenuService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.example.backend.config.jwt.SecurityUtil;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class CompanyMgmtServiceImpl implements CompanyMgmtService {
@@ -45,10 +41,22 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
 
     @Override
-    public List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList() {
-        Long companyId = SecurityUtil.getCompanyId();
-        Long parId = companyMgmtMapper.getCompanyMgmtNameTreeListForParId(companyId);
-        return companyMgmtMapper.getCompanyMgmtNameTreeList(companyId, parId);
+    public List<CompanyMgmtTreeListResDto> getFinalNameTree() {
+        // 재귀적 로직 시작
+        Long currentCompanyId = SecurityUtil.getCompanyId();
+        CompanyMgmtTreeListResDto result = companyMgmtMapper.getNameTreeByCompanyIdForParId(currentCompanyId);
+
+
+        if(result.getParId()==result.getId()){
+            List<CompanyMgmtTreeListResDto> resultList = companyMgmtMapper.getNameTreeByCompanyId(currentCompanyId);
+            return resultList;
+        }else{
+            List<CompanyMgmtTreeListResDto> resultList = companyMgmtMapper.getNameTreeByCompanyId(currentCompanyId);
+            CompanyMgmtTreeListResDto parResultList = companyMgmtMapper.getNameTreeByCompanyIdForParId(result.getParId());
+            resultList.add(parResultList);
+            return resultList;
+        }
+
     }
 
 
@@ -136,6 +144,7 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
             System.out.println("idcheck Company"+ companymgmt.getId());
             companyMgmtMapper.addIdTreeAndNameTreeWithLastInsertId(companymgmt.getName());
         } else {
+            companyMgmtMapper.changeParHaveChild(companymgmt.getParId());
             companyMgmtMapper.addCompanyMgmt(companymgmt);
             companyId = companymgmt.getId();
             System.out.println("idcheck Company2"+ companymgmt.getId());
@@ -241,13 +250,21 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
             // 삭제될 emp_id 목록 가져오기
             List<Long> employeeIdsToRemove = companyMgmtMapper.findEmployeeIdsByCompId(removeId);
 
+            List<Long> departmentIdsToRemove = companyMgmtMapper.findDepartmentIdsByCompId(removeId);
             // 각 emp_id에 대해 삭제 처리
             for(Long empId : employeeIdsToRemove) {
                 companyMgmtMapper.removeCompanyMgmtEmployee(empId);
+
             }
 
+            for(Long depId : departmentIdsToRemove) {
+                companyMgmtMapper.removeCompanyMgmtDepartment(depId);
+                companyMgmtMapper.removeCompanyMgmtEmployeeDepartment(depId);
+            }
             // 마지막으로 해당 회사의 직원 관계를 삭제
             companyMgmtMapper.removeCompanyMgmtEmployeeCompany(removeId);
+
+
         }
     }
 }

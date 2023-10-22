@@ -34,7 +34,7 @@ public class CompanyMgmtController {
 
   @GetMapping("/nametree")
   public ResponseEntity getCompanyMgmtNameTreeList() {
-    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getCompanyMgmtNameTreeList()),
+    return new ResponseEntity<>(new SingleResponseDto<>(companyMgmtService.getFinalNameTree()),
             HttpStatus.OK);
   }
   @GetMapping("/open")

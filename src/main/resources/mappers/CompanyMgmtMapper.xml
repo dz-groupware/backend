@@ -19,7 +19,7 @@
   </select>
 
   <select id="getAllCompanyMgmtParList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
-    SELECT id,code,name,corp_type,rep_name FROM company WHERE deleted_yn=false AND id_tree LIKE CONCAT('%', #{companyId}, '%')
+    SELECT id,code,name,corp_type,rep_name FROM company WHERE deleted_yn=false AND id_tree LIKE CONCAT('%>', #{companyId})
   </select>
 
   <select id="findCompanyMgmtList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtListResDto">
@@ -64,16 +64,16 @@
     FROM company
     WHERE deleted_yn = false AND (id = #{companyId} OR id_tree LIKE CONCAT('%', #{companyId}, '%'))
   </select>
-
-  <select id="getCompanyMgmtNameTreeListForParId" resultType="Long">
-    SELECT par_id FROM company WHERE deleted_yn=false AND id=#{companyId}
+  <select id="getNameTreeByCompanyIdForParId" resultType="com.example.backend.companymgmt.dto.CompanyMgmtTreeListResDto">
+    SELECT id, par_id, name_tree FROM company WHERE deleted_yn=false AND id=#{currentCompanyId}
   </select>
 
-  <select id="getCompanyMgmtNameTreeList" resultType="com.example.backend.companymgmt.dto.CompanyMgmtTreeListResDto">
-    SELECT id, par_id, name_tree
-    FROM company
-    WHERE deleted_yn = false AND (id = #{companyId} OR id_tree LIKE CONCAT('%', #{parId}, '%'))
+  <select id="getNameTreeByCompanyId" resultType="com.example.backend.companymgmt.dto.CompanyMgmtTreeListResDto">
+    SELECT id, par_id, name_tree FROM company WHERE deleted_yn=false AND id_tree LIKE CONCAT('%', #{currentCompanyId}, '%')
   </select>
+
+
+
 
 
   <select id="getOpenedCompanyMgmtList"
@@ -144,6 +144,11 @@ INSERT INTO  employee_company (`comp_id`,`emp_id`,`resigned_yn`,`join_date`,`res
     WHERE id = LAST_INSERT_ID()
   </update>
 
+  <update id="changeParHaveChild">
+    UPDATE company
+    SET child_node_yn =0
+    WHERE id=#{parId}
+  </update>
 
 
 
@@ -250,11 +255,23 @@ INSERT INTO  employee_company (`comp_id`,`emp_id`,`resigned_yn`,`join_date`,`res
     FROM employee_company
     WHERE comp_id=#{removeId}
   </select>
+  <select id="findDepartmentIdsByCompId" resultType="java.lang.Long">
+    SELECT id
+    FROM department
+    WHERE comp_id=#{removeId}
+  </select>
+
 
   <update id="removeCompanyMgmtEmployee">
     UPDATE employee SET deleted_yn=1
     WHERE id=#{empId}
   </update>
+
+  <update id="removeCompanyMgmtDepartment">
+    UPDATE department SET deleted_yn=1
+    WHERE id=#{depId}
+  </update>
+
 
   <update id="removeCompanyMgmtEmployeeCompany">
     UPDATE employee_company SET deleted_yn=1
@@ -263,7 +280,10 @@ INSERT INTO  employee_company (`comp_id`,`emp_id`,`resigned_yn`,`join_date`,`res
 
 
 
-
+  <update id="removeCompanyMgmtEmployeeDepartment">
+    UPDATE employee_department SET deleted_yn=1
+    WHERE dept_id=#{depId}
+  </update>
 
   <select id="checkSignUp"
           resultType="com.example.backend.companymgmt.dto.CompanyMgmtCeoResDto">
