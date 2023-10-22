@@ -97,5 +97,7 @@ public interface EmployeeMgmtMapper {
 
     List<Long> getEmployeeByUserId(Long userId);
 
-    Date getJoinDateForDetails(@Param("userId") Long userId,@Param("companyId") Long companyId);
+    Date getJoinDateForDetails(@Param("empId") Long empId,@Param("companyId") Long companyId);
+
+    List<Long> getEmployeeIdForJoinDate(Long userId);
 }

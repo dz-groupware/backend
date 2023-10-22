@@ -16,7 +16,7 @@
         INNER JOIN user u ON e.user_id = u.id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.deleted_yn=false
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -32,7 +32,7 @@
         INNER JOIN user u ON e.user_id = u.id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.resignation_date IS NULL AND ec.deleted_yn=false
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.resignation_date IS NULL
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -47,7 +47,7 @@
         INNER JOIN user u ON e.user_id = u.id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.resignation_date IS NOT NULL AND ec.deleted_yn=false
+        WHERE u.deleted_yn = false AND ec.comp_id = #{companyId} AND ec.resignation_date IS NOT NULL
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -76,9 +76,12 @@
         AND e.deleted_yn=false AND ec.deleted_yn=false
     </select>
 
+    <select id="getEmployeeIdForJoinDate" resultType="Long">
+        SELECT id FROM employee WHERE user_id=#{userId}
+    </select>
 
 <select id="getJoinDateForDetails" resultType="java.util.Date">
-    SELECT join_date FROM employee_company WHERE emp_id=#{userId} AND comp_id=#{companyId}LIMIT 1
+    SELECT join_date FROM employee_company WHERE emp_id=#{empId} AND comp_id=#{companyId} LIMIT 1
 </select>
 
 
@@ -129,7 +132,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )AND ec.deleted_yn=false
+        )
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -151,7 +154,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )AND ec.deleted_yn=false
+        )
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -168,7 +171,7 @@
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
         WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}
-        AND ec.deleted_yn=false
+
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -199,7 +202,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )AND ec.deleted_yn=false
+        )
         ) AS RankedEmployees
         WHERE rn = 1 ;
     </select>
@@ -221,7 +224,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )AND ec.deleted_yn=false
+        )
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -237,7 +240,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL AND ec.deleted_yn=false
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -262,7 +265,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        ) AND ec.deleted_yn=false
+        )
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -284,7 +287,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )AND ec.deleted_yn=false
+        )
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -300,7 +303,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.resignation_date IS NOT NULL AND ec.deleted_yn=false
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.resignation_date IS NOT NULL
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>

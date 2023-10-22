@@ -88,12 +88,18 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 //
             if (detailList.isEmpty() && userId != null) { // detailList가 비어 있고, userId가 존재하는 경우
             // 입사일처리
-                Date joinDate = employeeMgmtMapper.getJoinDateForDetails(userId,companyId);
+                List<Long> empIds = employeeMgmtMapper.getEmployeeIdForJoinDate(userId);
 
-            EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetails(userId,joinDate);
-            if (basicDetails != null) {
-                results.add(basicDetails);
-            }
+                for(Long empId : empIds) {
+                    Date joinDate = employeeMgmtMapper.getJoinDateForDetails(empId, companyId);
+
+                    EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetails(userId,joinDate);
+                    if (basicDetails != null) {
+                        results.add(basicDetails);
+                    }
+
+                }
+
         }
 
         return results;
