@@ -2,8 +2,10 @@ package com.example.backend.aws.controller;
 
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.example.backend.aws.service.S3;
+import com.example.backend.config.jwt.SecurityUtil;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ public class S3Controller {
 
   @GetMapping("/imgList")
   public ResponseEntity<List<S3ObjectSummary>> test() {
-    return new ResponseEntity<>(s3.getImageList(), HttpStatus.OK);
+    return new ResponseEntity<>(s3.getImageList(Objects.requireNonNull(SecurityUtil.getCompanyId()).toString()), HttpStatus.OK);
   }
 
   @PostMapping("/img")
@@ -40,7 +42,12 @@ public class S3Controller {
       return new ResponseEntity<String>("Error while uploading: " + e.getMessage(), HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<String>(uploadedUrl, HttpStatus.OK);
+  }
 
+  @GetMapping("/test")
+  public ResponseEntity<?> test(@RequestParam("compId") Long compId) throws IOException {
+    s3.createNewPrefix(compId);
+    return new ResponseEntity<Long>(compId, HttpStatus.OK);
   }
 
 

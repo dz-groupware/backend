@@ -41,6 +41,10 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
       if (result.size() < 1) {
         // SQL 에서 menuList 조회
         List<Long> menuList = redisService.findMenuList(SecurityUtil.getEmployeeId(), SecurityUtil.getDepartmentId(), SecurityUtil.getCompanyId());
+        if (menuList.size() == 0) {
+          logger.info("warning : employee has no access to available menus");
+          menuList.add(0L);
+        }
         // NoSql 에 menuSet 저장
         if (menuList.size() == 0) {
           logger.info("menuList is not null. but size is 0");

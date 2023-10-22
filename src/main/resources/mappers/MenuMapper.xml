@@ -8,9 +8,7 @@
     SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu
     INNER JOIN (SELECT DISTINCT menu_id FROM auth_menu
     INNER JOIN (SELECT auth_id FROM auth_employee WHERE emp_id = #{empId} AND deleted_yn = 0
-    UNION SELECT auth_id FROM auth_department
-    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
-    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
     UNION SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0)admin
     WHERE auth_menu.deleted_yn = 0 AND auth_menu.auth_id = admin.auth_id)menu_list
     WHERE enabled_yn = 1 AND deleted_yn = 0 AND menu.id = menu_list.menu_id AND id = par_id ORDER BY sort_order DESC;
@@ -26,12 +24,10 @@
     SELECT menu.id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM
     (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn FROM menu
     INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
-    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department
-    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
-    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
-    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
-    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})admin
+    WHERE admin.auth_id = auth_menu.auth_id)menu_list
     WHERE menu_list.menu_id = menu.id)menu
     INNER JOIN (SELECT * FROM favor WHERE emp_id = #{empId})favor
     WHERE menu.id = favor.menu_id;
@@ -69,22 +65,18 @@
     SELECT origin.id AS menu_id, par.id AS gnb_id, origin.name_tree, par.name AS gnb_name, page.page FROM
     (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn, comp_id, page_id FROM menu
     INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
-    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department
-    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
-    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
-    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
-    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})admin
+    WHERE admin.auth_id = auth_menu.auth_id)menu_list
     WHERE menu_list.menu_id = menu.id)origin
     JOIN
     (SELECT id, par_id, name, icon_url, sort_order, name_tree, child_node_yn, comp_id, page_id FROM menu
     INNER JOIN (SELECT auth_menu.menu_id FROM auth_menu INNER JOIN
-    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId}
-    UNION SELECT auth_id FROM auth_department
-    INNER JOIN (SELECT id FROM department WHERE comp_id = #{compId} AND id = #{deptId})dept
-    WHERE dept.id = auth_department.auth_id AND deleted_yn = 0
-    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})auth
-    WHERE auth.auth_id = auth_menu.auth_id)menu_list
+    (SELECT auth_id FROM auth_company WHERE comp_id = #{compId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_department WHERE dept_id = #{deptId} AND deleted_yn = 0
+    UNION SELECT auth_id FROM auth_employee WHERE emp_id = #{empId})admin
+    WHERE admin.auth_id = auth_menu.auth_id)menu_list
     WHERE menu_list.menu_id = menu.id)par
     ON origin.comp_id = #{compId} AND par.comp_id = #{compId} AND origin.name_tree LIKE concat(par.name, '%')
     JOIN page ON origin.page_id = page.id WHERE origin.comp_id = #{compId};
@@ -92,11 +84,10 @@
 
   <!-- 라우팅 리스트 : 마스터 -->
   <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
-    SELECT m.id AS menu_id, par.id AS gnb_id, m.name_tree, par.name AS gnb_name, page.page
-    FROM menu AS m
+    SELECT m.id AS menu_id, par.id AS gnb_id, m.name_tree, par.name AS gnb_name, page.page FROM menu AS m
     JOIN menu AS par ON m.comp_id = #{compId} AND par.comp_id = #{compId} AND m.name_tree LIKE concat(par.name, '%')
     JOIN page ON m.page_id = page.id
-    WHERE m.comp_id = #{compId};
+    WHERE m.deleted_yn = 0 and par.deleted_yn = 0;
   </select>
 
   <!-- 메뉴 검색 : 전체 -->

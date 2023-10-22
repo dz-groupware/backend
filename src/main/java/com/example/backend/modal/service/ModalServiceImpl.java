@@ -31,20 +31,20 @@ public class ModalServiceImpl implements ModalService {
   }
 
   @Override
-  public List<ProfileRes> getAllProfile() {
-    return modalMapper.getProfileByUserId(SecurityUtil.getUserId());
+  public ProfileRes getAllProfile() {
+    return modalMapper.getProfileByUserId(SecurityUtil.getEmployeeId());
   }
 
   @Override
   public List<TreeItemRes> getOrgTree(String type, Long compId, Long deptId) {
     if(type.equals("basic")) {
-      return modalMapper.getCompToGnb(SecurityUtil.getCompanyId());
+      return modalMapper.getBasicCompList(SecurityUtil.getCompanyId());
     }
     if (type.equals("comp")) {
-      return modalMapper.getGnbToLnb(compId);
+      return modalMapper.getCompsUnits(compId);
     }
     if (type.equals("dept")) {
-      return modalMapper.getLnbToLnb(compId, deptId);
+      return modalMapper.getDeptsUnits(compId, deptId);
     }
     return new ArrayList<TreeItemRes>();
   }

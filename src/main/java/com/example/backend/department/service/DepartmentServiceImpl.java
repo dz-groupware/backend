@@ -8,7 +8,6 @@ import com.example.backend.department.dto.EmpListDto;
 import com.example.backend.department.mapper.DepartmentMapper;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +28,9 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   public List<DeptListDto> getDepartmentById(Long compId, Long parId) {
     if (compId == 0L) {
-      return departmentMapper.getDepartmentById(SecurityUtil.getCompanyId(), parId);
+      return departmentMapper.getDepartmentById(SecurityUtil.getCompanyId(), parId, parId);
     } else {
-      return departmentMapper.getDepartmentById(compId, parId);
+      return departmentMapper.getDepartmentById(compId, parId, parId);
     }
   }
 
@@ -46,14 +45,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     return departmentMapper.getEmpListByDeptId(id);
   }
 
-  // 부서 추가
   @Override
   @Transactional
   public int addDepartment(DeptDto dept) {
     Long compId = SecurityUtil.getCompanyId();
 //    try{
-      dept.setCompId(compId);
-      // 메뉴 추가
+    dept.setCompId(compId);
+    // 메뉴 추가
     if (dept.getStatus().equals("add")){
       if (dept.getParId().toString().equals("0")){
         // 상위부서 없음 == 상위메뉴 (id == parId로 저장하기엔 parId가 존재하지 않아서 안됨)
@@ -65,17 +63,16 @@ public class DepartmentServiceImpl implements DepartmentService {
         modifyBatch(dept.getId(), dept.getParId(), false, false);
       }
     }
-      // 메뉴 수정
-      if (dept.getStatus().equals("modify")){
-        departmentMapper.modifyDepartment(dept);
-        System.out.println("request: modify");
-        if (dept.getParId().toString().equals("0")){
-          modifyBatch(dept.getId(), dept.getParId(), true, false);
-        } else {
-          modifyTree(new DeptTrans(dept));
-        }
+    // 메뉴 수정
+    if (dept.getStatus().equals("modify")){
+      departmentMapper.modifyDepartment(dept);
+      if (dept.getParId().toString().equals("0")){
+        modifyBatch(dept.getId(), dept.getParId(), true, false);
+      } else {
+        modifyTree(new DeptTrans(dept));
       }
-      return 1;
+    }
+    return 1;
 //    } catch (Exception e) {
 //      return -1;
 //    }
@@ -110,10 +107,14 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
+  public int getCountSearchDept(Long compId, String text){
+    return departmentMapper.getCountSearchDept(compId, text, text);
+  }
+
+  @Override
   public List<DeptListDto> findDeptNameAndCode(Long compId, String text){
     return departmentMapper.findDeptNameAndCode(compId, text, text);
   }
-
   // 부서 코드 중복 확인
   @Override
   public boolean checkDeptCode(String text, Long id) {
@@ -130,24 +131,18 @@ public class DepartmentServiceImpl implements DepartmentService {
   // 부서 추가/수정 시 수행 될 로직
   private void modifyTree(DeptTrans dept) {
     if (checkDeptInDept(dept.getId(), dept.getParId())) {
-      System.out.println("PAR_DEPT IN DEPT");
       DeptTrans originMenu = departmentMapper.getParDept(dept.getId());
       if (Objects.equals(originMenu.getId(), originMenu.getParId())) {
-        System.out.println("m 1 - head");
         modifyBatch(dept.getParId(), originMenu.getParId(), true, true);
         modifyBatch(dept.getId(), dept.getParId(), false, true);
       } else {
-        System.out.println("m 1 - general");
         modifyBatch(dept.getParId(), originMenu.getParId(), false, true);
         modifyBatch(dept.getId(), dept.getParId(), false, true);
       }
     } else {
-      System.out.println("PAR_DEPT NOT IN DEPT");
       if (Objects.equals(dept.getId(), dept.getParId())) {
-        System.out.println("m 2 - head");
         modifyBatch(dept.getId(), dept.getParId(), true, true);
       } else {
-        System.out.println("m 3 - general");
         modifyBatch(dept.getId(), dept.getParId(), false, true);
       }
     }
@@ -175,7 +170,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (batch) {
       List<DeptTrans> DeptList = departmentMapper.getMoveDeptList(id + ">%", "%>" + id+ ">%", "%>" + id);
       batchLength = DeptList.size();
-      System.out.println(batchLength);
       for (DeptTrans deptTrans : DeptList) {
         if (Objects.equals(deptTrans.getId(), originMenu.getId())) {
           continue;
@@ -195,16 +189,12 @@ public class DepartmentServiceImpl implements DepartmentService {
       }
     }
     if (( departmentMapper.getIsChildNodeYn(originParId+">%", "%>"+originParId+">%") - batchLength ) == 1) {
-      System.out.println("modify CYN true : " + originParId);
       departmentMapper.modifyUpperDeptCNN(originParId);
     } else {
-      System.out.println("not modify CYN" + departmentMapper.getIsChildNodeYn(originParId+">%", "&>"+originParId+">%"));
     }
-    System.out.println(batchLength);
   }
 
   public boolean checkDeptInDept(Long id, Long parId){
-    System.out.println("id: "+id+" || parId : "+parId);
     return departmentMapper.checkDeptInDept(parId, id+">%","%>" + id + ">%","%>" + id) != 0;
   }
 }

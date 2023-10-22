@@ -1,5 +1,6 @@
 package com.example.backend.companymgmt.service;
 
+import com.example.backend.aws.service.S3;
 import com.example.backend.companymgmt.dto.*;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
 import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
@@ -18,10 +19,12 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
 
     private final CompanyMgmtMapper companyMgmtMapper;
     private final MenuService menuService;
+    private final S3 s3;
     public CompanyMgmtServiceImpl(CompanyMgmtMapper companyMgmtMapper,
-        MenuService menuService) {
+        MenuService menuService, S3 s3) {
         this.companyMgmtMapper = companyMgmtMapper;
         this.menuService = menuService;
+        this.s3 = s3;
     }
 
     @Override
@@ -176,6 +179,8 @@ public class CompanyMgmtServiceImpl implements CompanyMgmtService {
         //사원회사테이블 추가
         System.out.println("입력되고난뒤" + companymgmt.getId());
         menuService.insertDefaultMenu(companyId);
+        // S3 회사 prefix 생성
+        s3.createNewPrefix(companyId);
 
     }
 
