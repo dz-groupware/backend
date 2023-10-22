@@ -46,6 +46,10 @@ public class AuthorizationMenuFilter extends OncePerRequestFilter {
           menuList.add(0L);
         }
         // NoSql 에 menuSet 저장
+        if (menuList.size() == 0) {
+          logger.info("menuList is not null. but size is 0");
+          menuList.add(0L);
+        }
         logger.info("result is null");
         result = menuList.stream().map(Object::toString).collect(Collectors.toSet());
         redisService.saveMenuSetToRedis(String.valueOf(SecurityUtil.getEmployeeId()), result.toArray(new String[result.size()]));

@@ -30,7 +30,7 @@ public interface CompanyMgmtService {
   void modifyCompanyMgmt(CompanyMgmtReqDto companyMgmt);
 
 
-  List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList();
+  List<CompanyMgmtTreeListResDto> getFinalNameTree();
 
   List<CompanyMgmtListResDto> findOpenCompanyMgmtList(String name, int enabledType);
 

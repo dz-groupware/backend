@@ -48,7 +48,6 @@ public interface CompanyMgmtMapper {
 
 
 
-  void modifyCompanyMgmtWithClosingDate(CompanyMgmtReqDto companyMgmt);
 
   Boolean getInfoDuplicated(CompanyMgmtReqDto companyMgmt);
 
@@ -56,7 +55,6 @@ public interface CompanyMgmtMapper {
 
   List<CompanyMgmtListResDto> getClosedCompanyMgmtList(Long companyId);
 
-  List<CompanyMgmtTreeListResDto> getCompanyMgmtNameTreeList(Long companyId, Long parId);
 
   Boolean checkDuplicates(@Param("dto")CompanyMgmtSignUpReqDto companyMgmt);
 
@@ -87,5 +85,17 @@ public interface CompanyMgmtMapper {
 
   List<CompanyMgmtListResDto> findCloseAllCompanyMgmtList(Long companyId, String name);
 
-  Long getCompanyMgmtNameTreeListForParId(Long companyId);
+
+    List<Long> findDepartmentIdsByCompId(Long removeId);
+
+  void removeCompanyMgmtDepartment(Long depId);
+
+  void removeCompanyMgmtEmployeeDepartment(Long depId);
+
+    void changeParHaveChild(Long parId);
+
+
+  List<CompanyMgmtTreeListResDto> getNameTreeByCompanyId(Long currentCompanyId);
+
+  CompanyMgmtTreeListResDto getNameTreeByCompanyIdForParId(Long currentCompanyId);
 }

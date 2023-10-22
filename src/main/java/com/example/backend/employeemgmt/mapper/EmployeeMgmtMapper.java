@@ -7,6 +7,7 @@ import com.example.backend.employeemgmt.dto.EmployeeMgmtSignUpReqDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public interface EmployeeMgmtMapper {
     List<EmployeeMgmtListResDto> findEmployeeMgmtList(@Param("deptId")Long deptId,@Param("text") String text);
 
 
-    List<EmployeeMgmtListResDto> findEmployeeMgmtListByText( @Param("deptId")Long deptId,@Param("text")String text);
+    List<EmployeeMgmtListResDto> findEmployeeMgmtListByText(@Param("text")String text);
 
     List<EmployeeMgmtListResDto> findEmployeeMgmtListById(@Param("deptId")Long deptId);
     Long addEmployeeMgmtUser(@Param("dto")EmployeeMgmtReqDto employeeMgmt);
@@ -66,7 +67,6 @@ public interface EmployeeMgmtMapper {
     Boolean checkDuplicates(@Param("dto")EmployeeMgmtSignUpReqDto employeeMgmt);
 
 
-    EmployeeMgmtResDto getEmployeeMgmtOnlyBasicDetailsById(Long empId, Long companyId);
 
     List<EmployeeMgmtListResDto> getIncumbentEmployeeMgmtList(Long companyId);
 
@@ -75,14 +75,14 @@ public interface EmployeeMgmtMapper {
     Boolean checkIfCompanyHasCEO(Long companyId);
 
 
-    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListByText(@Param("deptId") Long deptId, @Param("text") String text);
+    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListByText( @Param("text") String text);
 
     List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListById(@Param("deptId")Long deptId);
 
     List<EmployeeMgmtListResDto> findOpenEmployeeMgmtList(@Param("deptId") Long deptId, @Param("text") String text);
 
 
-    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListByText(@Param("deptId") Long deptId, @Param("text") String text);
+    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListByText(@Param("text") String text);
 
     List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListById(@Param("deptId")Long deptId);
 
@@ -91,9 +91,13 @@ public interface EmployeeMgmtMapper {
 
     List<Long> getSubsidiaryCompany(Long companyId);
 
-    EmployeeMgmtResDto getEmployeeMgmtOnlyBasicDetails(Long userId);
+    EmployeeMgmtResDto getEmployeeMgmtOnlyBasicDetails(@Param("userId") Long userId,@Param("joinDate") Date joinDate);
 
     void modifyEmployeeMgmtUserNotDelete(Long userId);
 
     List<Long> getEmployeeByUserId(Long userId);
+
+    Date getJoinDateForDetails(@Param("empId") Long empId,@Param("companyId") Long companyId);
+
+    List<Long> getEmployeeIdForJoinDate(Long userId);
 }
