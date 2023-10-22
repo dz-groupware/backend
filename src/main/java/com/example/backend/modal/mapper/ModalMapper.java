@@ -8,9 +8,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ModalMapper {
   ProfileRes getProfileByUserId(Long empId);
-  List<TreeItemRes> getCompToGnb(Long compId);
-  List<TreeItemRes> getGnbToLnb(Long compId);
-  List<TreeItemRes> getLnbToLnb(Long compId, Long deptId);
+  List<TreeItemRes> getBasicCompList(Long compId);
+  List<TreeItemRes> getCompsUnits(Long compId);
+  List<TreeItemRes> getDeptsUnits(Long compId, Long deptId);
   List<ProfileRes> getEmpListByCompId(Long compId);
   List<ProfileRes> getEmpListByDeptId(Long compId, Long deptId);
   List<TreeItemRes> findDeptAllByText(Long compId1, String text1, Long compId2, String text2);

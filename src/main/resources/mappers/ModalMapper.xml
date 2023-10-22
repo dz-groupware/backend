@@ -21,19 +21,32 @@
   </select>
 
   <!-- 조직도 트리 : 회사 리스트-->
-  <select id="getCompToGnb" resultType="com.example.backend.modal.dto.TreeItemRes">
-    SELECT id, par_id, name, sort_order, 'comp' AS type FROM company
-    WHERE enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC;
+  <select id="getBasicCompList" resultType="com.example.backend.modal.dto.TreeItemRes">
+    (SELECT id, par_id, name, sort_order, id AS comp_id, 'comp' AS type FROM company WHERE par_id = (
+    SELECT
+      CASE
+        WHEN LOCATE('>', id_tree) = 0 OR LOCATE('>', id_tree) IS NULL THEN id_tree
+        ELSE SUBSTRING(id_tree, 1, LOCATE('>', id_tree) - 1)
+      END AS head_id
+    FROM company
+    WHERE id = #{compId})
+    AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC)
+    UNION
+    (SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
+    WHERE par_id = id and comp_id = #{compId} AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC);
   </select>
 
   <!-- 조직도 트리 : 회사 선택 시 부서 -->
-  <select id="getGnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
-    SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
-    WHERE comp_id = #{compId} AND id = par_id AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC;
+  <select id="getCompsUnits" resultType="com.example.backend.modal.dto.TreeItemRes">
+    (SELECT id, par_id, name, sort_order, id AS comp_id, 'comp' AS type FROM company
+    WHERE par_id = #{compId} and id != #{compId} AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC)
+    UNION
+    (SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
+    WHERE par_id = id and comp_id = #{compId} AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC);
   </select>
 
   <!-- 조직도 트리 : 부서 선택 시 부서 -->
-  <select id="getLnbToLnb" resultType="com.example.backend.modal.dto.TreeItemRes">
+  <select id="getDeptsUnits" resultType="com.example.backend.modal.dto.TreeItemRes">
     SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
     WHERE comp_id = #{compId} AND par_id = #{deptId} AND id != par_id AND enabled_yn = 1 AND deleted_yn = 0;
   </select>
