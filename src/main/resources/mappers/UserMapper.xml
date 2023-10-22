@@ -8,7 +8,7 @@
     JOIN employee_company ec ON e.id = ec.emp_id
     JOIN company c ON c.id = ec.comp_id
     LEFT JOIN employee_department ed ON ed.emp_id = e.id
-    WHERE u.login_id = #{loginId} AND (org = 1 or org is NULL) AND u.deleted_yn=0
+    WHERE u.login_id = #{loginId} AND (org = 1 or org is NULL) AND u.deleted_yn=0 AND e.deleted_yn = 0 AND c.deleted_yn = 0
     ORDER BY e.last_access desc limit 1
   </select>
 
@@ -19,7 +19,7 @@
     JOIN employee_company ec ON e.id = ec.emp_id
     JOIN company c ON c.id = ec.comp_id
     LEFT JOIN employee_department ed ON ed.emp_id = e.id
-    WHERE u.id=#{userId} and e.id=#{empId} AND (org = 1 or org is NULL) AND u.deleted_yn=0
+    WHERE u.id=#{userId} and e.id=#{empId} AND (org = 1 or org is NULL) AND u.deleted_yn=0 AND e.deleted_yn=0 AND c.deleted_yn=0
   </select>
 
   <update id="setLastAccess" parameterType="java.lang.Long">
