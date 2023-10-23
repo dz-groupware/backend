@@ -556,7 +556,12 @@
       (#{employeeId}, #{authId})
       </foreach>
   </insert>
-
+  <delete id="deleteAuthEmployee">
+    DELETE FROM auth_employee WHERE emp_id = #{employeeId} AND auth_id IN
+    <foreach collection="unCheckedAuthIds" item="authId" open="(" separator="," close=")">
+      #{authId}
+    </foreach>
+  </delete>
   <delete id="deleteAuthEmployeeByEmpId">
     DELETE
     FROM auth_employee ae
@@ -583,5 +588,8 @@
 
   <select id="getEmpIdFromAuthEmployee">
     SELECT emp_id FROM auth_employee WHERE auth_id = #{authId}
+  </select>
+  <select id="getAuthIdsFromAuthEmployee">
+    SELECT auth_id FROM auth_employee WHERE emp_id = #{employeeId}
   </select>
 </mapper>
