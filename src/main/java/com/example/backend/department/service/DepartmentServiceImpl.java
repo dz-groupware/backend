@@ -133,7 +133,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (checkDeptInDept(dept.getId(), dept.getParId())) {
       DeptTrans originMenu = departmentMapper.getParDept(dept.getId());
       if (Objects.equals(originMenu.getId(), originMenu.getParId())) {
-        modifyBatch(dept.getParId(), originMenu.getParId(), true, true);
+//        modifyBatch(dept.getParId(), originMenu.getParId(), true, true);
         modifyBatch(dept.getId(), dept.getParId(), false, true);
       } else {
         modifyBatch(dept.getParId(), originMenu.getParId(), false, true);
@@ -153,11 +153,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     Long originParId = originMenu.getParId();
     String originIdTree = originMenu.getIdTree();
     String originNameTree = originMenu.getNameTree();
-    if (head || Objects.equals(originMenu.getId(), originMenu.getParId())) {
+    System.out.println("id:"+originParId+"||"+originIdTree+"||"+originNameTree);
+    if (head) {
       originMenu.setParId(originMenu.getId());
       originMenu.setIdTree(originMenu.getId().toString());
       originMenu.setNameTree(originMenu.getName());
+      System.out.println("head");
     } else {
+      System.out.println("not head");
       DeptTrans parDept = departmentMapper.getParDept(parId);
       originMenu.setParId(parId);
       originMenu.setIdTree(parDept.getIdTree() + ">" + originMenu.getId());
@@ -168,6 +171,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     int batchLength = 0;
     if (batch) {
+      System.out.println("batch");
       List<DeptTrans> DeptList = departmentMapper.getMoveDeptList(id + ">%", "%>" + id+ ">%", "%>" + id);
       batchLength = DeptList.size();
       for (DeptTrans deptTrans : DeptList) {
@@ -189,6 +193,8 @@ public class DepartmentServiceImpl implements DepartmentService {
       }
     }
     if (( departmentMapper.getIsChildNodeYn(originParId+">%", "%>"+originParId+">%") - batchLength ) == 1) {
+      System.out.println("childNode N");
+
       departmentMapper.modifyUpperDeptCNN(originParId);
     } else {
     }
