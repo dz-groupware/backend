@@ -15,6 +15,7 @@ import com.example.backend.authgroup.mapper.AuthGroupMapper;
 import com.example.backend.config.jwt.SecurityUtil;
 import com.example.backend.employee.mapper.EmployeeMapper;
 import com.example.backend.redis.RedisService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -194,14 +195,25 @@ public class AuthGroupServiceImpl implements AuthGroupService{
   @Override
   public void addAuthEmployee(AddEmpAuthDto addEmpAuthDto) {
     Long empId = addEmpAuthDto.getEmployeeId();
-    authGroupMapper.deleteAuthEmployeeByEmpId(empId);
-    List<Long> checkedAuthIds = addEmpAuthDto.getSelectedAuthIds().entrySet().stream()
-        .filter(entry -> entry.getValue())
-        .map(Map.Entry::getKey)
-        .collect(Collectors.toList());
-    if(!checkedAuthIds.isEmpty()) { // 리스트가 비어있지 않을 경우에만 추가
+    List<Long> checkedAuthIds = new ArrayList<>();
+    List<Long> unCheckedAuthIds = new ArrayList<>();
+    List<Long> existingAuthIds = authGroupMapper.getAuthIdsFromAuthEmployee(empId);
+    System.out.println("기존 체크는 " + checkedAuthIds.toString());
+    addEmpAuthDto.getSelectedAuthIds().forEach((key, value) -> {
+      if (value) {
+        checkedAuthIds.add(key);
+      } else {
+        unCheckedAuthIds.add(key);
+      }
+    });
+    checkedAuthIds.removeAll(existingAuthIds);
+    if(!unCheckedAuthIds.isEmpty()) { //false인것부터 해야 로직성공 사용자가 갖고있는걸 취소했을수도 있어서
+      authGroupMapper.deleteAuthEmployee(empId, unCheckedAuthIds);
+    }
+    if(!checkedAuthIds.isEmpty()) {
       authGroupMapper.addAuthEmployee(empId, checkedAuthIds);
     }
+
     redisService.deleteMenuSet(empId.toString());
   }
 }
