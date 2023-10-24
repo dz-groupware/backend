@@ -62,11 +62,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 
         for (Long company : companyIds) {
             // 상세 정보를 가져옵니다.
-            detailList.addAll(employeeMgmtMapper.getEmployeeMgmtDetailsById(userId, company));
+
+            detailList.addAll(employeeMgmtMapper.getEmployeeMgmtDetailsById(userId, company,companyId));
 
         }
         results.addAll(detailList);
-
+        System.out.println("detailList checkcheck"+detailList);
 
         // detailList가 비어 있지 않은 경우 기존 로직을 그대로 수행합니다.
 //        if (!detailList.isEmpty()) {
@@ -88,11 +89,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
 //
             if (detailList.isEmpty() && userId != null) { // detailList가 비어 있고, userId가 존재하는 경우
             // 입사일처리
+                System.out.println("did u come here");
                 List<Long> empIds = employeeMgmtMapper.getEmployeeIdForJoinDate(userId);
-
+                System.out.println("did u check? getEmployeeIdForJoinDate"+empIds);
                 for(Long empId : empIds) {
                     Date joinDate = employeeMgmtMapper.getJoinDateForDetails(empId, companyId);
-
+                    System.out.println("joindatedetails" + empId+"hey"+ joinDate);
                     EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetails(userId,joinDate);
                     if (basicDetails != null) {
                         results.add(basicDetails);
@@ -127,12 +129,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             return employeeMgmtMapper.getEmployeeMgmtList(companyId);
         }
         if (deptId == null || deptId <= 0) {
-            return employeeMgmtMapper.findEmployeeMgmtListByText(text);
+            return employeeMgmtMapper.findEmployeeMgmtListByText(text,companyId);
         } else if (text == null || text.trim().isEmpty()) {
-            return employeeMgmtMapper.findEmployeeMgmtListById(deptId);
+            return employeeMgmtMapper.findEmployeeMgmtListById(deptId,companyId);
         } else {
             // id와 text 둘 다 사용하는 경우
-            return employeeMgmtMapper.findEmployeeMgmtList(deptId, text);
+            return employeeMgmtMapper.findEmployeeMgmtList(deptId, text,companyId);
         }
     }
 
@@ -148,12 +150,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
                 return employeeMgmtMapper.getEmployeeMgmtList(companyId);
         }
         if (deptId == null || deptId <= 0) {
-            return employeeMgmtMapper.findOpenEmployeeMgmtListByText(text);
+            return employeeMgmtMapper.findOpenEmployeeMgmtListByText(text,companyId);
         } else if (text == null || text.trim().isEmpty()) {
-            return employeeMgmtMapper.findOpenEmployeeMgmtListById(deptId);
+            return employeeMgmtMapper.findOpenEmployeeMgmtListById(deptId,companyId);
         } else {
             // id와 text 둘 다 사용하는 경우
-            return employeeMgmtMapper.findOpenEmployeeMgmtList(deptId, text);
+            return employeeMgmtMapper.findOpenEmployeeMgmtList(deptId, text,companyId);
         }
     }
 
@@ -166,12 +168,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             return employeeMgmtMapper.getEmployeeMgmtList(companyId);
         }
         if (deptId == null || deptId <= 0) {
-            return employeeMgmtMapper.findCloseEmployeeMgmtListByText(text);
+            return employeeMgmtMapper.findCloseEmployeeMgmtListByText(text,companyId);
         } else if (text == null || text.trim().isEmpty()) {
-            return employeeMgmtMapper.findCloseEmployeeMgmtListById(deptId);
+            return employeeMgmtMapper.findCloseEmployeeMgmtListById(deptId,companyId);
         } else {
             // id와 text 둘 다 사용하는 경우
-            return employeeMgmtMapper.findCloseEmployeeMgmtList(deptId, text);
+            return employeeMgmtMapper.findCloseEmployeeMgmtList(deptId, text,companyId);
         }
     }
 
@@ -231,12 +233,17 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Override
     @Transactional
     public void modifyEmployeeMgmt(EmployeeMgmtReqDto employeeMgmt) {
+        Long companyId = SecurityUtil.getCompanyId();
+
         if(employeeMgmt.getImageUrl()==null || employeeMgmt.getImageUrl()==""){
             employeeMgmt.setImageUrl("https://img.freepik.com/free-vector/young-businessman-showing-ok-sign-hand-drawn-cartoon-art-illustration_56104-1093.jpg?size=626&ext=jpg&ga=GA1.1.2127282484.1692942479&semt=sph");
         }
 
-        Long userId = employeeMgmtMapper.getUserIdById(employeeMgmt.getId());
+        System.out.println("employeeMgmt what?"+employeeMgmt);
 
+        Long userId = employeeMgmt.getId();
+
+        System.out.println("userId what?"+userId);
         System.out.println("deletedyn what?"+employeeMgmt.getDeletedYn());
         System.out.println("employeeMgmt"+employeeMgmt.toString());
         // departmentId가 null인지 대표인지 확인
@@ -252,9 +259,10 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             employeeMgmtMapper.addEmployeeMgmtEmployeeCompany(employeeId, employeeMgmt, resignedYn);
             return; // 이후의 코드를 실행하지 않고 메서드를 종료
         }
-
+        System.out.println("did u come here?"+employeeMgmt.getDepartmentId());
         //부서가 없을때
         if (employeeMgmt.getDepartmentId() == null ) {
+            System.out.println("did u come here?" + employeeMgmt.getDepartmentId() );
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
             // 생성된 ID를 사용하여 직원 추가
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
@@ -280,14 +288,21 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             Boolean masterYn = employeeMgmt.getPosition().equals("대표") ? true : false;
             if (masterYn == false) {
                 Boolean org = employeeMgmt.getTransferredYn() == true ? false : true;
-                employeeMgmtMapper.modifyEmployeeMgmtEmployeeDepartment(empId, org, employeeMgmt);
-            }
+
+                    employeeMgmtMapper.modifyEmployeeMgmtEmployeeDepartment(empId, org, employeeMgmt);
+                }
+
             Boolean resignedYn = employeeMgmt.getResignationDate() == null ? false : true;
 
 
             employeeMgmtMapper.modifyEmployeeMgmtUser(empId, employeeMgmt);
             employeeMgmtMapper.modifyEmployeeMgmtEmployee(empId, employeeMgmt);
-            employeeMgmtMapper.modifyEmployeeMgmtEmployeeCompany(empId, resignedYn, employeeMgmt);
+            if (employeeMgmt.getCompId()==companyId){
+                employeeMgmtMapper.modifyEmployeeMgmtEmployeeCompany(empId, resignedYn, employeeMgmt);
+
+            }else {
+                employeeMgmtMapper.modifyEmployeeMgmtEmployeeCompanySameWithLogIn(empId, resignedYn, employeeMgmt,companyId);
+             }
 ////        }
         List<Long> employeeIds = employeeMgmtMapper.getEmployeeByUserId(userId);
 //
@@ -317,7 +332,7 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Transactional
     public void removeEmployeeMgmt(Long id, EmployeeMgmtReqDto employeeMgmt) {
 
-        Long userId = employeeMgmtMapper.getUserIdById(id);
+        Long userId = employeeMgmt.getId();
         List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
 
         for (Long empId : employeeIds) {
@@ -356,9 +371,11 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     @Override
     @Transactional
     public EmployeeMgmtCheckSignUpResultResDto checkSignUp(EmployeeMgmtSignUpReqDto employeeMgmt) {
-
+        Long companyId = SecurityUtil.getCompanyId();
         if (employeeMgmtMapper.checkDuplicates(employeeMgmt)) {
-                List<EmployeeMgmtListResDto> result = employeeMgmtMapper.checkSignUp(employeeMgmt);
+
+            List<EmployeeMgmtListResDto> result = employeeMgmtMapper.checkSignUp(employeeMgmt);
+
                 return new EmployeeMgmtCheckSignUpResultResDto(result, true);
                 }
             return new EmployeeMgmtCheckSignUpResultResDto(null, false);

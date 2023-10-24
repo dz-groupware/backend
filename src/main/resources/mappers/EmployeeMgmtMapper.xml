@@ -62,18 +62,52 @@
 
     <select id="getEmployeeMgmtDetailsById"
             resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtResDto">
-        SELECT u.id,e.image_url,u.name, u.user_id_num, u.gender, e.account_yn,
-        u.login_id, u.login_pw, u.priv_email,
-        u.mobile_number, u.home_number, e.address, ec.join_date AS ec_join_date, ec.resignation_date,
-        ed.id AS departmentId , ec.comp_id,e.position,ed.dept_id,ed.transferred_yn,ed.join_date AS ed_join_date,ed.left_date
-        ,e.deleted_yn, e.master_yn, e.id AS empId
-        FROM employee e
-        INNER JOIN user u ON e.user_id=u.id
-        INNER JOIN employee_company ec ON e.id=ec.emp_id
-        LEFT JOIN employee_department ed ON e.id=ed.emp_id
-        WHERE e.user_id=#{userId} AND ec.comp_id=#{company} AND (ed.org=1 OR ed.org IS NULL)
-        AND (ed.transferred_yn=false OR ed.transferred_yn IS NULL)
-        AND e.deleted_yn=false AND ec.deleted_yn=false
+        SELECT
+        u.id,
+        e.image_url,
+        u.name,
+        u.user_id_num,
+        u.gender,
+        e.account_yn,
+        u.login_id,
+        u.login_pw,
+        u.priv_email,
+        u.mobile_number,
+        u.home_number,
+        e.address,
+        CASE
+        WHEN ec.comp_id = #{companyId} THEN ec.join_date
+        ELSE NULL
+        END AS ec_join_date,
+        CASE
+        WHEN ec.comp_id = #{companyId} THEN ec.resignation_date
+        ELSE NULL
+        END AS resignation_date,
+        ed.id AS departmentId,
+        ec.comp_id,
+        e.position,
+        ed.dept_id,
+        ed.transferred_yn,
+        ed.join_date AS ed_join_date,
+        ed.left_date,
+        e.deleted_yn,
+        e.master_yn,
+        e.id AS empId
+        FROM
+        employee e
+        INNER JOIN
+        user u ON e.user_id = u.id
+        INNER JOIN
+        employee_company ec ON e.id = ec.emp_id
+        LEFT JOIN
+        employee_department ed ON e.id = ed.emp_id
+        WHERE
+        e.user_id = #{userId}
+        AND ec.comp_id = #{company}
+        AND (ed.org = 1 OR ed.org IS NULL)
+        AND (ed.transferred_yn = false OR ed.transferred_yn IS NULL)
+        AND e.deleted_yn = false
+        AND ec.deleted_yn = false
     </select>
 
     <select id="getEmployeeIdForJoinDate" resultType="Long">
@@ -132,7 +166,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )
+        )AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -154,7 +188,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )
+        )AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -170,7 +204,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.comp_id=#{companyId}
 
         ) AS RankedEmployees
         WHERE rn = 1;
@@ -202,7 +236,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )
+        )AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1 ;
     </select>
@@ -224,7 +258,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )
+        )AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -240,7 +274,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId}  AND ec.resignation_date IS NULL AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -265,7 +299,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )
+        )AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -287,7 +321,7 @@
         u.name LIKE CONCAT('%', #{text}, '%')
         OR u.priv_email  LIKE CONCAT('%', #{text}, '%')
         OR u.login_id  LIKE CONCAT('%', #{text}, '%')
-        )
+        )AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -303,7 +337,7 @@
         INNER JOIN employee e ON u.id = e.user_id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.resignation_date IS NOT NULL
+        WHERE u.deleted_yn = false AND ed.dept_id = #{deptId} AND ec.resignation_date IS NOT NULL AND ec.comp_id=#{companyId}
         ) AS RankedEmployees
         WHERE rn = 1;
     </select>
@@ -355,9 +389,6 @@
 
 
 <!--    delete-->
-    <select id="getUserIdById" resultType="Long">
-        SELECT user_id FROM employee WHERE id=#{id}
-    </select>
 
 
     <select id="getEmployeeIdsByUserId" resultType="Long">
@@ -471,6 +502,20 @@
         WHERE e.id = #{empId}
 
     </update>
+
+    <update id="modifyEmployeeMgmtEmployeeCompanySameWithLogIn">
+        UPDATE employee_company ec
+        JOIN employee e ON e.id = ec.emp_id
+        SET
+        ec.join_date = #{dto.joinDate},
+        ec.resignation_date = #{dto.resignationDate},
+        ec.comp_id = #{dto.compId},
+        ec.resigned_yn = #{resignedYn},
+        ec.deleted_yn = #{dto.deletedYn}
+        WHERE e.id = #{empId} AND ec.comp_id=#{companyId}
+
+    </update>
+
     <update id="modifyEmployeeMgmtEmployeeCompany">
         UPDATE employee_company ec
         JOIN employee e ON e.id = ec.emp_id
@@ -480,7 +525,7 @@
         ec.comp_id = #{dto.compId},
         ec.resigned_yn = #{resignedYn},
         ec.deleted_yn = #{dto.deletedYn}
-        WHERE e.id = #{empId}
+        WHERE e.id = #{empId} AND ec.comp_id=#{dto.compId}
 
     </update>
 
@@ -500,22 +545,25 @@
     </update>
 
 
+
+
 <select id="checkLoginId" resultType="String">
     SELECT login_id FROM user WHERE login_id=#{loginId}
 </select>
 
+
     <select id="checkSignUp"
             resultType="com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto">
         SELECT
-        id, login_id, image_url, name, join_date
+        id, login_id, image_url, name, join_date=null
         FROM (
-        SELECT e.id, u.login_id, e.image_url, u.name, ec.join_date,
+        SELECT u.id, u.login_id, e.image_url, u.name, ec.join_date,
         ROW_NUMBER() OVER(PARTITION BY e.user_id ORDER BY ed.id asc) AS rn
         FROM employee e
         INNER JOIN user u ON e.user_id = u.id
         INNER JOIN employee_company ec ON e.id = ec.emp_id
         LEFT JOIN employee_department ed ON e.id = ed.emp_id
-        WHERE e.name = #{dto.name} AND e.emp_id_num=#{dto.empIdNum}
+        WHERE u.name = #{dto.name} AND u.user_id_num=#{dto.empIdNum}
         AND u.priv_email=#{dto.privEmail}
         AND u.mobile_number=#{dto.mobileNumber}
         ) AS RankedEmployees

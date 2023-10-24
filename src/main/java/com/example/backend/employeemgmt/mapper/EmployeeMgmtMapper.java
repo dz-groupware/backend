@@ -15,15 +15,15 @@ import java.util.Map;
 public interface EmployeeMgmtMapper {
     List<EmployeeMgmtListResDto> getEmployeeMgmtList(@Param("companyId") Long companyId);
 
-    List<EmployeeMgmtResDto> getEmployeeMgmtDetailsById(@Param("userId")Long userId,@Param("company") Long company);
+    List<EmployeeMgmtResDto> getEmployeeMgmtDetailsById(@Param("userId")Long userId, @Param("company") Long company,@Param("companyId") Long companyId);
     List<Map<Long, String>> getAllDepartmentMgmtList(@Param("companyId")Long comanyId);
 
-    List<EmployeeMgmtListResDto> findEmployeeMgmtList(@Param("deptId")Long deptId,@Param("text") String text);
+    List<EmployeeMgmtListResDto> findEmployeeMgmtList(@Param("deptId")Long deptId, @Param("text") String text, Long companyId);
 
 
-    List<EmployeeMgmtListResDto> findEmployeeMgmtListByText(@Param("text")String text);
+    List<EmployeeMgmtListResDto> findEmployeeMgmtListByText(@Param("text")String text, Long companyId);
 
-    List<EmployeeMgmtListResDto> findEmployeeMgmtListById(@Param("deptId")Long deptId);
+    List<EmployeeMgmtListResDto> findEmployeeMgmtListById(@Param("deptId")Long deptId, Long companyId);
     Long addEmployeeMgmtUser(@Param("dto")EmployeeMgmtReqDto employeeMgmt);
 
     Long addEmployeeMgmtEmployee(@Param("userId") Long id, @Param("dto")EmployeeMgmtReqDto employeeMgmt, @Param("masterYn")Boolean masterYn);
@@ -75,18 +75,18 @@ public interface EmployeeMgmtMapper {
     Boolean checkIfCompanyHasCEO(Long companyId);
 
 
-    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListByText( @Param("text") String text);
+    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListByText(@Param("text") String text, Long companyId);
 
-    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListById(@Param("deptId")Long deptId);
+    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtListById(@Param("deptId")Long deptId, Long companyId);
 
-    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtList(@Param("deptId") Long deptId, @Param("text") String text);
+    List<EmployeeMgmtListResDto> findOpenEmployeeMgmtList(@Param("deptId") Long deptId, @Param("text") String text, Long companyId);
 
 
-    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListByText(@Param("text") String text);
+    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListByText(@Param("text") String text, Long companyId);
 
-    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListById(@Param("deptId")Long deptId);
+    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtListById(@Param("deptId")Long deptId, Long companyId);
 
-    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtList(@Param("deptId") Long deptId, @Param("text") String text);
+    List<EmployeeMgmtListResDto> findCloseEmployeeMgmtList(@Param("deptId") Long deptId, @Param("text") String text, Long companyId);
 
 
     List<Long> getSubsidiaryCompany(Long companyId);
@@ -100,4 +100,8 @@ public interface EmployeeMgmtMapper {
     Date getJoinDateForDetails(@Param("empId") Long empId,@Param("companyId") Long companyId);
 
     List<Long> getEmployeeIdForJoinDate(Long userId);
+
+    List<EmployeeMgmtListResDto> checkSignUpWithCompanyId(@Param("dto")EmployeeMgmtSignUpReqDto employeeMgmt, @Param("companyId")Long companyId);
+
+    void modifyEmployeeMgmtEmployeeCompanySameWithLogIn(@Param("empId")Long empId, @Param("resignedYn")Boolean resignedYn, @Param("dto")EmployeeMgmtReqDto employeeMgmt,@Param("companyId") Long companyId);
 }
