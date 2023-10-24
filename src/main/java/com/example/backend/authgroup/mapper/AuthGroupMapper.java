@@ -53,4 +53,6 @@ public interface AuthGroupMapper {
   List<Long> getEmpIdFromAuthEmployee(Long authId);
 
 
+  void deleteAuthEmployee(Long employeeId, List<Long> unCheckedAuthIds);
+  List<Long> getAuthIdsFromAuthEmployee(Long employeeId);
 }

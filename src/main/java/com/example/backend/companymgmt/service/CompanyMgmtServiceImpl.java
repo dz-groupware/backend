@@ -1,16 +1,12 @@
 package com.example.backend.companymgmt.service;
 
+import java.util.*;
 import com.example.backend.aws.service.S3;
 import com.example.backend.companymgmt.dto.*;
 import com.example.backend.companymgmt.mapper.CompanyMgmtMapper;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtListResDto;
-import com.example.backend.employeemgmt.dto.EmployeeMgmtListWithCompanyIdResDto;
 import com.example.backend.menu.service.MenuService;
-
-import java.util.*;
-
 import com.example.backend.config.jwt.SecurityUtil;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
