@@ -111,12 +111,13 @@
     </select>
 
     <select id="getEmployeeIdForJoinDate" resultType="Long">
-        SELECT id FROM employee WHERE user_id=#{userId}
+        SELECT ec.join_date FROM
+        employee e
+        INNER JOIN
+        employee_company ec ON e.id = ec.emp_id
+        WHERE e.user_id=#{userId} AND ec.comp_id=#{companyId} LIMIT 1;
     </select>
 
-<select id="getJoinDateForDetails" resultType="java.util.Date">
-    SELECT join_date FROM employee_company WHERE emp_id=#{empId} AND comp_id=#{companyId} LIMIT 1
-</select>
 
 
     <select id="getEmployeeMgmtOnlyBasicDetails"
@@ -124,7 +125,8 @@
         SELECT u.id=null,e.image_url=null,u.name, u.user_id_num, u.gender, e.account_yn=null,
         u.login_id, u.login_pw, u.priv_email,
         u.mobile_number, u.home_number, u.address, #{joinDate} AS ec_join_date , ec.resignation_date=null,
-        ed.id=null AS departmentId , ec.comp_id=null,e.position=null,ed.dept_id=null,ed.transferred_yn=null,ed.join_date=null AS ed_join_date,ed.left_date=null
+        ed.id=null AS departmentId , ec.comp_id=null,e.position=null,ed.dept_id=null,ed.transferred_yn=null,
+        ed.join_date=null AS ed_join_date,ed.left_date=null
         ,u.deleted_yn, e.master_yn=null, e.id = null AS empId
         FROM employee e
         INNER JOIN user u ON e.user_id=u.id
