@@ -16,7 +16,7 @@
 
   <!-- GNB : 마스터 -->
   <select id="getGnbForMaster">
-    SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu WHERE id = par_id AND comp_id = #{compId} ORDER BY sort_order DESC;
+    SELECT id, par_id, name, icon_url, sort_order, name_tree FROM menu WHERE id = par_id AND comp_id = #{compId} AND deleted_yn = 0 AND enabled_yn = 1 ORDER BY sort_order DESC;
   </select>
 
   <!-- GNB 즐겨찾기 -->
@@ -85,9 +85,10 @@
   <!-- 라우팅 리스트 : 마스터 -->
   <select id="getMenuListForMaster" resultType="com.example.backend.menu.dto.RouteDto">
     SELECT m.id AS menu_id, par.id AS gnb_id, m.name_tree, par.name AS gnb_name, page.page FROM menu AS m
-    JOIN menu AS par ON m.comp_id = #{compId} AND par.comp_id = #{compId} AND m.name_tree LIKE CONCAT(par.name, '%')
+    JOIN menu AS par ON m.comp_id = #{compId} AND par.comp_id = #{compId} AND m.name_tree LIKE CONCAT(par.name, '/%')
+    OR ( m.name_tree = par.name and m.id=par.id)
     JOIN page ON m.page_id = page.id
-    WHERE m.deleted_yn = 0 and par.deleted_yn = 0;
+    WHERE m.deleted_yn = 0 AND par.deleted_yn = 0 AND m.comp_id = #{compId} AND par.comp_id = #{compId};
   </select>
 
   <!-- 메뉴 검색 : 전체 -->
