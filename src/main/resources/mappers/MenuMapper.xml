@@ -166,7 +166,7 @@
 
   <!-- 메뉴 설정 페이지 : 대메뉴/메뉴 수정 -->
   <update id="modifyMenuById" parameterType="com.example.backend.menu.dto.MenuRes">
-    UPDATE menu SET par_id = #{parId}, comp_id = #{compId}, name = #{name}, enabled_yn = #{enabledYn}, icon_url = #{iconUrl},
+    UPDATE menu SET par_id = #{parId}, name = #{name}, enabled_yn = #{enabledYn}, icon_url = #{iconUrl},
     sort_order = #{sortOrder}, name_tree = #{nameTree}, id_tree = #{idTree}, page_id = #{pageId} WHERE id = #{id};
   </update>
 
