@@ -22,18 +22,14 @@
 
   <!-- 조직도 트리 : 회사 리스트-->
   <select id="getBasicCompList" resultType="com.example.backend.modal.dto.TreeItemRes">
-    (SELECT id, par_id, name, sort_order, id AS comp_id, 'comp' AS type FROM company WHERE par_id = (
-    SELECT
-      CASE
-        WHEN LOCATE('>', id_tree) = 0 OR LOCATE('>', id_tree) IS NULL THEN id_tree
-        ELSE SUBSTRING(id_tree, 1, LOCATE('>', id_tree) - 1)
-      END AS head_id
-    FROM company
-    WHERE id = #{compId})
-    AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC)
-    UNION
-    (SELECT id, par_id, name, sort_order, comp_id, 'dept' AS type FROM department
-    WHERE par_id = id and comp_id = #{compId} AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC);
+    (SELECT id, par_id, name, sort_order, id as comp_id, 'comp' AS TYPE from company WHERE par_id = (
+    SELECT CASE WHEN LOCATE('>', id_tree) = 0 or LOCATE('>', id_tree) IS NULL THEN id_tree
+    ELSE SUBSTRING(id_tree, 1, LOCATE('>', id_tree) - 1) END AS head_id FROM company WHERE id = #{compId})
+    AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC) UNION
+    (SELECT id, par_id, name, sort_order, comp_id, 'dept' as type from department
+    WHERE par_id = id AND comp_id = (SELECT CASE WHEN LOCATE('>', id_tree) = 0 or LOCATE('>', id_tree) IS NULL THEN id_tree
+    ELSE SUBSTRING(id_tree, 1, LOCATE('>', id_tree) - 1) END AS head_id FROM company
+    WHERE id = #{compId}) AND enabled_yn = 1 AND deleted_yn = 0 ORDER BY sort_order DESC);
   </select>
 
   <!-- 조직도 트리 : 회사 선택 시 부서 -->
@@ -65,15 +61,17 @@
 
   <!-- 사원 리스트 : 부서 선택 시 -->
   <select id="getEmpListByDeptId" resultType="com.example.backend.modal.dto.EmpList">
-    SELECT employee.name AS emp_name, company.name AS comp_name, department.name AS dept_name,
-    employee.position, user.login_id, employee.mobile_number AS number, priv_email AS email, image_url FROM employee_department
-    INNER JOIN department ON employee_department.transferred_yn = 0 AND department.deleted_yn = 0
-    AND employee_department.dept_id = #{deptId} AND department.id = employee_department.dept_id
-    INNER JOIN employee_company ON employee_department.emp_id = employee_company.emp_id AND
+    SELECT employee.name as emp_name, company.name AS comp_name, department.name AS dept_name,
+    employee.position, login_id, employee.mobile_number AS number, priv_email AS email, image_url FROM employee
+    INNER JOIN employee_department ON employee_department.transferred_yn = 0 AND employee_department.dept_id = #{deptId}
+    AND employee.id = employee_department.emp_id
+    INNER JOIN employee_department AS ed ON ed.transferred_yn = 0 AND employee.id = ed.emp_id AND ed.org = 1
+    INNER JOIN employee_company ON employee.id = employee_company.emp_id AND
     employee_company.deleted_yn = 0 AND employee_company.resigned_yn = 0 AND employee_company.comp_id = #{compId}
-    INNER JOIN company ON employee_company.comp_id = company.id AND company.enabled_yn = 1 AND company.deleted_yn = 0
-    INNER JOIN employee ON employee_department.emp_id = employee.id AND employee.account_yn = 1 AND employee.deleted_yn = 0
-    INNER JOIN user ON employee.user_id = user.id AND user.deleted_yn = 0 ;
+    LEFT JOIN department ON department.deleted_yn = 0 AND department.id=ed.dept_id
+    LEFT JOIN company ON employee_company.comp_id = company.id AND company.enabled_yn = 1 AND company.deleted_yn = 0
+    LEFT JOIN user ON employee.user_id = user.id and user.deleted_yn = 0
+    WHERE employee.account_yn = 1 AND employee.deleted_yn = 0 ;
   </select>
 
   <!-- 조직도 검색 (전체 옵션 - 부서) -->

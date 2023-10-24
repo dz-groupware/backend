@@ -43,7 +43,7 @@ public class MenuServiceImpl implements MenuService {
   public List<MenuDto> getFavorByEmpId() {
     Long compId = SecurityUtil.getCompanyId();
     if(Boolean.TRUE.equals(SecurityUtil.getMasterYn())) {
-      return menuMapper.getFavorForMaster(compId);
+      return menuMapper.getFavorForMaster(SecurityUtil.getEmployeeId());
     } else {
       return menuMapper.getFavorByEmpId(SecurityUtil.getEmployeeId(), compId, SecurityUtil.getDepartmentId());
     }
