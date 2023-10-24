@@ -14,7 +14,7 @@ public interface MenuMapper {
   List<MenuDto> getGnbByEmpId(Long empId, Long compId, Long deptId);
   List<MenuDto> getGnbForMaster(Long compId);
   List<MenuDto> getFavorByEmpId(Long empId, Long compId, Long deptId);
-  List<MenuDto> getFavorForMaster(Long compId);
+  List<MenuDto> getFavorForMaster(Long empId);
   int removeFavor(Long empId, Long menuId);
   List<MenuDto> getMenuById(Long menuId, Long empId, Long compId, Long deptId);
   List<MenuDto> getMenuForMaster(Long menuId, Long compId);
