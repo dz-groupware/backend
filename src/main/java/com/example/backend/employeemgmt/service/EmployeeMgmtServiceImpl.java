@@ -90,17 +90,15 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
             if (detailList.isEmpty() && userId != null) { // detailList가 비어 있고, userId가 존재하는 경우
             // 입사일처리
                 System.out.println("did u come here");
-                List<Long> empIds = employeeMgmtMapper.getEmployeeIdForJoinDate(userId);
-                System.out.println("did u check? getEmployeeIdForJoinDate"+empIds);
-                for(Long empId : empIds) {
-                    Date joinDate = employeeMgmtMapper.getJoinDateForDetails(empId, companyId);
-                    System.out.println("joindatedetails" + empId+"hey"+ joinDate);
+
+                Date joinDate = employeeMgmtMapper.getEmployeeIdForJoinDate(userId,companyId);
+
                     EmployeeMgmtResDto basicDetails = employeeMgmtMapper.getEmployeeMgmtOnlyBasicDetails(userId,joinDate);
                     if (basicDetails != null) {
                         results.add(basicDetails);
                     }
 
-                }
+
 
         }
 
@@ -333,9 +331,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     public void removeEmployeeMgmt(Long id, EmployeeMgmtReqDto employeeMgmt) {
 
         Long userId = employeeMgmt.getId();
+        System.out.println("what is user Id"+userId);
         List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
 
         for (Long empId : employeeIds) {
+            System.out.println("what is empId"+empId);
+
             employeeMgmt.setDeletedYn(true);
 // 대표가 아닐 때만 removeEmployeeMgmtEmployeeDepartment 매퍼를 호출
             if (!"대표".equals(employeeMgmt.getPosition())) {

@@ -97,11 +97,9 @@ public interface EmployeeMgmtMapper {
 
     List<Long> getEmployeeByUserId(Long userId);
 
-    Date getJoinDateForDetails(@Param("empId") Long empId,@Param("companyId") Long companyId);
 
-    List<Long> getEmployeeIdForJoinDate(Long userId);
+    Date getEmployeeIdForJoinDate(@Param("userId") Long userId,@Param("companyId") Long companyId);
 
-    List<EmployeeMgmtListResDto> checkSignUpWithCompanyId(@Param("dto")EmployeeMgmtSignUpReqDto employeeMgmt, @Param("companyId")Long companyId);
 
     void modifyEmployeeMgmtEmployeeCompanySameWithLogIn(@Param("empId")Long empId, @Param("resignedYn")Boolean resignedYn, @Param("dto")EmployeeMgmtReqDto employeeMgmt,@Param("companyId") Long companyId);
 }
