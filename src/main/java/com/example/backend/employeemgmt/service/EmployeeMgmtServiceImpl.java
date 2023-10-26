@@ -331,9 +331,12 @@ public class EmployeeMgmtServiceImpl implements EmployeeMgmtService {
     public void removeEmployeeMgmt(Long id, EmployeeMgmtReqDto employeeMgmt) {
 
         Long userId = employeeMgmt.getId();
+        System.out.println("what is user Id"+userId);
         List<Long> employeeIds = employeeMgmtMapper.getEmployeeIdsByUserId(userId);
 
         for (Long empId : employeeIds) {
+            System.out.println("what is empId"+empId);
+
             employeeMgmt.setDeletedYn(true);
 // 대표가 아닐 때만 removeEmployeeMgmtEmployeeDepartment 매퍼를 호출
             if (!"대표".equals(employeeMgmt.getPosition())) {

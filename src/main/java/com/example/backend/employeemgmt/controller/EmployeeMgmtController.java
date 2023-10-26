@@ -98,7 +98,7 @@ public class EmployeeMgmtController {
     }
 
     @PutMapping("/del/{id}")
-    public ResponseEntity removeEmployeeMgmt(@PathVariable Long id ,@RequestBody EmployeeMgmtReqDto employeeMgmt) {
+    public ResponseEntity removeEmployeeMgmt(@PathVariable("id") Long id ,@RequestBody EmployeeMgmtReqDto employeeMgmt) {
         employeeMgmtService.removeEmployeeMgmt(id,employeeMgmt);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
